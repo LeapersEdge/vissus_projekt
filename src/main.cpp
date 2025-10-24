@@ -1,6 +1,7 @@
 #include <cstdio>
 
 #include "rclcpp/rclcpp.hpp"
+#include "std_msgs/msg/string.hpp"
 #include <chrono>
 #include <memory>
 
