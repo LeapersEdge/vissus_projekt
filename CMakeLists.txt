@@ -30,6 +30,13 @@ endif()
 #------------------------------------------
 #------------------------------------------
 #------------------------------------------
+
+# msg stuff
+rosidl_generate_interfaces(${PROJECT_NAME}
+  "msg/OdometryArray.msg"
+  DEPENDENCIES std_msgs nav_msgs
+)
+
 # cpp stuff
 
 # find all .cpp files to compile
