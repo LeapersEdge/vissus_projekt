@@ -320,12 +320,7 @@ void Boit_Controller_Node::Subscription_Odom_Callback(const Msg_Odom::SharedPtr 
         // UPITNO za delta_linear_x jeli ok izracunati accel u namjenjenom za vremenski interval (t+1)-(t) 
         // a koristiti dt=(t)-(t-1)
         //
-        // Dinov komentar: misl
-            accel_containment.y = -this->containment_force_;
-        if (boit_id_pose.y < -4.9*0.8)
-            accel_containment.y = this->containment_force_;
-        
-        accel_total.x = im da je ok jer je simulation refresh rate nadam se capped na necemu
+        // Dinov komentar: mislim da je ok jer je simulation refresh rate nadam se capped na necemu
         float delta_angular_z = p_controller_update(
                     atan2(accel_total.y, accel_total.x), 
                     boits[id].last_rotation, 
@@ -377,8 +372,59 @@ Vector2 Boit_Controller_Node::Calculate_Force_Alignment(uint boit_id)
             boit_i_pose.y - boit_id_pose.y
         };
     
+        // is the boit[i] close enough to boit[id] take effect on it?
+        if (squared_euclidan_norm(distance) <= (this->alignment_range_ * this->alignment_range_))
+        {
+            // linear component of linear+angular pair
+            float boit_i_lin = boits[i].odom.twist.twist.linear.x;
+            float boit_id_lin = boits[boit_id].odom.twist.twist.linear.x;
 
+            // -calculating jaw based on quaternion data
+            // -x and y are unneccessary because were only rotating around jaw so they are always 0
+            // -full function if ever needed:
+            // // float boit_i_rot = atan2(2.0f * (w * z + x * y), w * w + x * x - y * y - z * z);
+            float z = (float)boits[i].odom.pose.pose.orientation.z;
+            float w = (float)boits[i].odom.pose.pose.orientation.w;
+            float boit_i_rot = atan2(2.0f * (w * z), w * w - z * z);
+            z = (float)boits[boit_id].odom.pose.pose.orientation.z;
+            w = (float)boits[boit_id].odom.pose.pose.orientation.w;
+            float boit_id_rot = atan2(2.0f * (w * z), w * w - z * z);
+
+            // -jaw = 0° is to the right of the screen
+            // -positive rotation axis is right handed if Z goes outside the screen
+            // -positive X is right, positive Y is up
+
+            // -we only calculate linear_xy vectors based on magnitude and rotation
+            // because angular velocity doesnt have affect on current_velocity_xy vector
+            // -angular velocity is only needed for rotating the vessel which we will
+            // calculate for actuation purposes, and not guidence, as it can be looked at as
+            // acceleration thats affecting the magnitude vector in global frame 
+            // (changes its value overtime in global frame, yes, twist.linear is in
+            // local coordinate frame)
+            Vector2 boit_i_vel_lin = {
+                (float)cos(boit_i_rot)*boit_i_lin,
+                (float)sin(boit_i_rot)*boit_i_lin,
+            };
+            Vector2 boit_id_vel_lin = {
+                (float)cos(boit_id_rot)*boit_id_lin,
+                (float)sin(boit_id_rot)*boit_id_lin,
+            };
+
+            force_alignment.x += boit_i_vel_lin.x - boit_id_vel_lin.x;
+            force_alignment.y += boit_i_vel_lin.y - boit_id_vel_lin.y;
+
+            ++alignment_neighbours_count;
+        }
     }
+    
+    if (alignment_neighbours_count != 0)
+    {
+        force_alignment.x /= alignment_neighbours_count;
+        force_alignment.y /= alignment_neighbours_count;
+    }
+    
+    force_alignment.x *= alignment_factor_;
+    force_alignment.y *= alignment_factor_;
 
     return force_alignment;
 }
@@ -408,8 +454,16 @@ Vector2 Boit_Controller_Node::Calculate_Force_Avoidence(uint boit_id)
             boit_i_pose.y - boit_id_pose.y
         };
     
-
+        // is the boit[i] close enough to boit[id] take effect on it?
+        if (squared_euclidan_norm(distance) <= (this->avoidance_range_ * this->avoidance_range_))
+        {
+            force_avoidence.x += distance.x / (squared_euclidan_norm(distance));
+            force_avoidence.y += distance.y / (squared_euclidan_norm(distance));
+        }
     }
+
+    force_avoidence.x *= avoidance_factor_;
+    force_avoidence.y *= avoidance_factor_;
 
     return force_avoidence;
 }
@@ -447,6 +501,15 @@ Vector2 Boit_Controller_Node::Calculate_Force_Cohesion(uint boit_id)
             ++cohesion_neighbours_count;
         }
     }
+
+    if (cohesion_neighbours_count != 0)
+    {
+        force_cohesion.x /= cohesion_neighbours_count;
+        force_cohesion.y /= cohesion_neighbours_count;
+    }
+
+    force_cohesion.x *= cohesion_factor_;
+    force_cohesion.y *= cohesion_factor_;
 
     return force_cohesion;
 }
