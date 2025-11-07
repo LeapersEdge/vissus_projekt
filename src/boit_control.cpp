@@ -318,7 +318,12 @@ void Boit_Controller_Node::Subscription_Odom_Callback(const Msg_Odom::SharedPtr 
         // UPITNO za delta_linear_x jeli ok izracunati accel u namjenjenom za vremenski interval (t+1)-(t) 
         // a koristiti dt=(t)-(t-1)
         //
-        // Dinov komentar: mislim da je ok jer je simulation refresh rate nadam se capped na necemu
+        // Dinov komentar: misl
+            accel_containment.y = -this->containment_force_;
+        if (boit_id_pose.y < -4.9*0.8)
+            accel_containment.y = this->containment_force_;
+        
+        accel_total.x = im da je ok jer je simulation refresh rate nadam se capped na necemu
         float delta_angular_z = p_controller_update(
                     atan2(accel_total.y, accel_total.x), 
                     boits[id].last_rotation, 
