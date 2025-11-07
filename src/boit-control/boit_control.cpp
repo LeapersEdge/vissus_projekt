@@ -117,6 +117,14 @@ private:
 
 };
 
+int main(int argc, char *argv[])
+{
+    rclcpp::init(argc, argv);
+    rclcpp::spin(std::make_shared<Boit_Controller_Node>());
+    rclcpp::shutdown();
+    return 0;
+}
+
 // ALL BOITS LOGIC HAPPENS HERE
 void Boit_Controller_Node::Subscription_Odom_Callback(const Msg_Odom::SharedPtr odom, uint id)
 {
