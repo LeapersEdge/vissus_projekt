@@ -14,6 +14,8 @@ find_package(rclpy REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(nav_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
+find_package(rosidl_default_generators REQUIRED)
+
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
@@ -44,16 +46,27 @@ file(GLOB_RECURSE MY_SOURCES CONFIGURE_DEPENDS
     "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
 )
 
-# compile and link cpp_exec
-add_executable(cpp_exec "${MY_SOURCES}")
-ament_target_dependencies(cpp_exec rclcpp std_msgs nav_msgs geometry_msgs)
+# compile and link boid_control
+add_executable(boid_control "${MY_SOURCES}")
+ament_target_dependencies(boid_control rclcpp std_msgs nav_msgs geometry_msgs)
+
+# compile and link goal_pub
+add_executable(goal_pub "${MY_SOURCES}")
+ament_target_dependencies(goal_pub rclcpp std_msgs nav_msgs geometry_msgs)
 
 # add includes for .cpp
-target_include_directories(cpp_exec PUBLIC
+target_include_directories(boid_control PUBLIC
     "${CMAKE_CURRENT_SOURCE_DIR}/include/"
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>)
-target_compile_features(cpp_exec PUBLIC c_std_99 cxx_std_17)
+target_compile_features(boid_control PUBLIC c_std_99 cxx_std_17)
+
+# add includes for .cpp
+target_include_directories(goal_pub PUBLIC
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/"
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include>)
+target_compile_features(goal_pub PUBLIC c_std_99 cxx_std_17)
 
 #------------------------------------------
 #------------------------------------------
@@ -72,9 +85,15 @@ file(GLOB_RECURSE MY_SCRIPTS CONFIGURE_DEPENDS
 #------------------------------------------
 # install stuff
 
-# install cpp exec
+# install boid_control
 install(TARGETS
-    cpp_exec
+    boid_control
+    DESTINATION lib/${PROJECT_NAME}
+)
+
+# install goal_pub
+install(TARGETS
+    goal_pub
     DESTINATION lib/${PROJECT_NAME}
 )
 
