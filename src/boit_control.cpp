@@ -94,7 +94,11 @@ public:
             boits.push_back(boit);
         }
     }
-    void Subscription_Odom_Callback(const Msg_Odom::SharedPtr odom, int id);   // ALL BOITS LOGIC HAPPENS HERE
+private:
+    void Subscription_Odom_Callback(const Msg_Odom::SharedPtr odom, uint id);   // ALL BOITS LOGIC HAPPENS HERE
+    Vector2 Calculate_Force_Alignment(uint boit_id);
+    Vector2 Calculate_Force_Avoidence(uint boit_id);
+    Vector2 Calculate_Force_Cohesion(uint boit_id);
 
 private:
     std::vector<Boit> boits;
@@ -125,10 +129,8 @@ int main(int argc, char **argv)
     return 0;
 }
 
-
-
 // ALL BOITS LOGIC HAPPENS HERE
-void Boit_Controller_Node::Subscription_Odom_Callback(const Msg_Odom::SharedPtr odom, int id)
+void Boit_Controller_Node::Subscription_Odom_Callback(const Msg_Odom::SharedPtr odom, uint id)
 {
     assert(id < boits.size() && "boit id should not surpass the size of boits container");
     
@@ -348,3 +350,104 @@ void Boit_Controller_Node::Subscription_Odom_Callback(const Msg_Odom::SharedPtr 
     
     boits[id].last_time = clock();  // this is for delta_time to work
 }
+
+Vector2 Boit_Controller_Node::Calculate_Force_Alignment(uint boit_id)
+{
+    Vector2 force_alignment = {};
+    uint alignment_neighbours_count = 0;
+
+    Vector2 boit_id_pose = {
+        (float)boits[boit_id].odom.pose.pose.position.x,
+        (float)boits[boit_id].odom.pose.pose.position.y,
+    };
+    
+    for (uint i = 0; i < boits.size(); ++i)
+    {
+        // skip calculations with itself
+        if (i == boit_id)
+            continue;
+
+        Vector2 boit_i_pose = {
+            (float)boits[i].odom.pose.pose.position.x,
+            (float)boits[i].odom.pose.pose.position.y,
+        };
+        // distance between boit[id] and boit[i] 
+        Vector2 distance = {
+            boit_i_pose.x - boit_id_pose.x,
+            boit_i_pose.y - boit_id_pose.y
+        };
+    
+
+    }
+
+    return force_alignment;
+}
+
+Vector2 Boit_Controller_Node::Calculate_Force_Avoidence(uint boit_id)
+{
+    Vector2 force_avoidence = {};
+
+    Vector2 boit_id_pose = {
+        (float)boits[boit_id].odom.pose.pose.position.x,
+        (float)boits[boit_id].odom.pose.pose.position.y,
+    };
+
+    for (uint i = 0; i < boits.size(); ++i)
+    {
+        // skip calculations with itself
+        if (i == boit_id)
+            continue;
+
+        Vector2 boit_i_pose = {
+            (float)boits[i].odom.pose.pose.position.x,
+            (float)boits[i].odom.pose.pose.position.y,
+        };
+        // distance between boit[id] and boit[i] 
+        Vector2 distance = {
+            boit_i_pose.x - boit_id_pose.x,
+            boit_i_pose.y - boit_id_pose.y
+        };
+    
+
+    }
+
+    return force_avoidence;
+}
+
+Vector2 Boit_Controller_Node::Calculate_Force_Cohesion(uint boit_id)
+{
+    Vector2 force_cohesion = {};
+    uint cohesion_neighbours_count = 0;
+    
+    Vector2 boit_id_pose = {
+        (float)boits[boit_id].odom.pose.pose.position.x,
+        (float)boits[boit_id].odom.pose.pose.position.y,
+    };
+    
+    for (uint i = 0; i < boits.size(); ++i)
+    {
+        // skip calculations with itself
+        if (i == boit_id)
+            continue;
+
+        Vector2 boit_i_pose = {
+            (float)boits[i].odom.pose.pose.position.x,
+            (float)boits[i].odom.pose.pose.position.y,
+        };
+        // distance between boit[id] and boit[i] 
+        Vector2 distance = {
+            boit_i_pose.x - boit_id_pose.x,
+            boit_i_pose.y - boit_id_pose.y
+        };
+    
+        if (squared_euclidan_norm(distance) <= (this->cohesion_range_ * this->cohesion_range_))
+        {
+            force_cohesion.x += distance.x;
+            force_cohesion.y += distance.y;
+            ++cohesion_neighbours_count;
+        }
+    }
+
+    return force_cohesion;
+}
+
