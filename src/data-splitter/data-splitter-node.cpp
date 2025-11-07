@@ -1,4 +1,5 @@
 #include "data-splitter/data-splitter-node.hpp"
+#include "vissus_projekt/msg/odometry_array.hpp"
 
 int main(int argc, char *argv[])
 {

@@ -58,14 +58,21 @@ file(GLOB_RECURSE MY_SRC_DATA_SPLITTER CONFIGURE_DEPENDS
 # compile and link boid_control
 add_executable(boid_control "${MY_SRC}" "${MY_SRC_BOIT_CONTROL}")
 ament_target_dependencies(boid_control rclcpp std_msgs nav_msgs geometry_msgs)
+rosidl_target_interfaces(boid_control
+  ${PROJECT_NAME} "rosidl_typesupport_cpp")
+
 
 # compile and link goal_pub
 add_executable(goal_pub "${MY_SRC}" "${MY_SRC_GOAL_PUB}")
 ament_target_dependencies(goal_pub rclcpp std_msgs nav_msgs geometry_msgs)
+rosidl_target_interfaces(goal_pub
+  ${PROJECT_NAME} "rosidl_typesupport_cpp")
 
 # compile and link data-splitter
 add_executable(data_splitter "${MY_SRC}" "${MY_SRC_DATA_SPLITTER}")
 ament_target_dependencies(data_splitter rclcpp std_msgs nav_msgs geometry_msgs)
+rosidl_target_interfaces(data_splitter
+  ${PROJECT_NAME} "rosidl_typesupport_cpp")
 
 # add includes for .cpp
 target_include_directories(boid_control PUBLIC
@@ -134,5 +141,6 @@ install(
   DIRECTORY launch
   DESTINATION share/${PROJECT_NAME}/
 )
+ament_export_dependencies(rosidl_default_runtime)
 
 ament_package()
