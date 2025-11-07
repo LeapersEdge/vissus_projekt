@@ -12,6 +12,8 @@ find_package(ament_cmake_python REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rclpy REQUIRED)
 find_package(std_msgs REQUIRED)
+find_package(nav_msgs REQUIRED)
+find_package(geometry_msgs REQUIRED)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
@@ -37,7 +39,7 @@ file(GLOB_RECURSE MY_SOURCES CONFIGURE_DEPENDS
 
 # compile and link cpp_exec
 add_executable(cpp_exec "${MY_SOURCES}")
-ament_target_dependencies(cpp_exec rclcpp std_msgs)
+ament_target_dependencies(cpp_exec rclcpp std_msgs nav_msgs geometry_msgs)
 
 # add incldues for .cpp
 target_include_directories(cpp_exec PUBLIC
@@ -45,12 +47,6 @@ target_include_directories(cpp_exec PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>)
 target_compile_features(cpp_exec PUBLIC c_std_99 cxx_std_17)
-
-# install cpp exec
-install(TARGETS
-    cpp_exec
-    DESTINATION lib/${PROJECT_NAME}
-)
 
 #------------------------------------------
 #------------------------------------------
@@ -64,10 +60,27 @@ file(GLOB_RECURSE MY_SCRIPTS CONFIGURE_DEPENDS
     "${CMAKE_CURRENT_SOURCE_DIR}/scripts/*.py"
 )
 
+#------------------------------------------
+#------------------------------------------
+#------------------------------------------
+# install stuff
+
+# install cpp exec
+install(TARGETS
+    cpp_exec
+    DESTINATION lib/${PROJECT_NAME}
+)
+
 # install py scripts
 install(PROGRAMS
   "${MY_SCRIPTS}" 
   DESTINATION lib/${PROJECT_NAME}
+)
+
+# install launch scripts
+install(
+  DIRECTORY launch
+  DESTINATION share/${PROJECT_NAME}/
 )
 
 ament_package()
