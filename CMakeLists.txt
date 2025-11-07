@@ -42,17 +42,30 @@ rosidl_generate_interfaces(${PROJECT_NAME}
 # cpp stuff
 
 # find all .cpp files to compile
-file(GLOB_RECURSE MY_SOURCES CONFIGURE_DEPENDS
+file(GLOB MY_SRC CONFIGURE_DEPENDS
     "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
+)
+file(GLOB_RECURSE MY_SRC_GOAL_PUB CONFIGURE_DEPENDS
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/goal-pub/*.cpp"
+)
+file(GLOB_RECURSE MY_SRC_BOIT_CONTROL CONFIGURE_DEPENDS
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/boit-control/*.cpp"
+)
+file(GLOB_RECURSE MY_SRC_DATA_SPLITTER CONFIGURE_DEPENDS
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/data-splitter/*.cpp"
 )
 
 # compile and link boid_control
-add_executable(boid_control "${MY_SOURCES}")
+add_executable(boid_control "${MY_SRC}" "${MY_SRC_BOIT_CONTROL}")
 ament_target_dependencies(boid_control rclcpp std_msgs nav_msgs geometry_msgs)
 
 # compile and link goal_pub
-add_executable(goal_pub "${MY_SOURCES}")
+add_executable(goal_pub "${MY_SRC}" "${MY_SRC_GOAL_PUB}")
 ament_target_dependencies(goal_pub rclcpp std_msgs nav_msgs geometry_msgs)
+
+# compile and link data-splitter
+add_executable(data_splitter "${MY_SRC}" "${MY_SRC_DATA_SPLITTER}")
+ament_target_dependencies(data_splitter rclcpp std_msgs nav_msgs geometry_msgs)
 
 # add includes for .cpp
 target_include_directories(boid_control PUBLIC
@@ -67,6 +80,13 @@ target_include_directories(goal_pub PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>)
 target_compile_features(goal_pub PUBLIC c_std_99 cxx_std_17)
+
+# add includes for .cpp
+target_include_directories(data_splitter PUBLIC
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/"
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include>)
+target_compile_features(data_splitter PUBLIC c_std_99 cxx_std_17)
 
 #------------------------------------------
 #------------------------------------------
@@ -94,6 +114,12 @@ install(TARGETS
 # install goal_pub
 install(TARGETS
     goal_pub
+    DESTINATION lib/${PROJECT_NAME}
+)
+
+# install data_splitter
+install(TARGETS
+    data_splitter
     DESTINATION lib/${PROJECT_NAME}
 )
 

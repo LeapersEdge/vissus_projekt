@@ -1,17 +1,9 @@
+#include "utils.h"
 #include <cmath>
 #include <cstdio>
-#include <chrono>
 #include <cstdlib>
 #include <ctime>
-#include <memory>
 #include <string>
-#include <vector>
-
-struct Vector2
-{
-    float x = 0.0f;
-    float y = 0.0f;
-};
 
 float squared_euclidan_norm(Vector2 vec)
 {

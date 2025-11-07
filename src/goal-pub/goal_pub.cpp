@@ -8,6 +8,7 @@
 #include "rclcpp/rclcpp.hpp"
 #include "nav_msgs/msg/odometry.hpp"
 #include "utils.h"
+#include "defines.h"
 
 using namespace std::chrono_literals;
 
@@ -44,7 +45,7 @@ public:
         odom_msg_.pose.pose.position.y = goal_.y;
         odom_msg_.pose.pose.position.z = 0.0;
 
-        publisher_ = this->create_publisher<Odom_Msg>("/goal_odom", 10);
+        publisher_ = this->create_publisher<Msg_Odom>("/goal_odom", 10);
 
         timer_ = this->create_wall_timer(
             500ms, std::bind(&MinimalPublisher::timer_callback, this));
