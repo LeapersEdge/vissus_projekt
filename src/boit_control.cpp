@@ -12,6 +12,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include "utils.h"
 
 // ctrl+f material (section keywords):
 //
@@ -30,55 +31,10 @@
 #define DEFAULT_RANGE_ALIGNMENT 1.0f
 #define DEFAULT_RANGE_AVOIDANCE 1.0f
 
-static float rotation_kp = 0.0f;
-static float containment_force = 0.0f;
-static float cohesion_range = DEFAULT_RANGE_COHESION;
-static float cohesion_factor = 0.0f;
-static float alignment_range = DEFAULT_RANGE_ALIGNMENT;
-static float alignment_factor = 0.0f;
-static float avoidance_range = DEFAULT_RANGE_AVOIDANCE;
-static float avoidance_factor = 0.0f;
-
-using std::placeholders::_1;
-
-// msg typedef
-typedef geometry_msgs::msg::Twist Msg_Twist;
-typedef nav_msgs::msg::Odometry Msg_Odom;
-// pubs/subs typedef
-typedef rclcpp::Publisher<Msg_Twist>::SharedPtr Publisher_Twist;
-typedef rclcpp::Subscription<Msg_Odom>::SharedPtr Subscription_Odom;
-
 // --------------------------------------------------------------
 // HELPER STRUCTS
 
-struct Vector2
-{
-    float x = 0.0f;
-    float y = 0.0f;
-};
-
-
-struct Boit
-{
-    Msg_Odom odom;
-    bool initialized = false;
-    float last_rotation = 0.0f; 
-    clock_t last_time = 0;
-};
-
-// --------------------------------------------------------------
-// HELPER FUNCTION DECLARATIONS
-
-// check if "string" contains "substring"
-bool string_contains(std::string string, std::string substring);
-// extracts first numers from string (doesnt have to be continues) and returns unsigned int
-// if no pattern, return 0
-uint parse_number_from_string(std::string string);
-float squared_euclidan_norm(Vector2 vec);
-float p_controller_update(float reference, float state, float kp);
-
-// --------------------------------------------------------------
-// ROS2 NODE
+using std::placeholders::_1;
 
 class Boit_Controller_Node : public rclcpp::Node
 {
@@ -86,6 +42,15 @@ public:
     Boit_Controller_Node() : Node("boit_controller_node")
     {
         // get all available topics and extract highest <number> from topics with "robot_<number>/odom" 
+        rotation_kp_        = this->declare_parameter<float>("rotation_kp", 0.0f);
+        containment_force_  = this->declare_parameter<float>("containment_force", 0.0f);
+        cohesion_range_     = this->declare_parameter<float>("cohesion_range", DEFAULT_RANGE_COHESION);
+        cohesion_factor_    = this->declare_parameter<float>("cohesion_factor", 0.0f);
+        alignment_range_    = this->declare_parameter<float>("alignment_range", DEFAULT_RANGE_ALIGNMENT);
+        alignment_factor_   = this->declare_parameter<float>("alignment_factor", 0.0f);
+        avoidance_range_    = this->declare_parameter<float>("avoidance_range", DEFAULT_RANGE_AVOIDANCE);
+        avoidance_factor_   = this->declare_parameter<float>("avoidance_factor", 0.0f);
+
         uint highest_robot_id = 0;
         {
             auto topics = get_topic_names_and_types();
@@ -107,11 +72,12 @@ public:
             std::string robot_odom_topic = "/robot_" + std::to_string(i) + "/odom";
             std::string robot_twist_topic = "/robot_" + std::to_string(i) + "/cmd_vel";
         
-            // init sub
             Subscription_Odom sub = this->create_subscription<Msg_Odom>(
                     robot_odom_topic, 
                     10, 
-                    std::bind(&Boit_Controller_Node::Subscription_Odom_Callback, this, _1, i)
+                    [this, i](const Msg_Odom::SharedPtr msg) {
+                        this->Subscription_Odom_Callback(msg, i);
+                    }
                 ); 
             subs.push_back(sub);
             
@@ -128,12 +94,23 @@ public:
             boits.push_back(boit);
         }
     }
+    void Subscription_Odom_Callback(const Msg_Odom::SharedPtr odom, int id);   // ALL BOITS LOGIC HAPPENS HERE
 
 private:
-    void Subscription_Odom_Callback(const Msg_Odom::SharedPtr odom, uint id);   // ALL BOITS LOGIC HAPPENS HERE
     std::vector<Boit> boits;
     std::vector<Publisher_Twist> pubs;
     std::vector<Subscription_Odom> subs;
+
+    //parameters definitions
+    float rotation_kp_;
+    float containment_force_;
+    float cohesion_range_;
+    float cohesion_factor_;
+    float alignment_range_;
+    float alignment_factor_;
+    float avoidance_range_;
+    float avoidance_factor_;
+
 };
 
 // --------------------------------------------------------------
@@ -148,32 +125,10 @@ int main(int argc, char **argv)
     return 0;
 }
 
-// --------------------------------------------------------------
-// FUNCTION DEFFINITIONS
 
-bool string_contains(std::string string, std::string substring)
-{
-    if (string.find(substring) != std::string::npos) 
-        return true;
-    return false;
-}
-
-uint parse_number_from_string(std::string string)
-{
-    std::string num = "";
-    for (const char c : string)
-    {
-        if (c >= '0' && c <= '9')
-            num += c;
-    }
-
-    if (num != "")
-        return std::stoul(num);
-    return 0;
-}
 
 // ALL BOITS LOGIC HAPPENS HERE
-void Boit_Controller_Node::Subscription_Odom_Callback(const Msg_Odom::SharedPtr odom, uint id)
+void Boit_Controller_Node::Subscription_Odom_Callback(const Msg_Odom::SharedPtr odom, int id)
 {
     assert(id < boits.size() && "boit id should not surpass the size of boits container");
     
@@ -233,7 +188,7 @@ void Boit_Controller_Node::Subscription_Odom_Callback(const Msg_Odom::SharedPtr 
         // calculate cohesion interactions
         {
             // is the boit[i] close enough to boit[id] take effect on it?
-            if (squared_euclidan_norm(distance) <= (cohesion_range * cohesion_range))
+            if (squared_euclidan_norm(distance) <= (this->cohesion_range_ * this->cohesion_range_))
             {
                 cohesion_center.x += distance.x;
                 cohesion_center.y += distance.y;
@@ -244,7 +199,7 @@ void Boit_Controller_Node::Subscription_Odom_Callback(const Msg_Odom::SharedPtr 
         // calculate alignment interactions 
         {
             // is the boit[i] close enough to boit[id] take effect on it?
-            if (squared_euclidan_norm(distance) <= (alignment_range * alignment_range))
+            if (squared_euclidan_norm(distance) <= (this->alignment_range_ * this->alignment_range_))
             {
                 // linear component of linear+angular pair
                 float boit_i_lin = boits[i].odom.twist.twist.linear.x;
@@ -291,7 +246,7 @@ void Boit_Controller_Node::Subscription_Odom_Callback(const Msg_Odom::SharedPtr 
         // calculate avoidence interactions 
         {
             // is the boit[i] close enough to boit[id] take effect on it?
-            if (squared_euclidan_norm(distance) <= (avoidance_range * avoidance_range))
+            if (squared_euclidan_norm(distance) <= (this->avoidance_range_ * this->avoidance_range_))
             {
                 avoidance_strength.x += distance.x / (squared_euclidan_norm(distance));
                 avoidance_strength.y += distance.y / (squared_euclidan_norm(distance));
@@ -316,27 +271,27 @@ void Boit_Controller_Node::Subscription_Odom_Callback(const Msg_Odom::SharedPtr 
 
     // combine forces forces
     {
-        accel_align.x += alignment_center.x * alignment_factor;
-        accel_align.y += alignment_center.y * alignment_factor;
+        accel_align.x += alignment_center.x * this->alignment_factor_;
+        accel_align.y += alignment_center.y * this->alignment_factor_;
     
-        accel_avoid.x += avoidance_strength.x * avoidance_factor;
-        accel_avoid.y += avoidance_strength.y * avoidance_factor;
+        accel_avoid.x += avoidance_strength.x * this->avoidance_factor_;
+        accel_avoid.y += avoidance_strength.y * this->avoidance_factor_;
 
-        accel_cohes.x += cohesion_center.x * cohesion_factor;
-        accel_cohes.y += cohesion_center.y * cohesion_factor;
+        accel_cohes.x += cohesion_center.x * this->cohesion_factor_;
+        accel_cohes.y += cohesion_center.y * this->cohesion_factor_;
 
         // converts within 20% to the wall
         // working area ~~ X€<-4.9,4.9>, Y€<-4.9,4.9>
         
         Vector2 accel_containment = {};
         if (boit_id_pose.x > 4.9*0.8)
-            accel_containment.x = -containment_force;
+            accel_containment.x = -this->containment_force_;
         if (boit_id_pose.x < -4.9*0.8)
-            accel_containment.x = containment_force;
+            accel_containment.x = this->containment_force_;
         if (boit_id_pose.y > 4.9*0.8)
-            accel_containment.y = -containment_force;
+            accel_containment.y = -this->containment_force_;
         if (boit_id_pose.y < -4.9*0.8)
-            accel_containment.y = containment_force;
+            accel_containment.y = this->containment_force_;
         
         accel_total.x = 
             accel_align.x + 
@@ -367,7 +322,7 @@ void Boit_Controller_Node::Subscription_Odom_Callback(const Msg_Odom::SharedPtr 
         float delta_angular_z = p_controller_update(
                     atan2(accel_total.y, accel_total.x), 
                     boits[id].last_rotation, 
-                    rotation_kp
+                    this->rotation_kp_
                 );
 
 
@@ -387,14 +342,4 @@ void Boit_Controller_Node::Subscription_Odom_Callback(const Msg_Odom::SharedPtr 
     // end of boits logic
     
     boits[id].last_time = clock();  // this is for delta_time to work
-}
-
-float squared_euclidan_norm(Vector2 vec)
-{
-    return vec.x * vec.x + vec.y * vec.y;
-}
-
-float p_controller_update(float reference, float state, float kp)
-{
-    return (reference - state)*kp;
 }

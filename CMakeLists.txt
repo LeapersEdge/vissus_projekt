@@ -41,7 +41,7 @@ file(GLOB_RECURSE MY_SOURCES CONFIGURE_DEPENDS
 add_executable(cpp_exec "${MY_SOURCES}")
 ament_target_dependencies(cpp_exec rclcpp std_msgs nav_msgs geometry_msgs)
 
-# add incldues for .cpp
+# add includes for .cpp
 target_include_directories(cpp_exec PUBLIC
     "${CMAKE_CURRENT_SOURCE_DIR}/include/"
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>

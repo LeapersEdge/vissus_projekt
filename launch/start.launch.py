@@ -202,7 +202,8 @@ def generate_launch_description():
     """Generate the launch description."""
 
     # Check for --rviz argument
-    start_rviz_default = 'true' if '--rviz' in sys.argv else 'false'
+    #start_rviz_default = 'true' if '--rviz' in sys.argv else 'false'
+    start_rviz_default = 'true'
 
     return LaunchDescription([
         # Launch arguments
