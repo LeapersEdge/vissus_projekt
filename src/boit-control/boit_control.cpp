@@ -2,6 +2,7 @@
 #include <cmath>
 #include <csignal>
 #include <cstdio>
+#include "defines.h"
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/string.hpp"
 #include "nav_msgs/msg/odometry.hpp"
@@ -13,16 +14,6 @@
 #include <string>
 #include <vector>
 #include "utils.h"
-#include "vissus_projekt/msg/odometry_array.hpp"
-// ctrl+f material (section keywords):
-//
-// DEFINES, GLOBALS FOR TUNNING
-// HELPER STRUCTS
-// HELPER FUNCTION DECLARATIONS
-// ROS2 NODE
-// MAIN
-// FUNCTION DEFFINITIONS
-// ALL BOITS LOGIC HAPPENS HERE
 
 // --------------------------------------------------------------
 // DEFINES, GLOBALS FOR TUNNING
@@ -32,7 +23,7 @@
 #define DEFAULT_RANGE_AVOIDANCE 1.0f
 
 // --------------------------------------------------------------
-// HELPER STRUCTS
+// ROS2 NODE 
 
 using std::placeholders::_1;
 
@@ -69,14 +60,14 @@ public:
         // initialize all publishers, subscriptions and boits
         for (uint i = 0; i < highest_robot_id; ++i)
         {
-            std::string robot_odom_topic = "/robot_" + std::to_string(i) + "/odom";
             std::string robot_twist_topic = "/robot_" + std::to_string(i) + "/cmd_vel";
+            std::string robot_boit_info_topic = "/robot_" + std::to_string(i) + "/boit_info";
         
-            Subscription_Odom sub = this->create_subscription<Msg_Odom>(
-                    robot_odom_topic, 
+            Subscription_Boit_Info sub = this->create_subscription<Msg_Boit_Info>(
+                    robot_boit_info_topic, 
                     10, 
-                    [this, i](const Msg_Odom::SharedPtr msg) {
-                        this->Subscription_Odom_Callback(msg, i);
+                    [this, i](const Msg_Boit_Info::SharedPtr msg) {
+                        this->Subscription_Boit_Info_Callback(msg, i);
                     }
                 ); 
             subs.push_back(sub);
@@ -95,17 +86,17 @@ public:
         }
     }
 private:
-    void Subscription_Odom_Callback(const Msg_Odom::SharedPtr odom, uint id);   // ALL BOITS LOGIC HAPPENS HERE
-    Vector2 Calculate_Force_Alignment(uint boit_id);
-    Vector2 Calculate_Force_Avoidence(uint boit_id);
-    Vector2 Calculate_Force_Cohesion(uint boit_id);
+    void Subscription_Boit_Info_Callback(const Msg_Boit_Info::SharedPtr info, uint id);   // ALL BOITS LOGIC HAPPENS HERE
+    Vector2 Calculate_Accel_Alignment(std::vector<Msg_Odom> odoms);
+    Vector2 Calculate_Accel_Avoidence(std::vector<Msg_Odom> odoms);
+    Vector2 Calculate_Accel_Cohesion(std::vector<Msg_Odom> odoms);
 
 private:
     std::vector<Boit> boits;
     std::vector<Publisher_Twist> pubs;
-    std::vector<Subscription_Odom> subs;
+    std::vector<Subscription_Boit_Info> subs;
 
-    //parameters definitions
+    //parameters declarations 
     float rotation_kp_;
     float containment_force_;
     float cohesion_range_;
@@ -126,19 +117,19 @@ int main(int argc, char *argv[])
 }
 
 // ALL BOITS LOGIC HAPPENS HERE
-void Boit_Controller_Node::Subscription_Odom_Callback(const Msg_Odom::SharedPtr odom, uint id)
+void Boit_Controller_Node::Subscription_Boit_Info_Callback(const Msg_Boit_Info::SharedPtr info, uint id)
 {
     assert(id < boits.size() && "boit id should not surpass the size of boits container");
+    assert(info->odometries.size() && "info odom array should never be completely empty, odom of boit self is always the first element");
     
     // update information we have
-    boits[id].odom = *odom;
-    float z = odom->pose.pose.orientation.z;
-    float w = odom->pose.pose.orientation.w;
+    Msg_Odom self_odom = info->odometries[0];
+    float z = self_odom.pose.pose.orientation.z;
+    float w = self_odom.pose.pose.orientation.w;
     boits[id].last_rotation = atan2(2.0f * (w * z), w * w - z * z);
 
     if (!boits[id].initialized)
     {
-        boits[id].odom = *odom;
         boits[id].last_time = clock();
         boits[id].initialized = true;
         return;
@@ -147,149 +138,31 @@ void Boit_Controller_Node::Subscription_Odom_Callback(const Msg_Odom::SharedPtr 
     // ---------------------------------------------------------
     // boits logic
     
-    // helper variables
-    uint count_neighbour_cohesion = 0; 
-    uint count_neighbour_alignment = 0; 
-   
-    Vector2 cohesion_center = {};
-    Vector2 alignment_center = {};
-    Vector2 avoidance_strength = {};
-
-    Vector2 accel_align = {};
-    Vector2 accel_avoid = {};
-    Vector2 accel_cohes = {};
+    Vector2 accel_align = Calculate_Accel_Alignment(info->odometries); 
+    Vector2 accel_avoid = Calculate_Accel_Avoidence(info->odometries);
+    Vector2 accel_cohes = Calculate_Accel_Cohesion(info->odometries);
     Vector2 accel_total = {};
-
-    Vector2 boit_id_pose = {
-        (float)boits[id].odom.pose.pose.position.x,
-        (float)boits[id].odom.pose.pose.position.y,
-    };
-
-    // loop though all boits
-    // calculate 3 rules interactions
-    for (uint i = 0; i < boits.size(); ++i)
-    {
-        // skip calculations with itself
-        if (i == id)
-            continue;
-
-        Vector2 boit_i_pose = {
-            (float)boits[i].odom.pose.pose.position.x,
-            (float)boits[i].odom.pose.pose.position.y,
-        };
-        // distance between boit[id] and boit[i] 
-        Vector2 distance = {
-            boit_i_pose.x - boit_id_pose.x,
-            boit_i_pose.y - boit_id_pose.y
-        };
-
-        // calculate cohesion interactions
-        {
-            // is the boit[i] close enough to boit[id] take effect on it?
-            if (squared_euclidan_norm(distance) <= (this->cohesion_range_ * this->cohesion_range_))
-            {
-                cohesion_center.x += distance.x;
-                cohesion_center.y += distance.y;
-                ++count_neighbour_cohesion;
-            }
-        }
-
-        // calculate alignment interactions 
-        {
-            // is the boit[i] close enough to boit[id] take effect on it?
-            if (squared_euclidan_norm(distance) <= (this->alignment_range_ * this->alignment_range_))
-            {
-                // linear component of linear+angular pair
-                float boit_i_lin = boits[i].odom.twist.twist.linear.x;
-                float boit_id_lin = boits[id].odom.twist.twist.linear.x;
-
-                // -calculating jaw based on quaternion data
-                // -x and y are unneccessary because were only rotating around jaw so they are always 0
-                // -full function if ever needed:
-                // // float boit_i_rot = atan2(2.0f * (w * z + x * y), w * w + x * x - y * y - z * z);
-                float z = (float)boits[i].odom.pose.pose.orientation.z;
-                float w = (float)boits[i].odom.pose.pose.orientation.w;
-                float boit_i_rot = atan2(2.0f * (w * z), w * w - z * z);
-                z = (float)boits[id].odom.pose.pose.orientation.z;
-                w = (float)boits[id].odom.pose.pose.orientation.w;
-                float boit_id_rot = atan2(2.0f * (w * z), w * w - z * z);
-                
-                // -jaw = 0° is to the right of the screen
-                // -positive rotation axis is right handed if Z goes outside the screen
-                // -positive X is right, positive Y is up
-
-                // -we only calculate linear_xy vectors based on magnitude and rotation
-                // because angular velocity doesnt have affect on current_velocity_xy vector
-                // -angular velocity is only needed for rotating the vessel which we will
-                // calculate for actuation purposes, and not guidence, as it can be looked at as
-                // acceleration thats affecting the magnitude vector in global frame 
-                // (changes its value overtime in global frame, yes, twist.linear is in
-                // local coordinate frame)
-                Vector2 boit_i_vel_lin = {
-                    (float)cos(boit_i_rot)*boit_i_lin,
-                    (float)sin(boit_i_rot)*boit_i_lin,
-                };
-                Vector2 boit_id_vel_lin = {
-                    (float)cos(boit_id_rot)*boit_id_lin,
-                    (float)sin(boit_id_rot)*boit_id_lin,
-                };
-                
-                alignment_center.x += boit_i_vel_lin.x - boit_id_vel_lin.x;
-                alignment_center.y += boit_i_vel_lin.y - boit_id_vel_lin.y;
-
-                ++count_neighbour_alignment;
-            }
-        }
-    
-        // calculate avoidence interactions 
-        {
-            // is the boit[i] close enough to boit[id] take effect on it?
-            if (squared_euclidan_norm(distance) <= (this->avoidance_range_ * this->avoidance_range_))
-            {
-                avoidance_strength.x += distance.x / (squared_euclidan_norm(distance));
-                avoidance_strength.y += distance.y / (squared_euclidan_norm(distance));
-            }
-        }
-    }
-
-    // scale all rule interaction variables that need it
-    {
-        if (count_neighbour_cohesion != 0)
-        {
-            cohesion_center.x /= count_neighbour_cohesion;
-            cohesion_center.y /= count_neighbour_cohesion;
-        }
-
-        if (count_neighbour_alignment != 0)
-        {
-            alignment_center.x /= count_neighbour_alignment;
-            alignment_center.y /= count_neighbour_alignment;
-        }
-    }
 
     // combine forces forces
     {
-        accel_align.x += alignment_center.x * this->alignment_factor_;
-        accel_align.y += alignment_center.y * this->alignment_factor_;
-    
-        accel_avoid.x += avoidance_strength.x * this->avoidance_factor_;
-        accel_avoid.y += avoidance_strength.y * this->avoidance_factor_;
-
-        accel_cohes.x += cohesion_center.x * this->cohesion_factor_;
-        accel_cohes.y += cohesion_center.y * this->cohesion_factor_;
-
         // converts within 20% to the wall
         // working area ~~ X€<-4.9,4.9>, Y€<-4.9,4.9>
-        
         Vector2 accel_containment = {};
-        if (boit_id_pose.x > 4.9*0.8)
-            accel_containment.x = -this->containment_force_;
-        if (boit_id_pose.x < -4.9*0.8)
-            accel_containment.x = this->containment_force_;
-        if (boit_id_pose.y > 4.9*0.8)
-            accel_containment.y = -this->containment_force_;
-        if (boit_id_pose.y < -4.9*0.8)
-            accel_containment.y = this->containment_force_;
+        {
+            Vector2 boit_self_pose = {
+                (float)self_odom.pose.pose.position.x,
+                (float)self_odom.pose.pose.position.y,
+            };
+
+            if (boit_self_pose.x > 4.9*0.8)
+                accel_containment.x = -this->containment_force_;
+            if (boit_self_pose.x < -4.9*0.8)
+                accel_containment.x = this->containment_force_;
+            if (boit_self_pose.y > 4.9*0.8)
+                accel_containment.y = -this->containment_force_;
+            if (boit_self_pose.y < -4.9*0.8)
+                accel_containment.y = this->containment_force_;
+        } 
         
         accel_total.x = 
             accel_align.x + 
@@ -326,12 +199,12 @@ void Boit_Controller_Node::Subscription_Odom_Callback(const Msg_Odom::SharedPtr 
 
         // construct message
         Msg_Twist twist_msg;
-        twist_msg.linear.x = boits[id].odom.twist.twist.linear.x + delta_linear_x;
+        twist_msg.linear.x = self_odom.twist.twist.linear.x + delta_linear_x;
         twist_msg.linear.y = 0.0f;
         twist_msg.linear.z = 0.0f;
         twist_msg.angular.x = 0.0f;
         twist_msg.angular.y = 0.0f;
-        twist_msg.angular.z = boits[id].odom.twist.twist.angular.z + delta_angular_z;
+        twist_msg.angular.z = self_odom.twist.twist.angular.z + delta_angular_z;
 
         pubs[id]->publish(twist_msg);
     }
@@ -342,49 +215,48 @@ void Boit_Controller_Node::Subscription_Odom_Callback(const Msg_Odom::SharedPtr 
     boits[id].last_time = clock();  // this is for delta_time to work
 }
 
-Vector2 Boit_Controller_Node::Calculate_Force_Alignment(uint boit_id)
+Vector2 Boit_Controller_Node::Calculate_Accel_Alignment(std::vector<Msg_Odom> odoms)
 {
     Vector2 force_alignment = {};
     uint alignment_neighbours_count = 0;
 
-    Vector2 boit_id_pose = {
-        (float)boits[boit_id].odom.pose.pose.position.x,
-        (float)boits[boit_id].odom.pose.pose.position.y,
-    };
-    
-    for (uint i = 0; i < boits.size(); ++i)
-    {
-        // skip calculations with itself
-        if (i == boit_id)
-            continue;
+    Msg_Odom self_odom = odoms[0];
 
+    Vector2 boit_self_pose = {
+        (float)self_odom.pose.pose.position.x,
+        (float)self_odom.pose.pose.position.y,
+    };
+
+    // start from 1 because 0 is boit self
+    for (uint i = 1; i < odoms.size(); ++i)
+    {
         Vector2 boit_i_pose = {
-            (float)boits[i].odom.pose.pose.position.x,
-            (float)boits[i].odom.pose.pose.position.y,
+            (float)odoms[i].pose.pose.position.x,
+            (float)odoms[i].pose.pose.position.y,
         };
         // distance between boit[id] and boit[i] 
         Vector2 distance = {
-            boit_i_pose.x - boit_id_pose.x,
-            boit_i_pose.y - boit_id_pose.y
+            boit_i_pose.x - boit_self_pose.x,
+            boit_i_pose.y - boit_self_pose.y
         };
     
         // is the boit[i] close enough to boit[id] take effect on it?
         if (squared_euclidan_norm(distance) <= (this->alignment_range_ * this->alignment_range_))
         {
             // linear component of linear+angular pair
-            float boit_i_lin = boits[i].odom.twist.twist.linear.x;
-            float boit_id_lin = boits[boit_id].odom.twist.twist.linear.x;
+            float boit_i_lin = odoms[i].twist.twist.linear.x;
+            float boit_self_lin = self_odom.twist.twist.linear.x;
 
             // -calculating jaw based on quaternion data
             // -x and y are unneccessary because were only rotating around jaw so they are always 0
             // -full function if ever needed:
             // // float boit_i_rot = atan2(2.0f * (w * z + x * y), w * w + x * x - y * y - z * z);
-            float z = (float)boits[i].odom.pose.pose.orientation.z;
-            float w = (float)boits[i].odom.pose.pose.orientation.w;
+            float z = (float)odoms[i].pose.pose.orientation.z;
+            float w = (float)odoms[i].pose.pose.orientation.w;
             float boit_i_rot = atan2(2.0f * (w * z), w * w - z * z);
-            z = (float)boits[boit_id].odom.pose.pose.orientation.z;
-            w = (float)boits[boit_id].odom.pose.pose.orientation.w;
-            float boit_id_rot = atan2(2.0f * (w * z), w * w - z * z);
+            z = (float)self_odom.pose.pose.orientation.z;
+            w = (float)self_odom.pose.pose.orientation.w;
+            float boit_self_rot = atan2(2.0f * (w * z), w * w - z * z);
 
             // -jaw = 0° is to the right of the screen
             // -positive rotation axis is right handed if Z goes outside the screen
@@ -402,8 +274,8 @@ Vector2 Boit_Controller_Node::Calculate_Force_Alignment(uint boit_id)
                 (float)sin(boit_i_rot)*boit_i_lin,
             };
             Vector2 boit_id_vel_lin = {
-                (float)cos(boit_id_rot)*boit_id_lin,
-                (float)sin(boit_id_rot)*boit_id_lin,
+                (float)cos(boit_self_rot)*boit_self_lin,
+                (float)sin(boit_self_rot)*boit_self_lin,
             };
 
             force_alignment.x += boit_i_vel_lin.x - boit_id_vel_lin.x;
@@ -425,29 +297,28 @@ Vector2 Boit_Controller_Node::Calculate_Force_Alignment(uint boit_id)
     return force_alignment;
 }
 
-Vector2 Boit_Controller_Node::Calculate_Force_Avoidence(uint boit_id)
+Vector2 Boit_Controller_Node::Calculate_Accel_Avoidence(std::vector<Msg_Odom> odoms)
 {
     Vector2 force_avoidence = {};
 
-    Vector2 boit_id_pose = {
-        (float)boits[boit_id].odom.pose.pose.position.x,
-        (float)boits[boit_id].odom.pose.pose.position.y,
+    Msg_Odom self_odom = odoms[0];
+
+    Vector2 boit_self_pose = {
+        (float)self_odom.pose.pose.position.x,
+        (float)self_odom.pose.pose.position.y,
     };
 
-    for (uint i = 0; i < boits.size(); ++i)
+    // start from 1 because 0 is boit self
+    for (uint i = 1; i < odoms.size(); ++i)
     {
-        // skip calculations with itself
-        if (i == boit_id)
-            continue;
-
         Vector2 boit_i_pose = {
-            (float)boits[i].odom.pose.pose.position.x,
-            (float)boits[i].odom.pose.pose.position.y,
+            (float)odoms[i].pose.pose.position.x,
+            (float)odoms[i].pose.pose.position.y,
         };
         // distance between boit[id] and boit[i] 
         Vector2 distance = {
-            boit_i_pose.x - boit_id_pose.x,
-            boit_i_pose.y - boit_id_pose.y
+            boit_i_pose.x - boit_self_pose.x,
+            boit_i_pose.y - boit_self_pose.y
         };
     
         // is the boit[i] close enough to boit[id] take effect on it?
@@ -464,30 +335,29 @@ Vector2 Boit_Controller_Node::Calculate_Force_Avoidence(uint boit_id)
     return force_avoidence;
 }
 
-Vector2 Boit_Controller_Node::Calculate_Force_Cohesion(uint boit_id)
+Vector2 Boit_Controller_Node::Calculate_Accel_Cohesion(std::vector<Msg_Odom> odoms)
 {
     Vector2 force_cohesion = {};
     uint cohesion_neighbours_count = 0;
     
-    Vector2 boit_id_pose = {
-        (float)boits[boit_id].odom.pose.pose.position.x,
-        (float)boits[boit_id].odom.pose.pose.position.y,
-    };
-    
-    for (uint i = 0; i < boits.size(); ++i)
-    {
-        // skip calculations with itself
-        if (i == boit_id)
-            continue;
+    Msg_Odom self_odom = odoms[0];
 
+    Vector2 boit_self_pose = {
+        (float)self_odom.pose.pose.position.x,
+        (float)self_odom.pose.pose.position.y,
+    };
+
+    // start from 1 because 0 is boit self
+    for (uint i = 1; i < odoms.size(); ++i)
+    {
         Vector2 boit_i_pose = {
-            (float)boits[i].odom.pose.pose.position.x,
-            (float)boits[i].odom.pose.pose.position.y,
+            (float)odoms[i].pose.pose.position.x,
+            (float)odoms[i].pose.pose.position.y,
         };
         // distance between boit[id] and boit[i] 
         Vector2 distance = {
-            boit_i_pose.x - boit_id_pose.x,
-            boit_i_pose.y - boit_id_pose.y
+            boit_i_pose.x - boit_self_pose.x,
+            boit_i_pose.y - boit_self_pose.y
         };
     
         if (squared_euclidan_norm(distance) <= (this->cohesion_range_ * this->cohesion_range_))

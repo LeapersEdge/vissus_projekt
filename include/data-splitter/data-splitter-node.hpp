@@ -1,9 +1,57 @@
 #pragma once
 
+#include "defines.h"
 #include "rclcpp/rclcpp.hpp"
 #include "utils.h"
 
 using std::placeholders::_1;
+
+/* CODE SNIPPET FOR BACK ANGLE IGNORING
+
+void Game::Apply_Avoidence(unsigned int boid_index)
+{
+    // sum of all avoidence forces that each boid in swarm applies to boid in boid_index
+    Vector2 avoidence_strength = (Vector2){0.0f,0.0f};
+
+    for (unsigned int i = 0; i < last_number_of_boids; i++)
+    {
+        if (i == boid_index)
+            continue;
+
+        // order is not inverse of this, vector direction is handeled by Boid::Update_Velocity
+        Vector2 delta;
+        delta.x = boids[i].position.x - boids[boid_index].position.x;
+        delta.y = boids[i].position.y - boids[boid_index].position.y;
+
+
+        // is within radius? 
+        // is within not cropped out part of the circle relative to current direction?
+        if ((delta.x * delta.x + delta.y * delta.y) <= (avoidence_visual_field_radius * avoidence_visual_field_radius) &&                                 
+            std::abs(Vector2Angle(boids[boid_index].velocity, delta)) <= side_angel_view)  
+        {
+            avoidence_strength.x += delta.x / (delta.x * delta.x + delta.y * delta.y);
+            avoidence_strength.y += delta.y / (delta.x * delta.x + delta.y * delta.y);
+        }
+    }
+
+    boids[boid_index].acceleration_avoidence.x += avoidence_strength.x * avoidence_factor;
+    boids[boid_index].acceleration_avoidence.y += avoidence_strength.y * avoidence_factor;
+}
+
+
+BITAN JE DIO
+    std::abs(Vector2Angle(boids[boid_index].velocity, delta)) <= side_angel_vie
+    float Vector2Angle(Vector2 v1, Vector2 v2)
+    {
+        float result = atan2f(v2.y - v1.y, v2.x - v1.x)*(180.0f/PI);
+
+        if (result < 0) result += 360.0f;
+
+        return result;
+    }
+TO SAM TAKO KORISTIO JER JE .VELOCITY IMAO INFORMATION I SMJERU, ALI SADA TO IMAMO DIREKTNO IZ KUTA,
+DODUSE NEZ AKO BI NAM BILO MUDRIJE ISKORISTITI TO ILI OVO
+*/
 
 class Data_Splitter_Node : public rclcpp::Node
 {
@@ -12,7 +60,7 @@ public:
     {
         boit_fov_ = this->declare_parameter<float>("boit_fov", 0.0f);
         boit_vision_range_ = this->declare_parameter<float>("boit_vision_range", 0.0f);
-        map_sub_ = this->create_subscription<Msg_Map>("/map", 10, std::bind(&Data_Splitter_Node::Map_Callback, this))
+        map_sub_ = this->create_subscription<Msg_Map>("/map", 10, std::bind(&Data_Splitter_Node::Map_Callback, this, _1));
 
         uint highest_robot_id = 0;
         {
@@ -53,7 +101,7 @@ public:
     }
 private:    
     
-    rclcpp::Subscription<Msg_Map> map_sub_;
+    Subscription_Map map_sub_;
 
     float boit_fov_;
     float boit_vision_range_;
@@ -64,7 +112,7 @@ private:
     Msg_Map map_;
 
     void Subscription_Odom_Callback(const Msg_Odom::SharedPtr odom, uint id);
-    void Data_Splitter_Node::Map_Callback(const Msg_Map::SharedPtr map){
+    void Map_Callback(const Msg_Map::SharedPtr map){
         map_ = *map;
     }
 
