@@ -42,11 +42,11 @@ public:
     Boit_Controller_Node() : Node("boit_controller_node")
     {
         // get all available topics and extract highest <number> from topics with "robot_<number>/odom" 
-        robot_id_ = this->declare_parameter<float>("robot_id_", 0);
+        robot_id_ = this->declare_parameter<int>("robot_id_", 0);
 
         // initialize all publishers, subscriptions and boits
-        std::string robot_twist_topic = "/robot_" + std::to_string(robot_id_) + "/cmd_vel";
-        std::string robot_boit_info_topic = "/robot_" + std::to_string(robot_id_) + "/boit_info";
+        std::string robot_twist_topic = "/robot_" + std::to_string(int(robot_id_)) + "/cmd_vel";
+        std::string robot_boit_info_topic = "/robot_" + std::to_string(int(robot_id_)) + "/boit_info";
         std::string robot_tuning_params_topic = "/tuning_params";
         std::string goal_odom_topic = "/goal_odom";
 

@@ -29,7 +29,7 @@ def generate_launch_description():
                 executable='boid_control',
                 name=f'boid_controller_{i}',
                 output='screen',
-                parameters=[{'robot_id': i}]
+                parameters=[{'robot_id': int(i)}]
             )
         )
 

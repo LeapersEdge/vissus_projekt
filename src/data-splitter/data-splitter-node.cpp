@@ -31,8 +31,8 @@ public:
         std::vector<std::string> cmd_vel_topics;
 
         for (unsigned int id : robot_ids_) {
-            odom_topics.push_back("/robot_id/" + std::to_string(id) + "/odom");
-            cmd_vel_topics.push_back("/robot_id/" + std::to_string(id) + "/OdometryArray");
+            odom_topics.push_back("/robot_" + std::to_string(id) + "/odom");
+            cmd_vel_topics.push_back("/robot_" + std::to_string(id) + "/boit_info");
         }
 
         robot_odoms_.resize(num_boids_);
