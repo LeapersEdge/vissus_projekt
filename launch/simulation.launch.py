@@ -29,7 +29,7 @@ def generate_launch_description():
         boid_controllers.append(
             Node(
                 package="vissus_projekt",
-                executable="boid-controller",
+                executable="boid_control",
                 name=f"boid_controller_{i}",
                 output="screen",
                 parameters=[{"robot_id": i}]
@@ -38,7 +38,7 @@ def generate_launch_description():
 
     data_splitter = Node(
         package="vissus_projekt",
-        executable="data-splitter",
+        executable="data_splitter",
         name="data_splitter",
         output="screen",
         parameters=[{"boid_number": boid_number}]
