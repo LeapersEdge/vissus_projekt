@@ -15,7 +15,30 @@ using std::placeholders::_1;
 class Data_Splitter_Node : public rclcpp::Node
 {
 public:
-    Data_Splitter_Node() : Node("data_splitter_node")
+Data_Splitter_Node() : Node("data_splitter_node")
+{
+    boit_fov_ = this->declare_parameter<float>("boit_fov", 0.0f);
+    boit_vision_range_ = this->declare_parameter<float>("boit_vision_range", 0.0f);
+    num_boids_ = (unsigned int)this->declare_parameter<int>("boid_number", 1);
+
+
+    map_sub_ = this->create_subscription<Msg_Map>("/map", 10, std::bind(&Data_Splitter_Node::Map_Callback, this, _1));
+    
+    for (unsigned int i = 0; i < num_boids_; ++i) {
+        robot_ids_.push_back(i);
+    }
+
+    std::vector<std::string> odom_topics;
+    std::vector<std::string> cmd_vel_topics;
+
+    for (unsigned int id : robot_ids_) {
+        odom_topics.push_back("/" + std::to_string(id) + "/odom");
+        cmd_vel_topics.push_back("/" + std::to_string(id) + "/OdometryArray");
+    }
+
+    robot_odoms_.resize(num_boids_);
+
+    for (unsigned int i = 0; i < num_boids_; ++i)
     {
         boid_fov_ = this->declare_parameter<float>("boid_fov", M_PI);
         boid_vision_range_ = this->declare_parameter<float>("boid_vision_range", 10.0f);
@@ -57,8 +80,8 @@ public:
     }
 
 private:
-    void Subscription_Odom_Callback(const Msg_Odom::SharedPtr odom, unsigned int id);
-    void Map_Callback(const Msg_Map::SharedPtr map);
+    //void Subscription_Odom_Callback(const Msg_Odom::SharedPtr odom, unsigned int id);
+    //void Map_Callback(const Msg_Map::SharedPtr map);
 
     Subscription_Map map_sub_;
     std::vector<Publisher_Twist> pubs_twist_;
@@ -118,8 +141,8 @@ private:
         if (id >= robot_odoms.size()) return {};
         const Msg_Odom& boid_id_odom = robot_odoms[id];
         Vector2 boid_pose{
-            boid_id_odom.pose.pose.position.x, 
-            boid_id_odom.pose.pose.position.y
+            (float)boid_id_odom.pose.pose.position.x, 
+            (float)boid_id_odom.pose.pose.position.y
         };
 
         std::vector<Msg_Odom> true_neighbours;
@@ -128,21 +151,19 @@ private:
             if (static_cast<unsigned int>(i) == id) continue;   
             const Msg_Odom& neighbour_i_odom = robot_odoms[i];
             Vector2 neighbour_i{
-                neighbour_i_odom.pose.pose.position.x, 
-                neighbour_i_odom.pose.pose.position.y
+                (float)neighbour_i_odom.pose.pose.position.x, 
+                (float)neighbour_i_odom.pose.pose.position.y
             };
             Vector2 diff{neighbour_i.x - boid_pose.x, neighbour_i.y - boid_pose.y};
             float distance_sq = squared_euclidan_norm(diff);
-            float angle = atan2f(diff.y, diff.x);
-            if (distance_sq < boid_vision_range_ * boid_vision_range_ &&
-                ((angle < boid_fov_ / 2.0f) && (angle > -boid_fov_ / 2.0f))) {
+            float angle = atan2(diff.x, diff.y);
+            if (distance_sq < boit_vision_range_ * boit_vision_range_ &&
+                ((angle < boit_fov_/2.0f) && (angle > -boit_fov_/2.0f))) {
                 true_neighbours.push_back(neighbour_i_odom);
             }
         }
         return true_neighbours;
     }
-
-    //
     void Subscription_Odom_Callback(const Msg_Odom::SharedPtr odom, unsigned int id){
         if (id >= robot_odoms_.size()) return;
         robot_odoms_[id] = *odom;
