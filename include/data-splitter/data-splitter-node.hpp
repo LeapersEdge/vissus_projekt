@@ -99,7 +99,7 @@ public:
             pubs.push_back(pub);
         }
     }
-private:
+private:    
     
     Subscription_Map map_sub_;
 
