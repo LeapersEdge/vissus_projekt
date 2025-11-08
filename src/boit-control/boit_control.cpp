@@ -41,17 +41,7 @@ public:
     Boit_Controller_Node() : Node("boit_controller_node")
     {
         // get all available topics and extract highest <number> from topics with "robot_<number>/odom" 
-        robot_id_           = this->declare_parameter<float>("robot_id_", 0);
-        rotation_kp_        = this->declare_parameter<float>("rotation_kp", 0.0f);
-        containment_force_  = this->declare_parameter<float>("containment_force", 0.0f);
-        cohesion_range_     = this->declare_parameter<float>("cohesion_range", DEFAULT_RANGE_COHESION);
-        cohesion_factor_    = this->declare_parameter<float>("cohesion_factor", 0.0f);
-        alignment_range_    = this->declare_parameter<float>("alignment_range", DEFAULT_RANGE_ALIGNMENT);
-        alignment_factor_   = this->declare_parameter<float>("alignment_factor", 0.0f);
-        avoidance_range_    = this->declare_parameter<float>("avoidance_range", DEFAULT_RANGE_AVOIDANCE);
-        avoidance_factor_   = this->declare_parameter<float>("avoidance_factor", 0.0f);
-        obstacle_avoid_range_   = this->declare_parameter<float>("obstacle_avoid_range", DEFAULT_RANGE_AVOIDANCE);
-        obstacle_avoid_factor_  = this->declare_parameter<float>("obstacle_avoid_factor", 0.0f);
+        robot_id_ = this->declare_parameter<float>("robot_id_", 0);
 
         // initialize all publishers, subscriptions and boits
         std::string robot_twist_topic = "/robot_" + std::to_string(robot_id_) + "/cmd_vel";
@@ -64,13 +54,11 @@ public:
             std::bind(&Boit_Controller_Node::Subscription_Boit_Info_Callback, this, _1) 
         ); 
         
-        /*
-        sub_tuning_params = this->create_subscription<Msg_Boit_Info>(
+        sub_tuning_params = this->create_subscription<Msg_Tuning_Params>(
             robot_tuning_params_topic, 
             10, 
             std::bind(&Boit_Controller_Node::Subscription_Tuning_Params_Callback, this, _1) 
         );
-        */
 
         // init pub
         pub_twist = this->create_publisher<Msg_Twist>(
@@ -84,17 +72,17 @@ public:
     }
 private:
     void Subscription_Boit_Info_Callback(const Msg_Boit_Info::SharedPtr info);   // ALL BOITS LOGIC HAPPENS HERE
-    //void Subscription_Tuning_Params_Callback(const Msg_Tuning_Params::SharedPtr params);
+    void Subscription_Tuning_Params_Callback(const Msg_Tuning_Params::SharedPtr params);
     Vector2 Calculate_Accel_Alignment(std::vector<Msg_Odom> odoms);
     Vector2 Calculate_Accel_Avoidence(std::vector<Msg_Odom> odoms);
     Vector2 Calculate_Accel_Cohesion(std::vector<Msg_Odom> odoms);
-    Vector2 Calculate_Accel_Obsticle_Avoid(const Msg_Odom& self_odom, const Msg_Point& closest_obsticle);
+    Vector2 Calculate_Accel_Obstacle_Avoid(const Msg_Odom& self_odom, const Msg_Point& closest_obstacle);
 
 private:
     Boit boit;
     Publisher_Twist pub_twist;
     Subscription_Boit_Info sub_boit_info;
-    //Subscription_Tuning_Params sub_tuning_params;
+    Subscription_Tuning_Params sub_tuning_params;
 
     //parameters declarations 
     float robot_id_;
@@ -149,7 +137,7 @@ void Boit_Controller_Node::Subscription_Boit_Info_Callback(const Msg_Boit_Info::
     Vector2 accel_align = Calculate_Accel_Alignment(info->odometries); 
     Vector2 accel_avoid = Calculate_Accel_Avoidence(info->odometries);
     Vector2 accel_cohes = Calculate_Accel_Cohesion(info->odometries);
-    Vector2 accel_obsti = Calculate_Accel_Obsticle_Avoid(self_odom, obstacle_point);
+    Vector2 accel_obsta = Calculate_Accel_Obstacle_Avoid(self_odom, obstacle_point);
     Vector2 accel_total = {};
 
     // combine forces forces
@@ -177,14 +165,14 @@ void Boit_Controller_Node::Subscription_Boit_Info_Callback(const Msg_Boit_Info::
             accel_align.x + 
             accel_avoid.x + 
             accel_cohes.x + 
-            accel_obsti.x +
+            accel_obsta.x +
             accel_containment.x;
 
         accel_total.y = 
             accel_align.y + 
             accel_avoid.y + 
             accel_cohes.y + 
-            accel_obsti.y +
+            accel_obsta.y +
             accel_containment.y;
 
     }
@@ -391,7 +379,7 @@ Vector2 Boit_Controller_Node::Calculate_Accel_Cohesion(std::vector<Msg_Odom> odo
     return force_cohesion;
 }
 
-Vector2 Boit_Controller_Node::Calculate_Accel_Obsticle_Avoid(const Msg_Odom& self_odom, const Msg_Point& closest_obstacle)
+Vector2 Boit_Controller_Node::Calculate_Accel_Obstacle_Avoid(const Msg_Odom& self_odom, const Msg_Point& closest_obstacle)
 {
     Vector2 force_obstacle = {};
 
@@ -421,20 +409,19 @@ Vector2 Boit_Controller_Node::Calculate_Accel_Obsticle_Avoid(const Msg_Odom& sel
     return force_obstacle;
 }
 
-/*
 void Boit_Controller_Node::Subscription_Tuning_Params_Callback(const Msg_Tuning_Params::SharedPtr params)
 {
-    init_params = true; 
+    params_init = true; 
     
-    rotation_kp_ = params.rotation_kp;
-    containment_force_ = params.containment_force;
-    cohesion_range_ = params.cohesion_range;
-    cohesion_factor_ = params.cohesion_factor; 
-    alignment_range_ = params.alignment_range; 
-    alignment_factor_ = params.alignment_factor; 
-    avoidance_range_ = params.avoidance_range; 
-    avoidance_factor_ = params.avoidance_factor;
-    obstacle_avoid_range_ = params.obstacle_avoid_range; 
-    obstacle_avoid_factor_ = params.obstacle_avoid_factor; 
+    rotation_kp_ = params->rotation_kp;
+    containment_force_ = params->containment_force;
+    cohesion_range_ = params->cohesion_range;
+    cohesion_factor_ = params->cohesion_factor; 
+    alignment_range_ = params->alignment_range; 
+    alignment_factor_ = params->alignment_factor; 
+    avoidance_range_ = params->avoidance_range; 
+    avoidance_factor_ = params->avoidance_factor;
+    obstacle_avoid_range_ = params->obstacle_avoid_range; 
+    obstacle_avoid_factor_ = params->obstacle_avoid_factor; 
 }
-*/
+

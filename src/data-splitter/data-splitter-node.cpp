@@ -89,17 +89,26 @@ public:
 
                     }
                 ); 
-            subs.push_back(sub);
+            subs_odom.push_back(sub);
             
             // init pub
             Publisher_Twist pub = this->create_publisher<Msg_Twist>(
                     robot_twist_topic, 
                     10
                 ); 
-            pubs.push_back(pub);
+            pubs_twist.push_back(pub);
         }
     }
-private:    
+private:
+    void Subscription_Odom_Callback(const Msg_Odom::SharedPtr odom, uint id);
+    void Map_Callback(const Msg_Map::SharedPtr map);
+    Vector2 get_closest_obstacle(const Msg_Odom& robot_odom); 
+private:
+    Subscription_Map map_sub_;
+    std::vector<Publisher_Twist> pubs_twist;
+    std::vector<Publisher_Boit_Info> pubs_boit_info;
+    std::vector<Subscription_Odom> subs_odom;
+    Msg_Map map_;
     
     Subscription_Map map_sub_;
 
@@ -116,7 +125,13 @@ private:
     std::vector<Publisher_Twist> pubs;
     std::vector<Subscription_Odom> subs;
 
-    Msg_Map map_;
+int main(int argc, char *argv[])
+{
+    rclcpp::init(argc, argv);
+    rclcpp::spin(std::make_shared<Data_Splitter_Node>());
+    rclcpp::shutdown();
+    return 0;
+}
 
     // publisher koji ce publishati poruke o obstaclima i susjedima
     void Subscription_Odom_Callback(const Msg_Odom::SharedPtr odom, uint id){
@@ -127,50 +142,41 @@ private:
         map_ = *map;
     }
 
-    Vector2 get_closest_obstacle(const Msg_Odom& robot_odom) {
-        if (map_.data.empty()) {
-            RCLCPP_WARN(this->get_logger(), "Map is empty!");
-            return Vector2{0.0f, 0.0f};
-        }
+    uint W = map_.info.width;
+    uint H = map_.info.height;
+    float resolution = map_.info.resolution;
+    float origin_x = map_.info.origin.position.x;
+    float origin_y = map_.info.origin.position.y;
 
-        uint W = map_.info.width;
-        uint H = map_.info.height;
-        float resolution = map_.info.resolution;
-        float origin_x = map_.info.origin.position.x;
-        float origin_y = map_.info.origin.position.y;
+    // Robot position in map frame
+    float x_odom = robot_odom.pose.pose.position.x;
+    float y_odom = robot_odom.pose.pose.position.y;
+    Vector2 pose_odom{x_odom, y_odom};
 
-        // Robot position in map frame
-        float x_odom = robot_odom.pose.pose.position.x;
-        float y_odom = robot_odom.pose.pose.position.y;
-        Vector2 pose_odom{x_odom, y_odom};
+    float smallest_distance = std::numeric_limits<float>::max();
+    Vector2 closest_obstacle{0.0f, 0.0f};
 
-        float smallest_distance = std::numeric_limits<float>::max();
-        Vector2 closest_obstacle{0.0f, 0.0f};
+    for (size_t i = 0; i < H; i++) {
+        for (size_t j = 0; j < W; j++) {
+            size_t idx = i * W + j;
+            if (map_.data[idx] <= 0) continue;
 
-        for (size_t i = 0; i < H; i++) {
-            for (size_t j = 0; j < W; j++) {
-                size_t idx = i * W + j;
-                if (map_.data[idx] <= 0) continue;
+            float cell_x = origin_x + j * resolution + resolution / 2.0f;
+            float cell_y = origin_y + i * resolution + resolution / 2.0f;
+            Vector2 cell_pos{cell_x, cell_y};
 
-                float cell_x = origin_x + j * resolution + resolution / 2.0f;
-                float cell_y = origin_y + i * resolution + resolution / 2.0f;
-                Vector2 cell_pos{cell_x, cell_y};
+            float dx = cell_pos.x - pose_odom.x;
+            float dy = cell_pos.y - pose_odom.y;
+            Vector2 cell_i{dx, dy};
+            float distance_sq = squared_euclidan_norm(cell_i - pose_odom);
 
-                float dx = cell_pos.x - pose_odom.x;
-                float dy = cell_pos.y - pose_odom.y;
-                Vector2 cell_i{dx, dy};
-                float distance_sq = squared_euclidan_norm(cell_i - pose_odom);
-
-                if (distance_sq < boit_vision_range_ * boit_vision_range_ &&
+            if (distance_sq < boit_vision_range_ * boit_vision_range_ &&
                     distance_sq < smallest_distance) 
-                {
-                    smallest_distance = distance_sq;
-                    closest_obstacle = cell_pos;
-                }
+            {
+                smallest_distance = distance_sq;
+                closest_obstacle = cell_pos;
             }
         }
-
-        return closest_obstacle;
     }
 
 };
