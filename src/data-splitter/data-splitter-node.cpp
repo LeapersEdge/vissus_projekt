@@ -52,7 +52,7 @@ public:
                     cmd_vel_topics[i], 
                     10
                 ); 
-            pubs_boit_info_ .push_back(pub);
+            pubs_boit_info_.push_back(pub);
         }
     }
 

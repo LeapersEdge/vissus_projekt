@@ -15,6 +15,7 @@
 #include <string>
 #include <vector>
 #include "utils.h"
+#include "vector2.hpp"
 
 // --------------------------------------------------------------
 // DEFINES, GLOBALS FOR TUNNING
@@ -47,7 +48,9 @@ public:
         std::string robot_twist_topic = "/robot_" + std::to_string(robot_id_) + "/cmd_vel";
         std::string robot_boit_info_topic = "/robot_" + std::to_string(robot_id_) + "/boit_info";
         std::string robot_tuning_params_topic = "/tuning_params";
+        std::string goal_odom_topic = "/goal_odom";
 
+        // init subs
         sub_boit_info = this->create_subscription<Msg_Boit_Info>(
             robot_boit_info_topic, 
             10, 
@@ -58,6 +61,12 @@ public:
             robot_tuning_params_topic, 
             10, 
             std::bind(&Boit_Controller_Node::Subscription_Tuning_Params_Callback, this, _1) 
+        );
+
+        sub_goal_odom = this->create_subscription<Msg_Odom>(
+            goal_odom_topic, 
+            10, 
+            std::bind(&Boit_Controller_Node::Subscription_Goal_Odom_Callback, this, _1) 
         );
 
         // init pub
@@ -73,16 +82,19 @@ public:
 private:
     void Subscription_Boit_Info_Callback(const Msg_Boit_Info::SharedPtr info);   // ALL BOITS LOGIC HAPPENS HERE
     void Subscription_Tuning_Params_Callback(const Msg_Tuning_Params::SharedPtr params);
+    void Subscription_Goal_Odom_Callback(const Msg_Odom::SharedPtr odom);
     Vector2 Calculate_Accel_Alignment(std::vector<Msg_Odom> odoms);
     Vector2 Calculate_Accel_Avoidence(std::vector<Msg_Odom> odoms);
     Vector2 Calculate_Accel_Cohesion(std::vector<Msg_Odom> odoms);
     Vector2 Calculate_Accel_Obstacle_Avoid(const Msg_Odom& self_odom, const Msg_Point& closest_obstacle);
+    Vector2 Calculate_Accel_Goal(const Msg_Odom& self_odom, const Msg_Odom& goal);
 
 private:
     Boit boit;
     Publisher_Twist pub_twist;
     Subscription_Boit_Info sub_boit_info;
     Subscription_Tuning_Params sub_tuning_params;
+    Subscription_Odom sub_goal_odom;
 
     //parameters declarations 
     float robot_id_;
@@ -98,6 +110,9 @@ private:
     float avoidance_factor_;
     float obstacle_avoid_range_;
     float obstacle_avoid_factor_;
+    float goal_factor_;
+
+    Msg_Odom goal_odom;
 };
 
 int main(int argc, char *argv[])
@@ -138,6 +153,7 @@ void Boit_Controller_Node::Subscription_Boit_Info_Callback(const Msg_Boit_Info::
     Vector2 accel_avoid = Calculate_Accel_Avoidence(info->odometries);
     Vector2 accel_cohes = Calculate_Accel_Cohesion(info->odometries);
     Vector2 accel_obsta = Calculate_Accel_Obstacle_Avoid(self_odom, obstacle_point);
+    Vector2 accel_goal  = Calculate_Accel_Goal(self_odom, goal_odom);
     Vector2 accel_total = {};
 
     // combine forces forces
@@ -166,6 +182,7 @@ void Boit_Controller_Node::Subscription_Boit_Info_Callback(const Msg_Boit_Info::
             accel_avoid.x + 
             accel_cohes.x + 
             accel_obsta.x +
+            accel_goal.x +
             accel_containment.x;
 
         accel_total.y = 
@@ -173,6 +190,7 @@ void Boit_Controller_Node::Subscription_Boit_Info_Callback(const Msg_Boit_Info::
             accel_avoid.y + 
             accel_cohes.y + 
             accel_obsta.y +
+            accel_goal.y +
             accel_containment.y;
 
     }
@@ -423,5 +441,31 @@ void Boit_Controller_Node::Subscription_Tuning_Params_Callback(const Msg_Tuning_
     avoidance_factor_ = params->avoidance_factor;
     obstacle_avoid_range_ = params->obstacle_avoid_range; 
     obstacle_avoid_factor_ = params->obstacle_avoid_factor; 
+    goal_factor_ = params->goal_factor; 
 }
 
+void Boit_Controller_Node::Subscription_Goal_Odom_Callback(const Msg_Odom::SharedPtr odom)
+{
+    goal_odom = *odom;
+}
+
+Vector2 Boit_Controller_Node::Calculate_Accel_Goal(const Msg_Odom& self_odom, const Msg_Odom& goal_odom)
+{
+    Vector2 force_goal;
+
+    Vector2 self_pose = {
+        (float)self_odom.pose.pose.position.x,
+        (float)self_odom.pose.pose.position.y,
+    };
+
+    Vector2 goal_pose = {
+        (float)goal_odom.pose.pose.position.x,
+        (float)goal_odom.pose.pose.position.y,
+    };
+
+    Vector2 difference = goal_pose - self_pose;
+    force_goal = difference / difference.length_squared();
+    force_goal *= goal_factor_;
+    
+    return force_goal;
+}

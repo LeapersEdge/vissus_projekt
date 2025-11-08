@@ -40,3 +40,8 @@ Umjesto da imamo jedan node koji upravlja svima (centralizirano upravljanje), mi
 Pošto svaki pojedini boid ne zna sam po sebi gdje je svaki drugi boid, koristimo `data-splitter` node, gdje će se konstruirati message **svoje odometrije**, **odometrije svakog od boida kojeg vidi**, te **closest obstacle**.
 
 `data-splitter`, dakle, uzme sve odometrije boidova i iz njih proizvede odmetry array kojeg šalje svakom pojedinačnom boidu. On je esencijalno centar informacije koji šalje svakom robotu informaciju potrebnu da napravi odluke.
+
+#### To do
+  1. Testirati simulaciju i isprobati razne parametre, parametri su definirani u msg/TuningParams.msg
+  2. Provjeriti sve nazive
+  3. Potencijalno pretvoriti sve floatove u double da ne moramo raditi konverziju
