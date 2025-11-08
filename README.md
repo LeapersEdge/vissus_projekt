@@ -1,7 +1,37 @@
 # vissus_projekt
 
+  Grupa: Gabrijel Biočić, Dino Dubinović, Quinn Lee Fletcher, Ita Poklepović, Antonio Škara,
+
 Dependencies (links to installation guides):
 
 - ROS2: Humble
+
 - [ROS2 stage](https://github.com/tuw-robotics/stage_ros2/blob/humble/res/install.md) [(alternativa ako faila)](https://github.com/LeapersEdge/vissus_projekt/blob/main/docs/stage%20installation.md)
+
 - [stvari iz uputa](https://github.com/larics/mrs_simulation/blob/main/README.md#2-manual-installation-if-you-already-have-ros-installed)
+
+ROS2 nema catkin; koristi colcon:
+
+```shell
+colcon build
+```
+
+### Concept
+
+#### Nodes
+Imamo dva čvora:
+- `Controller node`: aktivira se za svaki bot, *subscribe*a na svoj topic u kojem se nalaze odmetry msgs od svakog boida u svome susjedstvu, i nalazi pozu najbliže prepreke) 
+- `Simulacijski node`: pokreće se samo jednom i *publish*ati će sve topic-ove koje za svakog boida
+
+Controller ima jedan parametar: ID od robota na kojeg se *subscribe*ati.
+
+#### Boid control
+Svaki boid ima 2 *message*-a:
+- `odom` (odometrija)
+- `cmd_vel` (velocity command)
+
+Umjesto da imamo jedan node koji upravlja svima (centralizirano upravljanje), mi **radimo decentralizirano upravljanje** (svaki boid upravlja sobom).
+
+Pošto svaki pojedini boid ne zna sam po sebi gdje je svaki drugi boid, koristimo `data-splitter` node, gdje će se konstruirati message **svoje odometrije**, **odometrije svakog od boida kojeg vidi**, te **closest obstacle**.
+
+`data-splitter`, dakle, uzme sve odometrije boidova i iz njih proizvede odmetry array kojeg šalje svakom pojedinačnom boidu. On je esencijalno centar informacije koji šalje svakom robotu informaciju potrebnu da napravi odluke.
