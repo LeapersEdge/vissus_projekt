@@ -6,7 +6,6 @@
 
 struct Boit
 {
-    Msg_Odom odom;
     bool initialized = false;
     float last_rotation = 0.0f; 
     clock_t last_time = 0;
