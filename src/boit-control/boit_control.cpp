@@ -76,7 +76,7 @@ private:
     Vector2 Calculate_Accel_Alignment(std::vector<Msg_Odom> odoms);
     Vector2 Calculate_Accel_Avoidence(std::vector<Msg_Odom> odoms);
     Vector2 Calculate_Accel_Cohesion(std::vector<Msg_Odom> odoms);
-    Vector2 Calculate_Accel_Obsticle_Avoid(const Msg_Odom& self_odom, const Msg_Point& closest_obsticle);
+    Vector2 Calculate_Accel_Obstacle_Avoid(const Msg_Odom& self_odom, const Msg_Point& closest_obstacle);
 
 private:
     Boit boit;
@@ -137,7 +137,7 @@ void Boit_Controller_Node::Subscription_Boit_Info_Callback(const Msg_Boit_Info::
     Vector2 accel_align = Calculate_Accel_Alignment(info->odometries); 
     Vector2 accel_avoid = Calculate_Accel_Avoidence(info->odometries);
     Vector2 accel_cohes = Calculate_Accel_Cohesion(info->odometries);
-    Vector2 accel_obsti = Calculate_Accel_Obsticle_Avoid(self_odom, obstacle_point);
+    Vector2 accel_obsta = Calculate_Accel_Obstacle_Avoid(self_odom, obstacle_point);
     Vector2 accel_total = {};
 
     // combine forces forces
@@ -165,14 +165,14 @@ void Boit_Controller_Node::Subscription_Boit_Info_Callback(const Msg_Boit_Info::
             accel_align.x + 
             accel_avoid.x + 
             accel_cohes.x + 
-            accel_obsti.x +
+            accel_obsta.x +
             accel_containment.x;
 
         accel_total.y = 
             accel_align.y + 
             accel_avoid.y + 
             accel_cohes.y + 
-            accel_obsti.y +
+            accel_obsta.y +
             accel_containment.y;
 
     }
@@ -379,7 +379,7 @@ Vector2 Boit_Controller_Node::Calculate_Accel_Cohesion(std::vector<Msg_Odom> odo
     return force_cohesion;
 }
 
-Vector2 Boit_Controller_Node::Calculate_Accel_Obsticle_Avoid(const Msg_Odom& self_odom, const Msg_Point& closest_obstacle)
+Vector2 Boit_Controller_Node::Calculate_Accel_Obstacle_Avoid(const Msg_Odom& self_odom, const Msg_Point& closest_obstacle)
 {
     Vector2 force_obstacle = {};
 
