@@ -19,9 +19,9 @@ colcon build
 ### Concept
 
 #### Nodes
-Imamo dva čvora:
-- `Controller node`: aktivira se za svaki bot, *subscribe*a na svoj topic u kojem se nalaze odmetry msgs od svakog boida u svome susjedstvu, i nalazi pozu najbliže prepreke) 
-- `Simulacijski node`: pokreće se samo jednom i *publish*ati će sve topic-ove koje za svakog boida
+Imamo *node*ove:
+- `boit-control`: aktivira se za svaki bot, *subscribe*a na svoj topic u kojem se nalaze odmetry msgs od svakog boida u svome susjedstvu, i nalazi pozu najbliže prepreke) 
+- `data-splitter`: pokreće se samo jednom i *publish*ati će sve topic-ove koje za svakog boida
 
 Controller ima jedan parametar: ID od robota na kojeg se *subscribe*ati.
 
