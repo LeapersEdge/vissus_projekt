@@ -58,7 +58,7 @@ private:
     float cohesion_range_     = DEFAULT_RANGE_COHESION;
     float cohesion_factor_    = 0.0f;
     float alignment_range_    = DEFAULT_RANGE_ALIGNMENT;
-    float alignment_factor_   = 0.0f;y
+    float alignment_factor_   = 0.0f;
     float avoidance_range_    = DEFAULT_RANGE_AVOIDANCE;
     float avoidance_factor_   = 0.0f;
 
@@ -284,10 +284,3 @@ Vector2 Boit_Controller_Node::Calculate_Force_Cohesion(Vector2 boid_pose, Msg_Od
     return force_cohesion;
 }
 
-int main(int argc, char *argv[])
-{
-    rclcpp::init(argc, argv);
-    rclcpp::spin(std::make_shared<Boit_Controller_Node>());
-    rclcpp::shutdown();
-    return 0;
-}
