@@ -1,6 +1,6 @@
 # vissus_projekt
 
-  Grupa: Gabrijel Biočić, Dino Dubinović, Quinn Lee Fletcher, Ita Poklepović, Antonio Škara,
+  Grupa: Gabrijel Biočić, Dino Dubinović, Quinn Lee Fletcher, Ita Poklepović, Antonio Škara.
 
 Dependencies (links to installation guides):
 
