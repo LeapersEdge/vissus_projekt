@@ -6,3 +6,5 @@ float32 alignment_range
 float32 alignment_factor
 float32 avoidance_range
 float32 avoidance_factor
+float32 obstacle_avoid_range
+float32 obstacle_avoid_factor
