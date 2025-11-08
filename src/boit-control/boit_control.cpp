@@ -10,6 +10,7 @@
 #include <chrono>
 #include <cstdlib>
 #include <ctime>
+#include <functional>
 #include <memory>
 #include <string>
 #include <vector>
@@ -27,12 +28,20 @@
 
 using std::placeholders::_1;
 
+struct Boit
+{
+    bool initialized = false;
+    float last_rotation = 0.0f; 
+    clock_t last_time = 0;
+};
+
 class Boit_Controller_Node : public rclcpp::Node
 {
 public:
     Boit_Controller_Node() : Node("boit_controller_node")
     {
         // get all available topics and extract highest <number> from topics with "robot_<number>/odom" 
+        robot_id_           = this->declare_parameter<float>("robot_id_", 0);
         rotation_kp_        = this->declare_parameter<float>("rotation_kp", 0.0f);
         containment_force_  = this->declare_parameter<float>("containment_force", 0.0f);
         cohesion_range_     = this->declare_parameter<float>("cohesion_range", DEFAULT_RANGE_COHESION);
@@ -41,62 +50,56 @@ public:
         alignment_factor_   = this->declare_parameter<float>("alignment_factor", 0.0f);
         avoidance_range_    = this->declare_parameter<float>("avoidance_range", DEFAULT_RANGE_AVOIDANCE);
         avoidance_factor_   = this->declare_parameter<float>("avoidance_factor", 0.0f);
+        obstacle_avoid_range_   = this->declare_parameter<float>("obstacle_avoid_range", DEFAULT_RANGE_AVOIDANCE);
+        obstacle_avoid_factor_  = this->declare_parameter<float>("obstacle_avoid_factor", 0.0f);
 
-        uint highest_robot_id = 0;
-        {
-            auto topics = get_topic_names_and_types();
-            for (const auto& topic : topics)
-            {
-                std::string topic_name = topic.first;
-                if (string_contains(topic_name, "robot_") && string_contains(topic_name, "/odom"))
-                {
-                    uint robot_id = parse_number_from_string(topic_name);
-                    if (robot_id > highest_robot_id)
-                        highest_robot_id = robot_id;                
-                }
-            }
-        }
-      
         // initialize all publishers, subscriptions and boits
-        for (uint i = 0; i < highest_robot_id; ++i)
-        {
-            std::string robot_twist_topic = "/robot_" + std::to_string(i) + "/cmd_vel";
-            std::string robot_boit_info_topic = "/robot_" + std::to_string(i) + "/boit_info";
-        
-            Subscription_Boit_Info sub = this->create_subscription<Msg_Boit_Info>(
-                    robot_boit_info_topic, 
-                    10, 
-                    [this, i](const Msg_Boit_Info::SharedPtr msg) {
-                        this->Subscription_Boit_Info_Callback(msg, i);
-                    }
-                ); 
-            subs.push_back(sub);
-            
-            // init pub
-            Publisher_Twist pub = this->create_publisher<Msg_Twist>(
-                    robot_twist_topic, 
-                    10
-                ); 
-            pubs.push_back(pub);
+        std::string robot_twist_topic = "/robot_" + std::to_string(robot_id_) + "/cmd_vel";
+        std::string robot_boit_info_topic = "/robot_" + std::to_string(robot_id_) + "/boit_info";
+        std::string robot_tuning_params_topic = "/tuning_params";
 
-            // init boit
-            Boit boit;
-            boit.initialized = false;
-            boits.push_back(boit);
-        }
+        sub_boit_info = this->create_subscription<Msg_Boit_Info>(
+            robot_boit_info_topic, 
+            10, 
+            std::bind(&Boit_Controller_Node::Subscription_Boit_Info_Callback, this, _1) 
+        ); 
+        
+        /*
+        sub_tuning_params = this->create_subscription<Msg_Boit_Info>(
+            robot_tuning_params_topic, 
+            10, 
+            std::bind(&Boit_Controller_Node::Subscription_Tuning_Params_Callback, this, _1) 
+        );
+        */
+
+        // init pub
+        pub_twist = this->create_publisher<Msg_Twist>(
+                robot_twist_topic, 
+                10
+            ); 
+
+        // init boit
+        Boit boit;
+        boit.initialized = false;
     }
 private:
-    void Subscription_Boit_Info_Callback(const Msg_Boit_Info::SharedPtr info, uint id);   // ALL BOITS LOGIC HAPPENS HERE
+    void Subscription_Boit_Info_Callback(const Msg_Boit_Info::SharedPtr info);   // ALL BOITS LOGIC HAPPENS HERE
+    //void Subscription_Tuning_Params_Callback(const Msg_Tuning_Params::SharedPtr params);
     Vector2 Calculate_Accel_Alignment(std::vector<Msg_Odom> odoms);
     Vector2 Calculate_Accel_Avoidence(std::vector<Msg_Odom> odoms);
     Vector2 Calculate_Accel_Cohesion(std::vector<Msg_Odom> odoms);
+    Vector2 Calculate_Accel_Obsticle_Avoid(const Msg_Odom& self_odom, const Msg_Point& closest_obsticle);
 
 private:
-    std::vector<Boit> boits;
-    std::vector<Publisher_Twist> pubs;
-    std::vector<Subscription_Boit_Info> subs;
+    Boit boit;
+    Publisher_Twist pub_twist;
+    Subscription_Boit_Info sub_boit_info;
+    //Subscription_Tuning_Params sub_tuning_params;
 
     //parameters declarations 
+    float robot_id_;
+    // modefiable params
+    bool params_init = false;
     float rotation_kp_;
     float containment_force_;
     float cohesion_range_;
@@ -105,7 +108,8 @@ private:
     float alignment_factor_;
     float avoidance_range_;
     float avoidance_factor_;
-
+    float obstacle_avoid_range_;
+    float obstacle_avoid_factor_;
 };
 
 int main(int argc, char *argv[])
@@ -117,21 +121,25 @@ int main(int argc, char *argv[])
 }
 
 // ALL BOITS LOGIC HAPPENS HERE
-void Boit_Controller_Node::Subscription_Boit_Info_Callback(const Msg_Boit_Info::SharedPtr info, uint id)
+void Boit_Controller_Node::Subscription_Boit_Info_Callback(const Msg_Boit_Info::SharedPtr info)
 {
-    assert(id < boits.size() && "boit id should not surpass the size of boits container");
     assert(info->odometries.size() && "info odom array should never be completely empty, odom of boit self is always the first element");
     
+    // dont want to perform any calculations until params are set
+    if (!params_init)
+        return;
+
     // update information we have
     Msg_Odom self_odom = info->odometries[0];
+    Msg_Point obstacle_point = info->closest_obstacle; 
     float z = self_odom.pose.pose.orientation.z;
     float w = self_odom.pose.pose.orientation.w;
-    boits[id].last_rotation = atan2(2.0f * (w * z), w * w - z * z);
+    boit.last_rotation = atan2(2.0f * (w * z), w * w - z * z);
 
-    if (!boits[id].initialized)
+    if (!boit.initialized)
     {
-        boits[id].last_time = clock();
-        boits[id].initialized = true;
+        boit.last_time = clock();
+        boit.initialized = true;
         return;
     }
 
@@ -141,6 +149,7 @@ void Boit_Controller_Node::Subscription_Boit_Info_Callback(const Msg_Boit_Info::
     Vector2 accel_align = Calculate_Accel_Alignment(info->odometries); 
     Vector2 accel_avoid = Calculate_Accel_Avoidence(info->odometries);
     Vector2 accel_cohes = Calculate_Accel_Cohesion(info->odometries);
+    Vector2 accel_obsti = Calculate_Accel_Obsticle_Avoid(self_odom, obstacle_point);
     Vector2 accel_total = {};
 
     // combine forces forces
@@ -168,12 +177,14 @@ void Boit_Controller_Node::Subscription_Boit_Info_Callback(const Msg_Boit_Info::
             accel_align.x + 
             accel_avoid.x + 
             accel_cohes.x + 
+            accel_obsti.x +
             accel_containment.x;
 
         accel_total.y = 
             accel_align.y + 
             accel_avoid.y + 
             accel_cohes.y + 
+            accel_obsti.y +
             accel_containment.y;
 
     }
@@ -182,7 +193,7 @@ void Boit_Controller_Node::Subscription_Boit_Info_Callback(const Msg_Boit_Info::
     // and publish it
     {
         // delta time in seconds
-        float delta_time = (double)(clock() - boits[id].last_time) / CLOCKS_PER_SEC;
+        float delta_time = (double)(clock() - boit.last_time) / CLOCKS_PER_SEC;
 
         // calculate delta_velocities
         float delta_linear_x = sqrt(accel_total.x*accel_total.x + accel_total.y*accel_total.y) * delta_time; 
@@ -192,7 +203,7 @@ void Boit_Controller_Node::Subscription_Boit_Info_Callback(const Msg_Boit_Info::
         // Dinov komentar: mislim da je ok jer je simulation refresh rate nadam se capped na necemu
         float delta_angular_z = p_controller_update(
                     atan2(accel_total.y, accel_total.x), 
-                    boits[id].last_rotation, 
+                    boit.last_rotation, 
                     this->rotation_kp_
                 );
 
@@ -206,13 +217,13 @@ void Boit_Controller_Node::Subscription_Boit_Info_Callback(const Msg_Boit_Info::
         twist_msg.angular.y = 0.0f;
         twist_msg.angular.z = self_odom.twist.twist.angular.z + delta_angular_z;
 
-        pubs[id]->publish(twist_msg);
+        pub_twist->publish(twist_msg);
     }
 
     // ---------------------------------------------------------
     // end of boits logic
     
-    boits[id].last_time = clock();  // this is for delta_time to work
+    boit.last_time = clock();  // this is for delta_time to work
 }
 
 Vector2 Boit_Controller_Node::Calculate_Accel_Alignment(std::vector<Msg_Odom> odoms)
@@ -380,3 +391,50 @@ Vector2 Boit_Controller_Node::Calculate_Accel_Cohesion(std::vector<Msg_Odom> odo
     return force_cohesion;
 }
 
+Vector2 Boit_Controller_Node::Calculate_Accel_Obsticle_Avoid(const Msg_Odom& self_odom, const Msg_Point& closest_obstacle)
+{
+    Vector2 force_obstacle = {};
+
+    Vector2 boit_self_pose = {
+        (float)self_odom.pose.pose.position.x,
+        (float)self_odom.pose.pose.position.y,
+    };
+
+    Vector2 closest_obstacle_pose = {
+        (float)closest_obstacle.x,
+        (float)closest_obstacle.y,
+    };
+   
+    Vector2 distance = {
+        closest_obstacle_pose.x - boit_self_pose.x,
+        closest_obstacle_pose.y - boit_self_pose.y
+    };
+    
+    if (squared_euclidan_norm(distance) <= (this->obstacle_avoid_range_ * this->obstacle_avoid_range_))
+    {
+        force_obstacle.x += distance.x / (squared_euclidan_norm(distance));
+        force_obstacle.y += distance.y / (squared_euclidan_norm(distance));
+    }
+
+    force_obstacle.x *= obstacle_avoid_factor_;
+    force_obstacle.y *= obstacle_avoid_factor_;
+    return force_obstacle;
+}
+
+/*
+void Boit_Controller_Node::Subscription_Tuning_Params_Callback(const Msg_Tuning_Params::SharedPtr params)
+{
+    init_params = true; 
+    
+    rotation_kp_ = params.rotation_kp;
+    containment_force_ = params.containment_force;
+    cohesion_range_ = params.cohesion_range;
+    cohesion_factor_ = params.cohesion_factor; 
+    alignment_range_ = params.alignment_range; 
+    alignment_factor_ = params.alignment_factor; 
+    avoidance_range_ = params.avoidance_range; 
+    avoidance_factor_ = params.avoidance_factor;
+    obstacle_avoid_range_ = params.obstacle_avoid_range; 
+    obstacle_avoid_factor_ = params.obstacle_avoid_factor; 
+}
+*/
