@@ -1,57 +1,45 @@
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument, GroupAction
+from launch.actions import OpaqueFunction, IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch_ros.actions import Node
-from launch.substitutions import LaunchConfiguration
 from ament_index_python.packages import get_package_share_directory
 import os
-
+import yaml
 
 def generate_launch_description():
-    # === Launch Arguments ===
-    boid_num_arg = DeclareLaunchArgument(
-        "boid_number",
-        default_value="3",  # Change this default if needed
-        description="Number of boid_controller nodes to launch"
-    )
+    launch_dir = get_package_share_directory('vissus_projekt')
+    yaml_path = os.path.join(launch_dir, 'launch', 'launch_params.yaml')
 
-    boid_number = LaunchConfiguration("boid_number")
+    with open(yaml_path, 'r') as f:
+        params = yaml.safe_load(f)
 
-    vissus_dir = get_package_share_directory("vissus_projekt")
-    start_launch_path = os.path.join(vissus_dir, "launch", "start.launch.py")
+    num_of_robots = int(params['num_of_robots'])
+
+    start_launch_path = os.path.join(launch_dir, 'launch', 'start.launch.py')
 
     start_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(start_launch_path)
     )
 
     boid_controllers = []
-    for i in range(boid_number):
+    for i in range(num_of_robots):
         boid_controllers.append(
             Node(
-                package="vissus_projekt",
-                executable="boid_control",
-                name=f"boid_controller_{i}",
-                output="screen",
-                parameters=[{"robot_id": i}]
+                package='vissus_projekt',
+                executable='boid_control',
+                name=f'boid_controller_{i}',
+                output='screen',
+                parameters=[{'robot_id': i}]
             )
         )
 
     data_splitter = Node(
-        package="vissus_projekt",
-        executable="data_splitter",
-        name="data_splitter",
-        output="screen",
-        parameters=[{"boid_number": boid_number}]
+        package='vissus_projekt',
+        executable='data_splitter',
+        name='data_splitter',
+        output='screen',
+        parameters=[{'boid_number': num_of_robots}]
     )
 
-    # === Build Launch Description ===
-    ld = LaunchDescription()
-    ld.add_action(boid_number_arg)
-    ld.add_action(start_launch)
+    return LaunchDescription([start_launch] + boid_controllers + [data_splitter])
 
-    for controller in boid_controllers:
-        ld.add_action(controller)
-
-    ld.add_action(data_splitter)
-
-    return ld
