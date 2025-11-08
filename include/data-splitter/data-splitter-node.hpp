@@ -1,5 +1,6 @@
 #pragma once
 
+#include "defines.h"
 #include "rclcpp/rclcpp.hpp"
 #include "utils.h"
 
@@ -12,7 +13,7 @@ public:
     {
         boit_fov_ = this->declare_parameter<float>("boit_fov", 0.0f);
         boit_vision_range_ = this->declare_parameter<float>("boit_vision_range", 0.0f);
-        map_sub_ = this->create_subscription<Msg_Map>("/map", 10, std::bind(&Data_Splitter_Node::Map_Callback, this))
+        map_sub_ = this->create_subscription<Msg_Map>("/map", 10, std::bind(&Data_Splitter_Node::Map_Callback, this, _1));
 
         uint highest_robot_id = 0;
         {
@@ -53,7 +54,7 @@ public:
     }
 private:
     
-    rclcpp::Subscription<Msg_Map> map_sub_;
+    Subscription_Map map_sub_;
 
     float boit_fov_;
     float boit_vision_range_;
@@ -64,7 +65,7 @@ private:
     Msg_Map map_;
 
     void Subscription_Odom_Callback(const Msg_Odom::SharedPtr odom, uint id);
-    void Data_Splitter_Node::Map_Callback(const Msg_Map::SharedPtr map){
+    void Map_Callback(const Msg_Map::SharedPtr map){
         map_ = *map;
     }
 
