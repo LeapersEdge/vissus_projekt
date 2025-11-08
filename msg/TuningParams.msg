@@ -8,3 +8,4 @@ float32 avoidance_range
 float32 avoidance_factor
 float32 obstacle_avoid_range
 float32 obstacle_avoid_factor
+float32 goal_factor 
