@@ -17,7 +17,7 @@ Data_Splitter_Node() : Node("data_splitter_node")
 {
     boit_fov_ = this->declare_parameter<float>("boit_fov", 0.0f);
     boit_vision_range_ = this->declare_parameter<float>("boit_vision_range", 0.0f);
-    num_boids_ = this->declare_parameter<unsigned int>("boid_number", 1u);
+    num_boids_ = (unsigned int)this->declare_parameter<int>("boid_number", 1);
 
 
     map_sub_ = this->create_subscription<Msg_Map>("/map", 10, std::bind(&Data_Splitter_Node::Map_Callback, this, _1));
@@ -56,10 +56,9 @@ Data_Splitter_Node() : Node("data_splitter_node")
 }
 
 private:
-    void Subscription_Odom_Callback(const Msg_Odom::SharedPtr odom, unsigned int id);
-    void Map_Callback(const Msg_Map::SharedPtr map);
+    //void Subscription_Odom_Callback(const Msg_Odom::SharedPtr odom, unsigned int id);
+    //void Map_Callback(const Msg_Map::SharedPtr map);
 
-    ```
     Subscription_Map map_sub_;
     std::vector<Publisher_Twist> pubs_twist_;
     std::vector<Publisher_Boit_Info> pubs_boit_info_;
@@ -116,8 +115,8 @@ private:
     std::vector<Msg_Odom> get_neighbours(const std::vector<Msg_Odom>& robot_odoms, unsigned int id){
         const Msg_Odom& boid_id_odom = robot_odoms[id];
         Vector2 boid_pose{
-            boid_id_odom.pose.pose.position.x, 
-            boid_id_odom.pose.pose.position.y
+            (float)boid_id_odom.pose.pose.position.x, 
+            (float)boid_id_odom.pose.pose.position.y
         };
 
         std::vector<Msg_Odom> true_neighbours;
@@ -126,40 +125,40 @@ private:
             if (static_cast<unsigned int>(i) == id) continue;   
             const Msg_Odom& neighbour_i_odom = robot_odoms[i];
             Vector2 neighbour_i{
-                neighbour_i_odom.pose.pose.position.x, 
-                neighbour_i_odom.pose.pose.position.y
+                (float)neighbour_i_odom.pose.pose.position.x, 
+                (float)neighbour_i_odom.pose.pose.position.y
             };
             Vector2 diff{neighbour_i.x - boid_pose.x, neighbour_i.y - boid_pose.y};
             float distance_sq = squared_euclidan_norm(diff);
             float angle = atan2(diff.x, diff.y);
             if (distance_sq < boit_vision_range_ * boit_vision_range_ &&
-                ((angle < boit_fov_/2) && (angle > -boit_fov/2))) {
+                ((angle < boit_fov_/2.0f) && (angle > -boit_fov_/2.0f))) {
                 true_neighbours.push_back(neighbour_i_odom);
             }
         }
         return true_neighbours;
     }
-
     void Subscription_Odom_Callback(const Msg_Odom::SharedPtr odom, unsigned int id){
         if (id >= robot_odoms_.size()) return;
         robot_odoms_[id] = *odom;
         std::vector<Msg_Odom> neighbours = get_neighbours(robot_odoms_, id); 
         vissus_projekt::msg::OdometryArray odom_array_id;
 
-        odom_array_id.OdometryArray = neighbours;
-        odom_array_id.closest_obstacle = get_closest_obstacle(*odom);
+        odom_array_id.odometries = neighbours;
+        Vector2 closests_obst = get_closest_obstacle(*odom);
+        odom_array_id.closest_obstacle.x = closests_obst.x;
+        odom_array_id.closest_obstacle.y = closests_obst.y;
     }
 
     void Map_Callback(const Msg_Map::SharedPtr map){
         map_ = *map;
     }
-
 };
 
-    int main(int argc, char *argv[])
-    {
-        rclcpp::init(argc, argv);
-        rclcpp::spin(std::make_shared<Data_Splitter_Node>());
-        rclcpp::shutdown();
-        return 0;
+int main(int argc, char *argv[])
+{
+    rclcpp::init(argc, argv);
+    rclcpp::spin(std::make_shared<Data_Splitter_Node>());
+    rclcpp::shutdown();
+    return 0;
 }
