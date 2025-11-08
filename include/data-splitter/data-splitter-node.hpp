@@ -12,6 +12,7 @@ public:
     {
         boit_fov_ = this->declare_parameter<float>("boit_fov", 0.0f);
         boit_vision_range_ = this->declare_parameter<float>("boit_vision_range", 0.0f);
+        map_sub_ = this->create_subscription<Msg_Map>("/map", 10, std::bind(&Data_Splitter_Node::Map_Callback, this))
 
         uint highest_robot_id = 0;
         {
@@ -52,7 +53,7 @@ public:
     }
 private:
     
-    rclcpp::Subscription<Map> map_sub_;
+    rclcpp::Subscription<Msg_Map> map_sub_;
 
     float boit_fov_;
     float boit_vision_range_;
@@ -80,8 +81,8 @@ private:
         float origin_y = map_.info.origin.position.y;
 
         // Robot position in map frame
-        float x_odom = robot_odom.pose.position.x;
-        float y_odom = robot_odom.pose.position.y;
+        float x_odom = robot_odom.pose.pose.position.x;
+        float y_odom = robot_odom.pose.pose.position.y;
         Vector2 pose_odom{x_odom, y_odom};
 
         float smallest_distance = std::numeric_limits<float>::max();

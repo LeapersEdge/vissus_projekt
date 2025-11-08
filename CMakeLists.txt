@@ -36,7 +36,7 @@ endif()
 # msg stuff
 rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/OdometryArray.msg"
-  DEPENDENCIES std_msgs nav_msgs
+  DEPENDENCIES std_msgs nav_msgs geometry_msgs
 )
 
 # cpp stuff

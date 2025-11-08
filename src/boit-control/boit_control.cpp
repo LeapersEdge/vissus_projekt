@@ -13,7 +13,7 @@
 #include <string>
 #include <vector>
 #include "utils.h"
-
+#include "vissus_projekt/msg/odometry_array.hpp"
 // ctrl+f material (section keywords):
 //
 // DEFINES, GLOBALS FOR TUNNING
