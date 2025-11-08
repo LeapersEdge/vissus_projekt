@@ -25,11 +25,16 @@ Imamo *node*ove:
 
 Controller ima jedan parametar: ID od robota na kojeg se *subscribe*ati.
 
+#### Messages
+- `OdometryArray`: header, odometries[], closest_obstacle
+- `TuningParams`
+
 #### Boid control
 Svaki boid ima 2 *message*-a:
 - `odom` (odometrija)
 - `cmd_vel` (velocity command)
 
+#### Data splitter
 Umjesto da imamo jedan node koji upravlja svima (centralizirano upravljanje), mi **radimo decentralizirano upravljanje** (svaki boid upravlja sobom).
 
 Pošto svaki pojedini boid ne zna sam po sebi gdje je svaki drugi boid, koristimo `data-splitter` node, gdje će se konstruirati message **svoje odometrije**, **odometrije svakog od boida kojeg vidi**, te **closest obstacle**.
