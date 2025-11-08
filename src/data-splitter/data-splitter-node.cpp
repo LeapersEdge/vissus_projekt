@@ -19,7 +19,7 @@ public:
     {
         boid_fov_ = this->declare_parameter<float>("boid_fov", M_PI);
         boid_vision_range_ = this->declare_parameter<float>("boid_vision_range", 10.0f);
-        num_boids_ = this->declare_parameter<int>("boid_number", 10);
+        num_boids_ = (unsigned int)this->declare_parameter<int>("boid_number", 1u);
 
         map_sub_ = this->create_subscription<Msg_Map>("/map", 10, std::bind(&Data_Splitter_Node::Map_Callback, this, _1));
         
