@@ -1,0 +1,293 @@
+#include <cassert>
+#include <cmath>
+#include <csignal>
+#include <cstdio>
+#include "rclcpp/rclcpp.hpp"
+#include "std_msgs/msg/string.hpp"
+#include "nav_msgs/msg/odometry.hpp"
+#include "geometry_msgs/msg/twist.hpp"
+#include <chrono>
+#include <cstdlib>
+#include <ctime>
+#include <memory>
+#include <string>
+#include <vector>
+#include "utils.h"
+#include "vissus_projekt/msg/odometry_array.hpp"
+#include "vissus_projekt/msg/tuning_params.hpp"
+
+
+#define DEFAULT_RANGE_COHESION 1.0f
+#define DEFAULT_RANGE_ALIGNMENT 1.0f
+#define DEFAULT_RANGE_AVOIDANCE 1.0f
+
+using std::placeholders::_1;
+
+class Boit_Controller_Node : public rclcpp::Node
+{
+public:
+    Boit_Controller_Node() : Node("boit_controller_node")
+    {
+        robot_id_ = this->declare_parameter<int>("robot_id", 0);
+        // Subscribe to config topic
+        config_sub_ = this->create_subscription<vissus_projekt::msg::TuningParams>(
+            "tuning_parameters",
+            10,
+            std::bind(&Boit_Controller_Node::ConfigCallback, this, _1)
+        );
+        odom_sub_ = this->create_subscription<vissus_projekt::msg::OdometryArray>(
+            "tuning_parameters",
+            10,
+            std::bind(&Boit_Controller_Node::Odom_Callback, this, _1)
+        );
+
+
+        RCLCPP_INFO(this->get_logger(),
+                    "Boit Controller Node %d initialized, subscribing to config topic: %s",
+                    robot_id_, config_topic.c_str());
+    }
+
+private:
+    // --- SUBSCRIBERS AND PUBLISHERS ---
+    rclcpp::Subscription<vissus_projekt::msg::TuningParams>::SharedPtr config_sub_;
+    rclcpp::Subscription<vissus_projekt::msg::OdometryArray>::SharedPtr odom_sub_;
+
+    // Replace parameter variables with runtime values
+    float rotation_kp_        = 0.0f;
+    float containment_force_  = 0.0f;
+    float cohesion_range_     = DEFAULT_RANGE_COHESION;
+    float cohesion_factor_    = 0.0f;
+    float alignment_range_    = DEFAULT_RANGE_ALIGNMENT;
+    float alignment_factor_   = 0.0f;y
+    float avoidance_range_    = DEFAULT_RANGE_AVOIDANCE;
+    float avoidance_factor_   = 0.0f;
+
+    uint robot_id_;
+
+    // Example: existing logic functions
+    void Subscription_Odom_Callback(const Msg_Odom::SharedPtr odom);
+    Vector2 Calculate_Force_Alignment(uint boit_id);
+    Vector2 Calculate_Force_Avoidence(uint boit_id);
+    Vector2 Calculate_Force_Cohesion(uint boit_id);
+
+    // 
+    void TuningCallback(const vissus_projekt::msg::BoitConfig::SharedPtr msg)
+    {
+        rotation_kp_        = msg->rotation_kp;
+        containment_force_  = msg->containment_force;
+        cohesion_range_     = msg->cohesion_range;
+        cohesion_factor_    = msg->cohesion_factor;
+        alignment_range_    = msg->alignment_range;
+        alignment_factor_   = msg->alignment_factor;
+        avoidance_range_    = msg->avoidance_range;
+        avoidance_factor_   = msg->avoidance_factor;
+
+        RCLCPP_INFO(this->get_logger(),
+                    "Updated config for robot %d | rot_kp=%.2f, coh_range=%.2f, avoid_range=%.2f",
+                    robot_id_, rotation_kp_, cohesion_range_, avoidance_range_);
+    }
+
+
+// Here boid calculates velocity update
+void Boit_Controller_Node::Odom_Callback(const vissus_projekt::msg::OddometryArray::SharedPtr odom)
+{   
+    uint num_neighbours = sizeof(odom->odometries); //how many neghbouirs boid has
+    geometry_msgs::msg::Point obstacle = odom->closest_obstacle;
+    Msg_Odom robot_odom: // odometrija robota ovog kotrnolera
+    Msg_Odom[num_neighbours] neighbours; // odometrije njegovig susjeda
+    
+    robot_odom = odom->odometries[0];
+
+    //set neighbours
+    if (sizeof(odometries) > 1) {
+        for (i, i<num_neighbours, i++){
+            neighbours[i] = odometries[i+1];
+    }
+
+    float z = robot_odom.pose.pose.orientation.z;
+    float w = robot_odom.pose.pose.orientation.w;
+
+    Vector2 robot_pose{
+        robot_odom.pose.position.x, 
+        robot-odom.pose.position.y
+    };
+
+    Vector2 force_alignment = Boit_Controller_Node:Calculate_Force_Alignment(robot_odom, neighbours);
+    Vector2 force_avoidance = Boit_Controller_Node:Calculate_Force_Avoidance(robot_pose, neighbours);
+    Vector2 force_cohesion = Boit_Controller_Node:Calculate_Force_Cohesion(robot_pose, neighbours);
+
+    vector2 acc_force = force_alignment + forice_avoidance + force_cohesion;
+
+    // delta time in seconds
+    float delta_time = (double)(clock() - boits[id].last_time) / CLOCKS_PER_SEC;
+
+    // calculate delta_velocities
+    float delta_linear_x = sqrt(accel_total.x*accel_total.x + accel_total.y*accel_total.y) * delta_time; 
+    // UPITNO za delta_linear_x jeli ok izracunati accel u namjenjenom za vremenski interval (t+1)-(t) 
+    // a koristiti dt=(t)-(t-1)
+    //
+    // Dinov komentar: mislim da je ok jer je simulation refresh rate nadam se capped na necemu
+    float delta_angular_z = p_controller_update(
+                atan2(accel_total.y, accel_total.x), 
+                boits[id].last_rotation, 
+                this->rotation_kp_
+            );
+
+    // construct message
+    Msg_Twist twist_msg;
+    twist_msg.linear.x = boits[id].odom.twist.twist.linear.x + delta_linear_x;
+    twist_msg.linear.y = 0.0f;
+    twist_msg.linear.z = 0.0f;
+    twist_msg.angular.x = 0.0f;
+    twist_msg.angular.y = 0.0f;
+    twist_msg.angular.z = boits[id].odom.twist.twist.angular.z + delta_angular_z;
+
+    pubs[id]->publish(twist_msg);
+    }
+
+    }
+    
+Vector2 Boit_Controller_Node::Calculate_Force_Alignment(Msg_Odom boid_id, Msg_Odom[] neighbours)
+{
+    Vector2 force_alignment;
+    uint neighbours_count = neighbours.size();
+
+    for (uint i = 0; i < neighbours.size(); ++i)
+    {
+
+        Vector2 neighbour_i_pose = {
+            (float)neighbours[i].odom.pose.pose.position.x,
+            (float)neighbours[i].odom.pose.pose.position.y,
+        };
+        // distance between boit[id] and boit[i] 
+        Vector2 distance_vector = boid_pose - neighbour_i_pose;
+
+        // is the boit[i] close enough to boit[id] take effect on it?
+        if (squared_euclidan_norm(distance_vector) <= (this->alignment_range_ * this->alignment_range_))
+        {
+            // linear component of linear+angular pair
+            float boit_i_lin = neighbours[i].twist.twist.linear.x;
+            float boit_id_lin = boid_id.twist.twisst.linear.x;
+
+            // -calculating jaw based on quaternion data
+            // -x and y are unneccessary because were only rotating around jaw so they are always 0
+            // -full function if ever needed:
+            // // float neighbour_i = atan2(2.0f * (w * z + x * y), w * w + x * x - y * y - z * z);
+            float z = (float)neighbours[i].odom.pose.pose.orientation.z;
+            float w = (float)neighbours[i].odom.pose.pose.orientation.w;
+            float neighbour_i = atan2(2.0f * (w * z), w * w - z * z);
+
+            z = (float)boid_id.pose.pose.orientation.z;
+            w = (float)boid_id.pose.pose.orientation.w;
+            float boit_id_rot = atan2(2.0f * (w * z), w * w - z * z);
+
+            // -jaw = 0° is to the right of the screen
+            // -positive rotation axis is right handed if Z goes outside the screen
+            // -positive X is right, positive Y is up
+
+            // -we only calculate linear_xy vectors based on magnitude and rotation
+            // because angular velocity doesnt have affect on current_velocity_xy vector
+            // -angular velocity is only needed for rotating the vessel which we will
+            // calculate for actuation purposes, and not guidence, as it can be looked at as
+            // acceleration thats affecting the magnitude vector in global frame 
+            // (changes its value overtime in global frame, yes, twist.linear is in
+            // local coordinate frame)
+            Vector2 boit_i_vel_lin = {
+                (float)cos(neighbour_i)*boit_i_lin,
+                (float)sin(neighbour_i)*boit_i_lin,
+            };
+            Vector2 boit_id_vel_lin = {
+                (float)cos(boit_id_rot)*boit_id_lin,
+                (float)sin(boit_id_rot)*boit_id_lin,
+            };
+
+            force_alignment += boit_i_vel_lin - boit_id_vel_lin.;
+
+            ++alignment_neighbours_count;
+        }
+    }
+    force_alignment /= alignment_neighbours_count_
+    
+    force_alignment *= alignment_factor_;
+
+    return force_alignment;
+}
+
+Vector2 Boit_Controller_Node::Calculate_Force_Avoidence(Vector2 boid_pose, Msg_Odom[] neighbours)
+{
+    Vector2 force_avoidence;
+    uint neighbours_count = neighbours.size()
+
+    for (uint i = 0; i < neighbours_count; ++i)
+    {
+        // skip calculations with itself
+        if (i == boit_id)
+            continue;
+
+        Vector2 num_neighbours = {
+            (float)neighbours[i].odom.pose.pose.position.x,
+            (float)neighbours[i].odom.pose.pose.position.y,
+        };
+        
+        // distance between boit[id] and boit[i] 
+        Vector2 distance_vector = pfor (uint i = 0; i < neighbours_count; ++i)
+
+        Vector2 neighbour_i_pose = {
+            (float)neighbours[i].odom.pose.pose.position.x,
+            (float)neighbours[i].odom.pose.pose.position.y,
+        };
+        // distance between boit[id] and boit[i] 
+        Vector2 distance_vector = boid_pose - neighbour_i_pose;
+
+        // is the boit[i] close enough to boit[id] take effect on it?
+        if (squared_euclidan_norm(distance_vector) <= (avoidance_range_ * avoidance_range_))
+        {
+            force_avoidence.x += distance_vector.x / (squared_euclidan_norm(distance_vector));
+            force_avoidence.y += distance_vector.y / (squared_euclidan_norm(distance_vector));
+        }
+    
+    }
+
+    force_avodiance *= avoidance_factor_;
+
+    return force_avoidence;
+}
+
+
+Vector2 Boit_Controller_Node::Calculate_Force_Cohesion(Vector2 boid_pose, Msg_Odom[] neighbours)
+{    
+    uint neighbours_count = neighbours.size();
+    if (neighbours_count == 0){continue;}
+
+    Vector2 force_cohesion;
+
+    for (uint i = 0; i < neighbours.size(); ++i)
+    {
+
+        Vector2 neighbour_i_pose = {
+            (float)neighbours[i].odom.pose.pose.position.x,
+            (float)neighbours[i].odom.pose.pose.position.y,
+        };
+        // distance between boit[id] and boit[i] 
+        Vector2 distance_vector = boid_pose - neighbour_i_pose;
+    
+        if (squared_euclidan_norm(distance_vector) <= (cohesion_range_ * cohesion_range_))
+        {
+            force_cohesion += distance_vector;
+            ++cohesion_neighbours_count;
+        }
+    }
+
+    force_cohesion /= neighbours_count;
+    force_cohesion *= cohesion_factor_;
+
+    return force_cohesion;
+}
+
+int main(int argc, char *argv[])
+{
+    rclcpp::init(argc, argv);
+    rclcpp::spin(std::make_shared<Boit_Controller_Node>());
+    rclcpp::shutdown();
+    return 0;
+}

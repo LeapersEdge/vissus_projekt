@@ -51,7 +51,7 @@ public:
             pubs.push_back(pub);
         }
     }
-private:
+private:    
     
     rclcpp::Subscription<Msg_Map> map_sub_;
 
