@@ -35,6 +35,7 @@
 // ROS2 NODE 
 
 using std::placeholders::_1;
+double getYawFromQuaternion(const geometry_msgs::msg::Quaternion& q);
 
 struct Boit
 {
@@ -201,24 +202,26 @@ void Boit_Controller_Node::Subscription_Boit_Info_Callback(const Msg_Boit_Info::
         // a koristiti dt=(t)-(t-1)
         //
         // Dinov komentar: mislim da je ok jer je simulation refresh rate nadam se capped na necemu
+        float yaw = getYawFromQuaternion(self_odom.pose.pose.orientation);
+        
         float delta_angular_z = p_controller_update(
-                    atan2(accel_total.y, accel_total.x), 
+                    atan2(accel_total.y, accel_total.x) - yaw, 
                     boit.last_rotation, 
                     this->rotation_kp_
                 );
 
-
         // construct message
         Msg_Twist twist_msg;
         // twist_msg.linear.x = self_odom.twist.twist.linear.x + delta_linear_x * delta_time;
+        float v_max = 1;
         twist_msg.linear.x = self_odom.twist.twist.linear.x + accel_total.x * delta_time;
-        twist_msg.linear.y = self_odom.twist.twist.linear.y + accel_total.y * delta_time;
-        //twist_msg.linear.y = 0.0f;
+        //twist_msg.linear.y = self_odom.twist.twist.linear.y + accel_total.y * delta_time;
+        twist_msg.linear.y = 0.0f;
         twist_msg.linear.z = 0.0f;
         twist_msg.angular.x = 0.0f;
         twist_msg.angular.y = 0.0f;
-        twist_msg.angular.z = 0.0f;
-        // twist_msg.angular.z = self_odom.twist.twist.angular.z + delta_angular_z * delta_time;
+        //twist_msg.angular.z = 0.0f;
+        twist_msg.angular.z = self_odom.twist.twist.angular.z + delta_angular_z * delta_time;
 
         pub_twist->publish(twist_msg);
     }
@@ -489,5 +492,18 @@ Vector2 Boit_Controller_Node::Calculate_Accel_Goal(const Msg_Odom& self_odom, co
     force_goal *= goal_factor_; 
     
     return force_goal;
+}
+
+double getYawFromQuaternion(const geometry_msgs::msg::Quaternion& q)
+{
+    double x = q.x;
+    double y = q.y;
+    double z = q.z;
+    double w = q.w;
+
+    double yaw = std::atan2(2.0 * (w * z + x * y),
+                            1.0 - 2.0 * (y * y + z * z));
+
+    return yaw;
 }
 
