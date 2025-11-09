@@ -1,5 +1,5 @@
 float32 rotation_kp
-float32 containment_force
+float32 max_speed
 float32 cohesion_range
 float32 cohesion_factor
 float32 alignment_range

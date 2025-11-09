@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <cassert>
 #include <cmath>
 #include <csignal>
@@ -117,6 +118,7 @@ private:
     float obstacle_avoid_range_;
     float obstacle_avoid_factor_;
     float goal_factor_;
+    float max_speed_;
 
     Msg_Point goal_point;
 };
@@ -207,20 +209,38 @@ void Boit_Controller_Node::Subscription_Boit_Info_Callback(const Msg_Boit_Info::
                     this->rotation_kp_
                 );
 
-
         // construct message
         Msg_Twist twist_msg;
-        // twist_msg.linear.x = self_odom.twist.twist.linear.x + delta_linear_x * delta_time;
-        twist_msg.linear.x = self_odom.twist.twist.linear.x + accel_total.x * delta_time;
-        twist_msg.linear.y = self_odom.twist.twist.linear.y + accel_total.y * delta_time;
-        //twist_msg.linear.y = 0.0f;
-        twist_msg.linear.z = 0.0f;
-        twist_msg.angular.x = 0.0f;
-        twist_msg.angular.y = 0.0f;
-        twist_msg.angular.z = 0.0f;
-        // twist_msg.angular.z = self_odom.twist.twist.angular.z + delta_angular_z * delta_time;
+      
+        /*
+        // fully linear
+        {
+            twist_msg.linear.x = self_odom.twist.twist.linear.x + accel_total.x * delta_time;
+            twist_msg.linear.y = self_odom.twist.twist.linear.y + accel_total.y * delta_time;
+            twist_msg.angular.z = 0.0f;
+            float norm = sqrt(twist_msg.linear.x*twist_msg.linear.x + twist_msg.linear.y*twist_msg.linear.y);
+            if (norm > max_speed_)
+            {
+                twist_msg.linear.x /= norm;
+                twist_msg.linear.y /= norm;
+                twist_msg.linear.x *= max_speed_;
+                twist_msg.linear.y *= max_speed_;
+            }
+        }
+        */
 
-        pub_twist->publish(twist_msg);
+        twist_msg.linear.x = self_odom.twist.twist.linear.x + delta_linear_x * delta_time;
+        twist_msg.linear.y = 0.0f;
+        twist_msg.angular.z = self_odom.twist.twist.angular.z + delta_angular_z * delta_time;
+        twist_msg.linear.x = std::min((float)twist_msg.linear.x, max_speed_);
+     
+        // angular
+        {
+            twist_msg.linear.z = 0.0f;
+            twist_msg.angular.x = 0.0f;
+            twist_msg.angular.y = 0.0f;
+            pub_twist->publish(twist_msg);
+        }
     }
 
     // ---------------------------------------------------------
@@ -457,6 +477,7 @@ void Boit_Controller_Node::Subscription_Tuning_Params_Callback(const Msg_Tuning_
     obstacle_avoid_range_ = params->obstacle_avoid_range; 
     obstacle_avoid_factor_ = params->obstacle_avoid_factor; 
     goal_factor_ = params->goal_factor; 
+    max_speed_ = params->max_speed; 
 }
 
 // TLDR: updates tuning params 
