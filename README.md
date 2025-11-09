@@ -54,7 +54,7 @@ Prvo u launch/launch_params.yaml morate podesiti:
   2. FOV boida
   3. Njegov vidni dosed
 
-Parametre sustava koji su zapravo pojačanja reynolodsovih pravila namještate tako da publishate poruku tipa TuningParams msg. Mi preporučujemo rqt za to. Ali možete i lagano iskoristiti ros2 topic pub.
+Parametre sustava(koji su zapravo pojačanja reynolodsovih pravila) namještate tako da publishate poruku tipa TuningParams msg. Mi preporučujemo rqt za to, ali možete i lagano iskoristiti ros2 topic pub.
 ```shell
 rqt
 ```
