@@ -108,7 +108,6 @@ private:
     // modefiable params
     bool params_init = false;
     float rotation_kp_;
-    float containment_force_;
     float cohesion_range_;
     float cohesion_factor_;
     float alignment_range_;
@@ -175,34 +174,12 @@ void Boit_Controller_Node::Subscription_Boit_Info_Callback(const Msg_Boit_Info::
 
     // combine forces forces
     {
-        /*
-        // converts within % to the wall
-        // working area ~~ X€<-4.9,4.9>, Y€<-4.9,4.9>
-        Vector2 accel_containment = {};
-        {
-            Vector2 boit_self_pose = {
-                (float)self_odom.pose.pose.position.x,
-                (float)self_odom.pose.pose.position.y,
-            };
-
-            if (boit_self_pose.x > 4.9*0.8)
-                accel_containment.x = -this->containment_force_;
-            if (boit_self_pose.x < -4.9*0.8)
-                accel_containment.x = this->containment_force_;
-            if (boit_self_pose.y > 4.9*0.8)
-                accel_containment.y = -this->containment_force_;
-            if (boit_self_pose.y < -4.9*0.8)
-                accel_containment.y = this->containment_force_;
-        } 
-        */
-        
         accel_total.x = 
             accel_align.x + 
             accel_avoid.x + 
             accel_cohes.x + 
             accel_obsta.x +
             accel_goal.x;
-            //accel_containment.x;
 
         accel_total.y = 
             accel_align.y + 
@@ -210,8 +187,6 @@ void Boit_Controller_Node::Subscription_Boit_Info_Callback(const Msg_Boit_Info::
             accel_cohes.y + 
             accel_obsta.y +
             accel_goal.y;
-            //accel_containment.y;
-
     }
 
     // create twist message based on total accel and current state well give to boit
@@ -221,7 +196,7 @@ void Boit_Controller_Node::Subscription_Boit_Info_Callback(const Msg_Boit_Info::
         float delta_time = (double)(clock() - boit.last_time) / CLOCKS_PER_SEC;
 
         // calculate delta_velocities
-        float delta_linear_x = sqrt(accel_total.x*accel_total.x + accel_total.y*accel_total.y) * delta_time; 
+        float delta_linear_x = sqrt(accel_total.x*accel_total.x + accel_total.y*accel_total.y); 
         // UPITNO za delta_linear_x jeli ok izracunati accel u namjenjenom za vremenski interval (t+1)-(t) 
         // a koristiti dt=(t)-(t-1)
         //
@@ -235,12 +210,15 @@ void Boit_Controller_Node::Subscription_Boit_Info_Callback(const Msg_Boit_Info::
 
         // construct message
         Msg_Twist twist_msg;
+        // twist_msg.linear.x = self_odom.twist.twist.linear.x + delta_linear_x * delta_time;
         twist_msg.linear.x = self_odom.twist.twist.linear.x + accel_total.x * delta_time;
         twist_msg.linear.y = self_odom.twist.twist.linear.y + accel_total.y * delta_time;
+        //twist_msg.linear.y = 0.0f;
         twist_msg.linear.z = 0.0f;
         twist_msg.angular.x = 0.0f;
         twist_msg.angular.y = 0.0f;
         twist_msg.angular.z = 0.0f;
+        // twist_msg.angular.z = self_odom.twist.twist.angular.z + delta_angular_z * delta_time;
 
         pub_twist->publish(twist_msg);
     }
@@ -425,8 +403,6 @@ Vector2 Boit_Controller_Node::Calculate_Accel_Cohesion(std::vector<Msg_Odom> odo
     force_cohesion.x *= cohesion_factor_;
     force_cohesion.y *= cohesion_factor_;
 
-    RCLCPP_INFO(get_logger(), "force cohesion:\n\tx:%f\n\ty:%f", force_cohesion.x, force_cohesion.y);
-
     return force_cohesion;
 }
 
@@ -472,7 +448,6 @@ void Boit_Controller_Node::Subscription_Tuning_Params_Callback(const Msg_Tuning_
     params_init = true; 
     
     rotation_kp_ = params->rotation_kp;
-    containment_force_ = params->containment_force;
     cohesion_range_ = params->cohesion_range;
     cohesion_factor_ = params->cohesion_factor; 
     alignment_range_ = params->alignment_range; 
