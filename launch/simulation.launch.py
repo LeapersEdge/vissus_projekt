@@ -14,6 +14,8 @@ def generate_launch_description():
         params = yaml.safe_load(f)
 
     num_of_robots = int(params['num_of_robots'])
+    boid_vision_range = float(params['boid_vision_range'])
+    boid_fov = float(params['boid_fov'])
 
     start_launch_path = os.path.join(launch_dir, 'launch', 'start.launch.py')
 
@@ -38,7 +40,7 @@ def generate_launch_description():
         executable='data_splitter',
         name='data_splitter',
         output='screen',
-        parameters=[{'boid_number': num_of_robots}]
+        parameters=[{'boid_number': num_of_robots}, {'boid_fov': boid_fov}, {'boid_vision_range': boid_vision_range}]
     )
 
     return LaunchDescription([start_launch] + boid_controllers + [data_splitter])

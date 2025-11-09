@@ -11,7 +11,8 @@
 #define _USE_MATH_DEFINES
 
 using std::placeholders::_1;
-
+double getYawFromQuaternion(const geometry_msgs::msg::Quaternion& q);
+float normalize_angle(float angle);
 
 /**
  * @class Data_Splitter_Node
@@ -21,7 +22,6 @@ using std::placeholders::_1;
 class Data_Splitter_Node : public rclcpp::Node
 {
 public:
-    //constructor
     Data_Splitter_Node() : Node("data_splitter_node")
     {
         //ros parameters of node
@@ -142,6 +142,7 @@ private:
             (float)boid_id_odom.pose.pose.position.x, 
             (float)boid_id_odom.pose.pose.position.y
         };
+        float yaw = getYawFromQuaternion(boid_id_odom.pose.pose.orientation); //from rotation quaternion mathematical definition
 
         std::vector<Msg_Odom> true_neighbours;
 
@@ -155,10 +156,15 @@ private:
             Vector2 diff{neighbour_i.x - boid_pose.x, neighbour_i.y - boid_pose.y};
             float distance_sq = squared_euclidan_norm(diff);
             float angle = atan2(diff.x, diff.y);
-            if (distance_sq < boid_vision_range_ * boid_vision_range_ &&
-                ((angle < boid_fov_/2.0f) && (angle > -boid_fov_/2.0f))) {
-                true_neighbours.push_back(neighbour_i_odom);
-            }
+
+            float relative_angle = normalize_angle(angle - yaw);
+
+            //if (distance_sq < boid_vision_range_ * boid_vision_range_ &&
+            //    ((relative_angle < (boid_fov_/2.0f)) && (relative_angle > (-boid_fov_/2.0f)))) {
+            //    true_neighbours.push_back(neighbour_i_odom);
+            //}
+            true_neighbours.push_back(neighbour_i_odom);
+            
         }
         return true_neighbours;
     }
@@ -201,3 +207,23 @@ int main(int argc, char *argv[])
     rclcpp::shutdown();
     return 0;
 }       
+
+double getYawFromQuaternion(const geometry_msgs::msg::Quaternion& q)
+{
+    double x = q.x;
+    double y = q.y;
+    double z = q.z;
+    double w = q.w;
+
+    double yaw = std::atan2(2.0 * (w * z + x * y),
+                            1.0 - 2.0 * (y * y + z * z));
+
+    return yaw;
+}
+
+float normalize_angle(float angle)
+{
+    while (angle > M_PI)  angle -= 2.0f * M_PI;
+    while (angle < -M_PI) angle += 2.0f * M_PI;
+    return angle;
+}
