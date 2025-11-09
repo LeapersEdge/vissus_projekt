@@ -203,7 +203,7 @@ void Boit_Controller_Node::Subscription_Boit_Info_Callback(const Msg_Boit_Info::
 
         accel_total.y = 
             accel_align.y + 
-            accel_avoid.y + 
+            accel_avoid.y - 
             accel_cohes.y + 
             accel_obsta.y +
             accel_goal.y +
