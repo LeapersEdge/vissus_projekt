@@ -357,8 +357,8 @@ Vector2 Boit_Controller_Node::Calculate_Accel_Avoidence(std::vector<Msg_Odom> od
         };
         // distance between boit[id] and boit[i] 
         Vector2 distance = {
-            boit_i_pose.x - boit_self_pose.x,
-            boit_i_pose.y - boit_self_pose.y
+            boit_self_pose.x - boit_i_pose.x,
+            boit_self_pose.y - boit_i_pose.y
         };
     
         // is the boit[i] close enough to boit[id] take effect on it?
