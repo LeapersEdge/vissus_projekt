@@ -184,7 +184,7 @@ private:
         Msg_Boit_Info odom_array_id;
 
         odom_array_id.odometries = neighbours;
-        odom_array_id.odometries.push_back(*odom);
+        odom_array_id.odometries.insert(odom_array_id.odometries.begin(), *odom);
         Vector2 closest = get_closest_obstacle(*odom);
         //potrebno je pretvoriti u double jer Point message koristi double
         odom_array_id.closest_obstacle.x = static_cast<double>(closest.x);

@@ -12,6 +12,7 @@
 #include <ctime>
 #include <functional>
 #include <memory>
+#include <rclcpp/logging.hpp>
 #include <string>
 #include <vector>
 #include "utils.h"
@@ -174,7 +175,8 @@ void Boit_Controller_Node::Subscription_Boit_Info_Callback(const Msg_Boit_Info::
 
     // combine forces forces
     {
-        // converts within 20% to the wall
+        /*
+        // converts within % to the wall
         // working area ~~ X€<-4.9,4.9>, Y€<-4.9,4.9>
         Vector2 accel_containment = {};
         {
@@ -192,22 +194,23 @@ void Boit_Controller_Node::Subscription_Boit_Info_Callback(const Msg_Boit_Info::
             if (boit_self_pose.y < -4.9*0.8)
                 accel_containment.y = this->containment_force_;
         } 
+        */
         
         accel_total.x = 
             accel_align.x + 
             accel_avoid.x + 
             accel_cohes.x + 
             accel_obsta.x +
-            accel_goal.x +
-            accel_containment.x;
+            accel_goal.x;
+            //accel_containment.x;
 
         accel_total.y = 
             accel_align.y + 
             accel_avoid.y +
             accel_cohes.y + 
             accel_obsta.y +
-            accel_goal.y +
-            accel_containment.y;
+            accel_goal.y;
+            //accel_containment.y;
 
     }
 
@@ -232,12 +235,12 @@ void Boit_Controller_Node::Subscription_Boit_Info_Callback(const Msg_Boit_Info::
 
         // construct message
         Msg_Twist twist_msg;
-        twist_msg.linear.x = self_odom.twist.twist.linear.x + delta_linear_x;
-        twist_msg.linear.y = 0.0f;
+        twist_msg.linear.x = self_odom.twist.twist.linear.x + accel_total.x * delta_time;
+        twist_msg.linear.y = self_odom.twist.twist.linear.y + accel_total.y * delta_time;
         twist_msg.linear.z = 0.0f;
         twist_msg.angular.x = 0.0f;
         twist_msg.angular.y = 0.0f;
-        twist_msg.angular.z = self_odom.twist.twist.angular.z + delta_angular_z;
+        twist_msg.angular.z = 0.0f;
 
         pub_twist->publish(twist_msg);
     }
@@ -394,8 +397,8 @@ Vector2 Boit_Controller_Node::Calculate_Accel_Cohesion(std::vector<Msg_Odom> odo
     for (uint i = 1; i < odoms.size(); ++i)
     {
         Vector2 boit_i_pose = {
-            (float)odoms[i].pose.pose.position.x,
-            (float)odoms[i].pose.pose.position.y,
+            0.0f,
+            0.0f
         };
         // distance between boit[id] and boit[i] 
         Vector2 distance = {
@@ -422,6 +425,8 @@ Vector2 Boit_Controller_Node::Calculate_Accel_Cohesion(std::vector<Msg_Odom> odo
     force_cohesion.x *= cohesion_factor_;
     force_cohesion.y *= cohesion_factor_;
 
+    RCLCPP_INFO(get_logger(), "force cohesion:\n\tx:%f\n\ty:%f", force_cohesion.x, force_cohesion.y);
+
     return force_cohesion;
 }
 
@@ -443,8 +448,8 @@ Vector2 Boit_Controller_Node::Calculate_Accel_Obstacle_Avoid(const Msg_Odom& sel
     };
    
     Vector2 distance = {
-        closest_obstacle_pose.x - boit_self_pose.x,
-        closest_obstacle_pose.y - boit_self_pose.y
+        boit_self_pose.x - closest_obstacle_pose.x,
+        boit_self_pose.y - closest_obstacle_pose.y 
     };
    
     // is within range?
