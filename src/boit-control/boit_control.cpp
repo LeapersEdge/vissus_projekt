@@ -233,7 +233,7 @@ void Boit_Controller_Node::Subscription_Boit_Info_Callback(const Msg_Boit_Info::
         twist_msg.linear.z = 0.0f;
         twist_msg.angular.x = 0.0f;
         twist_msg.angular.y = 0.0f;
-        twist_msg.angular.z = self_odom.twist.twist.angular.z + angular_velocity;
+        twist_msg.angular.z = angular_velocity;
 
         pub_twist->publish(twist_msg);
     }
