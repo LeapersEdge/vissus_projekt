@@ -234,19 +234,18 @@ void Boit_Controller_Node::Subscription_Boit_Info_Callback(const Msg_Boit_Info::
         }
         */
 
-        twist_msg.linear.x = self_odom.twist.twist.linear.x + (delta_linear_x);
-        twist_msg.linear.y = 0.0f;
-        twist_msg.angular.z = self_odom.twist.twist.linear.x + delta_angular_z * delta_time;
-        //twist_msg.angular.z = delta_angular_z * delta_time;
-        twist_msg.linear.x = std::min((float)twist_msg.linear.x, max_speed_);
-     
         // angular
         {
-            twist_msg.linear.z = 0.0f;
-            twist_msg.angular.x = 0.0f;
-            twist_msg.angular.y = 0.0f;
-            pub_twist->publish(twist_msg);
+            twist_msg.linear.x = self_odom.twist.twist.linear.x + delta_linear_x * delta_time;
+            twist_msg.linear.y = 0.0f;
+            twist_msg.angular.z = delta_angular_z * delta_time;
+            twist_msg.linear.x = std::min((float)twist_msg.linear.x, max_speed_);
         }
+     
+        twist_msg.linear.z = 0.0f;
+        twist_msg.angular.x = 0.0f;
+        twist_msg.angular.y = 0.0f;
+        pub_twist->publish(twist_msg);
     }
 
     // ---------------------------------------------------------
