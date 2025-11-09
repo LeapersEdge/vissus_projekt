@@ -506,7 +506,7 @@ Vector2 Boit_Controller_Node::Calculate_Accel_Goal(const Msg_Odom& self_odom, co
 
     Vector2 difference = goal_pose - self_pose;
     force_goal = difference / difference.length_squared();
-    force_goal *= goal_factor_;
+    force_goal *= goal_factor_; 
     
     return force_goal;
 }
