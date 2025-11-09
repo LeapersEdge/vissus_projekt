@@ -217,8 +217,6 @@ void Boit_Controller_Node::Subscription_Boit_Info_Callback(const Msg_Boit_Info::
         // construct message
         Msg_Twist twist_msg;
       
-        /*
-        // fully linear
         {
             twist_msg.linear.x = self_odom.twist.twist.linear.x + accel_total.x * delta_time;
             twist_msg.linear.y = self_odom.twist.twist.linear.y + accel_total.y * delta_time;
@@ -231,15 +229,6 @@ void Boit_Controller_Node::Subscription_Boit_Info_Callback(const Msg_Boit_Info::
                 twist_msg.linear.x *= max_speed_;
                 twist_msg.linear.y *= max_speed_;
             }
-        }
-        */
-
-        // angular
-        {
-            twist_msg.linear.x = self_odom.twist.twist.linear.x + delta_linear_x * delta_time;
-            twist_msg.linear.y = 0.0f;
-            twist_msg.angular.z = delta_angular_z * delta_time;
-            twist_msg.linear.x = std::min((float)twist_msg.linear.x, max_speed_);
         }
      
         twist_msg.linear.z = 0.0f;
