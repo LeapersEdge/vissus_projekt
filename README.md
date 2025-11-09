@@ -60,11 +60,10 @@ rqt
 ```
 
 #### Parameters
-It is advised to modify the parameters via rqt.
-`/tuning_params`
+It is advised to modify the parameters via rqt; change the parameters in `/tuning_params`. The parameters and what they control are listed below, along with some values found to be acceptable while testing.
 - `rotation_kp`: rotation rate amplification, `1`
 - `cohesion_range`: radius in which to attempt cohesion, `3`
-- `cohesion_factor`: strength with which cohesion is attempted, 5 (negative value for dispersion)
+- `cohesion_factor`: strength with which cohesion is attempted, `5` (negative value for dispersion)
 - `alignment_range`: radius in which to consider alignment partners, `2`
 - `alignment_factor`: strength with which to maintain alignment, `10`
 - `avoidance_range`: range at which to avoid running into other boids, `0.75`
