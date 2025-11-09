@@ -37,6 +37,7 @@
 
 using std::placeholders::_1;
 double getYawFromQuaternion(const geometry_msgs::msg::Quaternion& q);
+float normalize_angle(float angle);
 
 struct Boit
 {
@@ -206,8 +207,9 @@ void Boit_Controller_Node::Subscription_Boit_Info_Callback(const Msg_Boit_Info::
         // Dinov komentar: mislim da je ok jer je simulation refresh rate nadam se capped na necemu
         float yaw = getYawFromQuaternion(self_odom.pose.pose.orientation);
         
+        float relative_angle = normalize_angle(atan2(accel_total.y, accel_total.x) - yaw);
         float delta_angular_z = p_controller_update(
-                    atan2(accel_total.y, accel_total.x) - yaw, 
+                    atan2(accel_total.y, accel_total.x), 
                     boit.last_rotation, 
                     this->rotation_kp_
                 );
@@ -232,9 +234,10 @@ void Boit_Controller_Node::Subscription_Boit_Info_Callback(const Msg_Boit_Info::
         }
         */
 
-        twist_msg.linear.x = self_odom.twist.twist.linear.x + delta_linear_x * delta_time;
+        twist_msg.linear.x = self_odom.twist.twist.linear.x + (delta_linear_x);
         twist_msg.linear.y = 0.0f;
-        twist_msg.angular.z = self_odom.twist.twist.angular.z + delta_angular_z * delta_time;
+        twist_msg.angular.z = self_odom.twist.twist.linear.x + delta_angular_z * delta_time;
+        //twist_msg.angular.z = delta_angular_z * delta_time;
         twist_msg.linear.x = std::min((float)twist_msg.linear.x, max_speed_);
      
         // angular
@@ -526,5 +529,12 @@ double getYawFromQuaternion(const geometry_msgs::msg::Quaternion& q)
                             1.0 - 2.0 * (y * y + z * z));
 
     return yaw;
+}
+
+float normalize_angle(float angle)
+{
+    while (angle > M_PI)  angle -= 2.0f * M_PI;
+    while (angle < -M_PI) angle += 2.0f * M_PI;
+    return angle;
 }
 
