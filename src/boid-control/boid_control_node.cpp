@@ -39,44 +39,44 @@ using std::placeholders::_1;
 double getYawFromQuaternion(const geometry_msgs::msg::Quaternion& q);
 float normalize_angle(float angle);
 
-struct Boit
+struct Boid
 {
     bool initialized = false;
     float last_rotation = 0.0f; 
     clock_t last_time = 0;
 };
 
-class Boit_Controller_Node : public rclcpp::Node
+class Boid_Controller_Node : public rclcpp::Node
 {
 public:
-    Boit_Controller_Node() : Node("boit_controller_node")
+    Boid_Controller_Node() : Node("boid_controller_node")
     {
         // get all available topics and extract highest <number> from topics with "robot_<number>/odom" 
         robot_id_ = this->declare_parameter<int>("robot_id", 0);
 
-        // initialize all publishers, subscriptions and boits
+        // initialize all publishers, subscriptions and boids
         std::string robot_twist_topic = "/robot_" + std::to_string(int(robot_id_)) + "/cmd_vel";
-        std::string robot_boit_info_topic = "/robot_" + std::to_string(int(robot_id_)) + "/boit_info";
+        std::string robot_boid_info_topic = "/robot_" + std::to_string(int(robot_id_)) + "/boid_info";
         std::string robot_tuning_params_topic = "/tuning_params";
         std::string goal_odom_topic = "/goal_point";
 
         // init subs
-        sub_boit_info = this->create_subscription<Msg_Boit_Info>(
-            robot_boit_info_topic, 
+        sub_boid_info = this->create_subscription<Msg_Boid_Info>(
+            robot_boid_info_topic,
             10, 
-            std::bind(&Boit_Controller_Node::Subscription_Boit_Info_Callback, this, _1) 
+            std::bind(&Boid_Controller_Node::Subscription_Boid_Info_Callback, this, _1)
         ); 
         
         sub_tuning_params = this->create_subscription<Msg_Tuning_Params>(
             robot_tuning_params_topic, 
             10, 
-            std::bind(&Boit_Controller_Node::Subscription_Tuning_Params_Callback, this, _1) 
+            std::bind(&Boid_Controller_Node::Subscription_Tuning_Params_Callback, this, _1)
         );
 
         sub_goal_odom = this->create_subscription<Msg_Point>(
             goal_odom_topic, 
             10, 
-            std::bind(&Boit_Controller_Node::Subscription_Goal_Odom_Callback, this, _1) 
+            std::bind(&Boid_Controller_Node::Subscription_Goal_Odom_Callback, this, _1)
         );
 
         // init pub
@@ -85,12 +85,12 @@ public:
                 10
             ); 
 
-        // init boit
-        Boit boit;
-        boit.initialized = false;
+        // init boid
+        Boid boid;
+        boid.initialized = false;
     }
 private:
-    void Subscription_Boit_Info_Callback(const Msg_Boit_Info::SharedPtr info);   // ALL BOITS LOGIC HAPPENS HERE
+    void Subscription_Boid_Info_Callback(const Msg_Boid_Info::SharedPtr info);   // ALL BOITS LOGIC HAPPENS HERE
     void Subscription_Tuning_Params_Callback(const Msg_Tuning_Params::SharedPtr params);
     void Subscription_Goal_Odom_Callback(const Msg_Point::SharedPtr point);
     Vector2 Calculate_Accel_Alignment(std::vector<Msg_Odom> odoms);
@@ -100,9 +100,9 @@ private:
     Vector2 Calculate_Accel_Goal(const Msg_Odom& self_odom, const Msg_Point& goal);
 
 private:
-    Boit boit;
+    Boid boid;
     Publisher_Twist pub_twist;
-    Subscription_Boit_Info sub_boit_info;
+    Subscription_Boid_Info sub_boid_info;
     Subscription_Tuning_Params sub_tuning_params;
     Subscription_Point sub_goal_odom;
 
@@ -131,7 +131,7 @@ private:
 int main(int argc, char *argv[])
 {
     rclcpp::init(argc, argv);
-    rclcpp::spin(std::make_shared<Boit_Controller_Node>());
+    rclcpp::spin(std::make_shared<Boid_Controller_Node>());
     rclcpp::shutdown();
     return 0;
 }
@@ -140,12 +140,12 @@ int main(int argc, char *argv[])
 // FUNCTION DEFINITIONS
 
 // ALL BOITS LOGIC HAPPENS HERE
-// TLDR: controls the boit based on boit_info message 
-// not TLDR: Calculates forces from all of the rules based on available information in Msg_Boit_Info
+// TLDR: controls the boid based on boid_info message
+// not TLDR: Calculates forces from all of the rules based on available information in Msg_Boid_Info
 // return: nothing 
-void Boit_Controller_Node::Subscription_Boit_Info_Callback(const Msg_Boit_Info::SharedPtr info)
+void Boid_Controller_Node::Subscription_Boid_Info_Callback(const Msg_Boid_Info::SharedPtr info)
 {
-    assert(info->odometries.size() && "info odom array should never be completely empty, odom of boit self is always the first element");
+    assert(info->odometries.size() && "info odom array should never be completely empty, odom of boid self is always the first element");
     
     // dont want to perform any calculations until params are set
     if (!params_init)
@@ -156,18 +156,18 @@ void Boit_Controller_Node::Subscription_Boit_Info_Callback(const Msg_Boit_Info::
     Msg_Point obstacle_point = info->closest_obstacle; 
     float z = self_odom.pose.pose.orientation.z;
     float w = self_odom.pose.pose.orientation.w;
-    boit.last_rotation = atan2(2.0f * (w * z), w * w - z * z);
+    boid.last_rotation = atan2(2.0f * (w * z), w * w - z * z);
 
     // we need this to function and the garantee that at least single iteration has passed
-    if (!boit.initialized)
+    if (!boid.initialized)
     {
-        boit.last_time = clock();
-        boit.initialized = true;
+        boid.last_time = clock();
+        boid.initialized = true;
         return;
     }
 
     // ---------------------------------------------------------
-    // boits logic
+    // boids logic
     
     Vector2 accel_align = Calculate_Accel_Alignment(info->odometries); 
     Vector2 accel_avoid = Calculate_Accel_Avoidence(info->odometries);
@@ -193,11 +193,11 @@ void Boit_Controller_Node::Subscription_Boit_Info_Callback(const Msg_Boit_Info::
             accel_goal.y;
     }
 
-    // create twist message based on total accel and current state well give to boit
+    // create twist message based on total accel and current state well give to boid
     // and publish it
     {
         // delta time in seconds
-        float delta_time = (double)(clock() - boit.last_time) / CLOCKS_PER_SEC;
+        float delta_time = (double)(clock() - boid.last_time) / CLOCKS_PER_SEC;
 
         // calculate delta_velocities
         float delta_linear_x = sqrt(accel_total.x*accel_total.x + accel_total.y*accel_total.y); 
@@ -210,7 +210,7 @@ void Boit_Controller_Node::Subscription_Boit_Info_Callback(const Msg_Boit_Info::
         float relative_angle = normalize_angle(atan2(accel_total.y, accel_total.x) - yaw);
         float delta_angular_z = p_controller_update(
                     atan2(accel_total.y, accel_total.x), 
-                    boit.last_rotation, 
+                    boid.last_rotation,
                     this->rotation_kp_
                 );
 
@@ -249,56 +249,56 @@ void Boit_Controller_Node::Subscription_Boit_Info_Callback(const Msg_Boit_Info::
     }
 
     // ---------------------------------------------------------
-    // end of boits logic
+    // end of boids logic
     
-    boit.last_time = clock();  // this is for delta_time to work
+    boid.last_time = clock();  // this is for delta_time to work
 }
 
 // TLDR: calculates alignment rule influence 
-// not TLDR: Calculates acceleration based from alignment rule influence, with respect to odometries of self and other boits 
+// not TLDR: Calculates acceleration based from alignment rule influence, with respect to odometries of self and other boids
 // return: vector2 of acceleration 
-Vector2 Boit_Controller_Node::Calculate_Accel_Alignment(std::vector<Msg_Odom> odoms)
+Vector2 Boid_Controller_Node::Calculate_Accel_Alignment(std::vector<Msg_Odom> odoms)
 {
     Vector2 force_alignment = {};
     uint alignment_neighbours_count = 0;
 
     Msg_Odom self_odom = odoms[0];
 
-    Vector2 boit_self_pose = {
+    Vector2 boid_self_pose = {
         (float)self_odom.pose.pose.position.x,
         (float)self_odom.pose.pose.position.y,
     };
 
-    // start from 1 because 0 is boit self
+    // start from 1 because 0 is boid self
     for (uint i = 1; i < odoms.size(); ++i)
     {
-        Vector2 boit_i_pose = {
+        Vector2 boid_i_pose = {
             (float)odoms[i].pose.pose.position.x,
             (float)odoms[i].pose.pose.position.y,
         };
-        // distance between boit[id] and boit[i] 
+        // distance between boid[id] and boid[i]
         Vector2 distance = {
-            boit_i_pose.x - boit_self_pose.x,
-            boit_i_pose.y - boit_self_pose.y
+            boid_i_pose.x - boid_self_pose.x,
+            boid_i_pose.y - boid_self_pose.y
         };
     
-        // is the boit[i] close enough to boit[id] take effect on it?
+        // is the boid[i] close enough to boid[id] take effect on it?
         if (squared_euclidan_norm(distance) <= (this->alignment_range_ * this->alignment_range_))
         {
             // linear component of linear+angular pair
-            float boit_i_lin = odoms[i].twist.twist.linear.x;
-            float boit_self_lin = self_odom.twist.twist.linear.x;
+            float boid_i_lin = odoms[i].twist.twist.linear.x;
+            float boid_self_lin = self_odom.twist.twist.linear.x;
 
             // -calculating jaw based on quaternion data
             // -x and y are unneccessary because were only rotating around jaw so they are always 0
             // -full function if ever needed:
-            // // float boit_i_rot = atan2(2.0f * (w * z + x * y), w * w + x * x - y * y - z * z);
+            // // float boid_i_rot = atan2(2.0f * (w * z + x * y), w * w + x * x - y * y - z * z);
             float z = (float)odoms[i].pose.pose.orientation.z;
             float w = (float)odoms[i].pose.pose.orientation.w;
-            float boit_i_rot = atan2(2.0f * (w * z), w * w - z * z);
+            float boid_i_rot = atan2(2.0f * (w * z), w * w - z * z);
             z = (float)self_odom.pose.pose.orientation.z;
             w = (float)self_odom.pose.pose.orientation.w;
-            float boit_self_rot = atan2(2.0f * (w * z), w * w - z * z);
+            float boid_self_rot = atan2(2.0f * (w * z), w * w - z * z);
 
             // -jaw = 0° is to the right of the screen
             // -positive rotation axis is right handed if Z goes outside the screen
@@ -311,17 +311,17 @@ Vector2 Boit_Controller_Node::Calculate_Accel_Alignment(std::vector<Msg_Odom> od
             // acceleration thats affecting the magnitude vector in global frame 
             // (changes its value overtime in global frame, yes, twist.linear is in
             // local coordinate frame)
-            Vector2 boit_i_vel_lin = {
-                (float)cos(boit_i_rot)*boit_i_lin,
-                (float)sin(boit_i_rot)*boit_i_lin,
+            Vector2 boid_i_vel_lin = {
+                (float)cos(boid_i_rot)*boid_i_lin,
+                (float)sin(boid_i_rot)*boid_i_lin,
             };
-            Vector2 boit_id_vel_lin = {
-                (float)cos(boit_self_rot)*boit_self_lin,
-                (float)sin(boit_self_rot)*boit_self_lin,
+            Vector2 boid_id_vel_lin = {
+                (float)cos(boid_self_rot)*boid_self_lin,
+                (float)sin(boid_self_rot)*boid_self_lin,
             };
 
-            force_alignment.x += boit_i_vel_lin.x - boit_id_vel_lin.x;
-            force_alignment.y += boit_i_vel_lin.y - boit_id_vel_lin.y;
+            force_alignment.x += boid_i_vel_lin.x - boid_id_vel_lin.x;
+            force_alignment.y += boid_i_vel_lin.y - boid_id_vel_lin.y;
 
             ++alignment_neighbours_count;
         }
@@ -341,33 +341,33 @@ Vector2 Boit_Controller_Node::Calculate_Accel_Alignment(std::vector<Msg_Odom> od
 }
 
 // TLDR: calculates aboidence rule influence 
-// not TLDR: Calculates acceleration based from avoidence rule influence, with respect to odometries of self and other boits 
+// not TLDR: Calculates acceleration based from avoidence rule influence, with respect to odometries of self and other boids
 // return: vector2 of acceleration 
-Vector2 Boit_Controller_Node::Calculate_Accel_Avoidence(std::vector<Msg_Odom> odoms)
+Vector2 Boid_Controller_Node::Calculate_Accel_Avoidence(std::vector<Msg_Odom> odoms)
 {
     Vector2 force_avoidence = {};
 
     Msg_Odom self_odom = odoms[0];
 
-    Vector2 boit_self_pose = {
+    Vector2 boid_self_pose = {
         (float)self_odom.pose.pose.position.x,
         (float)self_odom.pose.pose.position.y,
     };
 
-    // start from 1 because 0 is boit self
+    // start from 1 because 0 is boid self
     for (uint i = 1; i < odoms.size(); ++i)
     {
-        Vector2 boit_i_pose = {
+        Vector2 boid_i_pose = {
             (float)odoms[i].pose.pose.position.x,
             (float)odoms[i].pose.pose.position.y,
         };
-        // distance between boit[id] and boit[i] 
+        // distance between boid[id] and boid[i]
         Vector2 distance = {
-            boit_self_pose.x - boit_i_pose.x,
-            boit_self_pose.y - boit_i_pose.y
+            boid_self_pose.x - boid_i_pose.x,
+            boid_self_pose.y - boid_i_pose.y
         };
     
-        // is the boit[i] close enough to boit[id] take effect on it?
+        // is the boid[i] close enough to boid[id] take effect on it?
         if (squared_euclidan_norm(distance) <= (this->avoidance_range_ * this->avoidance_range_))
         {
             force_avoidence.x += distance.x / (squared_euclidan_norm(distance));
@@ -382,31 +382,31 @@ Vector2 Boit_Controller_Node::Calculate_Accel_Avoidence(std::vector<Msg_Odom> od
 }
 
 // TLDR: calculates cohesion rule influence 
-// not TLDR: Calculates acceleration based from cohesion rule influence, with respect to odometries of self and other boits 
+// not TLDR: Calculates acceleration based from cohesion rule influence, with respect to odometries of self and other boids
 // return: vector2 of acceleration 
-Vector2 Boit_Controller_Node::Calculate_Accel_Cohesion(std::vector<Msg_Odom> odoms)
+Vector2 Boid_Controller_Node::Calculate_Accel_Cohesion(std::vector<Msg_Odom> odoms)
 {
     Vector2 force_cohesion = {};
     uint cohesion_neighbours_count = 0;
     
     Msg_Odom self_odom = odoms[0];
 
-    Vector2 boit_self_pose = {
+    Vector2 boid_self_pose = {
         (float)self_odom.pose.pose.position.x,
         (float)self_odom.pose.pose.position.y,
     };
 
-    // start from 1 because 0 is boit self
+    // start from 1 because 0 is boid self
     for (uint i = 1; i < odoms.size(); ++i)
     {
-        Vector2 boit_i_pose = {
+        Vector2 boid_i_pose = {
             0.0f,
             0.0f
         };
-        // distance between boit[id] and boit[i] 
+        // distance between boid[id] and boid[i]
         Vector2 distance = {
-            boit_i_pose.x - boit_self_pose.x,
-            boit_i_pose.y - boit_self_pose.y
+            boid_i_pose.x - boid_self_pose.x,
+            boid_i_pose.y - boid_self_pose.y
         };
     
         // is within range?
@@ -434,11 +434,11 @@ Vector2 Boit_Controller_Node::Calculate_Accel_Cohesion(std::vector<Msg_Odom> odo
 // TLDR: calculates obstacle avoidence rule influence 
 // not TLDR: Calculates acceleration based on closest obstacle point coordinates, with respect to odometry of self
 // return: vector2 of acceleration 
-Vector2 Boit_Controller_Node::Calculate_Accel_Obstacle_Avoid(const Msg_Odom& self_odom, const Msg_Point& closest_obstacle)
+Vector2 Boid_Controller_Node::Calculate_Accel_Obstacle_Avoid(const Msg_Odom& self_odom, const Msg_Point& closest_obstacle)
 {
     Vector2 force_obstacle = {};
 
-    Vector2 boit_self_pose = {
+    Vector2 boid_self_pose = {
         (float)self_odom.pose.pose.position.x,
         (float)self_odom.pose.pose.position.y,
     };
@@ -449,8 +449,8 @@ Vector2 Boit_Controller_Node::Calculate_Accel_Obstacle_Avoid(const Msg_Odom& sel
     };
    
     Vector2 distance = {
-        boit_self_pose.x - closest_obstacle_pose.x,
-        boit_self_pose.y - closest_obstacle_pose.y 
+        boid_self_pose.x - closest_obstacle_pose.x,
+        boid_self_pose.y - closest_obstacle_pose.y
     };
    
     // is within range?
@@ -468,7 +468,7 @@ Vector2 Boit_Controller_Node::Calculate_Accel_Obstacle_Avoid(const Msg_Odom& sel
 // TLDR: updates tuning params 
 // not TLDR: Based on subscription of topic thats designed to update tuning params, updates tuning params 
 // return: nothing
-void Boit_Controller_Node::Subscription_Tuning_Params_Callback(const Msg_Tuning_Params::SharedPtr params)
+void Boid_Controller_Node::Subscription_Tuning_Params_Callback(const Msg_Tuning_Params::SharedPtr params)
 {
     params_init = true; 
     
@@ -488,7 +488,7 @@ void Boit_Controller_Node::Subscription_Tuning_Params_Callback(const Msg_Tuning_
 // TLDR: updates tuning params 
 // not TLDR: Based on subscription of topic thats designed to update tuning params, updates tuning params 
 // return: nothing
-void Boit_Controller_Node::Subscription_Goal_Odom_Callback(const Msg_Point::SharedPtr point)
+void Boid_Controller_Node::Subscription_Goal_Odom_Callback(const Msg_Point::SharedPtr point)
 {
     goal_point = *point;
 }
@@ -496,7 +496,7 @@ void Boit_Controller_Node::Subscription_Goal_Odom_Callback(const Msg_Point::Shar
 // TLDR: calculates goal following rule influence 
 // not TLDR: Calculates acceleration based from goal following rule influence, with respect to odometries of self and goal 
 // return: vector2 of acceleration 
-Vector2 Boit_Controller_Node::Calculate_Accel_Goal(const Msg_Odom& self_odom, const Msg_Point& goal_point)
+Vector2 Boid_Controller_Node::Calculate_Accel_Goal(const Msg_Odom& self_odom, const Msg_Point& goal_point)
 {
     Vector2 force_goal;
 

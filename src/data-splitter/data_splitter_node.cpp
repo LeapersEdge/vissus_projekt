@@ -31,7 +31,7 @@ public:
 
         map_sub_ = this->create_subscription<Msg_Map>("/map", 10, std::bind(&Data_Splitter_Node::Map_Callback, this, _1));
 
-        // construction of robot ids and topic array: /robot_<id>/odom, /robot_<id>/boit_info
+        // construction of robot ids and topic array: /robot_<id>/odom, /robot_<id>/boid_info
         // these topic will be used by publishers
         for (unsigned int i = 0; i < num_boids_; ++i) {
             robot_ids_.push_back(i);
@@ -40,7 +40,7 @@ public:
         std::vector<std::string> cmd_vel_topics;
         for (unsigned int id : robot_ids_) {
             odom_topics.push_back("/robot_" + std::to_string(id) + "/odom");
-            cmd_vel_topics.push_back("/robot_" + std::to_string(id) + "/boit_info");
+            cmd_vel_topics.push_back("/robot_" + std::to_string(id) + "/boid_info");
         }
 
         robot_odoms_.resize(num_boids_);
@@ -57,17 +57,17 @@ public:
                 ); 
             subs_odom_.push_back(sub);
             
-            Publisher_Boit_Info pub = this->create_publisher<Msg_Boit_Info>(
+            Publisher_Boid_Info pub = this->create_publisher<Msg_Boid_Info>(
                     cmd_vel_topics[i], 
                     10
                 ); 
-            pubs_boit_info_.push_back(pub);
+            pubs_boid_info_.push_back(pub);
         }
     }
 
 private:
     Subscription_Map map_sub_;
-    std::vector<Publisher_Boit_Info> pubs_boit_info_; //OdometryArray msgs spublishers
+    std::vector<Publisher_Boid_Info> pubs_boid_info_; //OdometryArray msgs spublishers
     std::vector<Subscription_Odom> subs_odom_;
     Msg_Map map_;
 
@@ -170,7 +170,7 @@ private:
     /**
     * @brief Computes the closest obstacle to a given robot odometry.
     * 
-    * This callback is called by boids/odom sub and constructs OdometryArray(boit_info)
+    * This callback is called by boids/odom sub and constructs OdometryArray(boid_info)
     * message.
     * 
     * @param odom Pointer to the robot odometry 
@@ -180,7 +180,7 @@ private:
         if (id >= robot_odoms_.size()) return;
         robot_odoms_[id] = *odom;
         std::vector<Msg_Odom> neighbours = get_neighbours(robot_odoms_, id); 
-        Msg_Boit_Info odom_array_id;
+        Msg_Boid_Info odom_array_id;
 
         odom_array_id.odometries = neighbours;
         odom_array_id.odometries.insert(odom_array_id.odometries.begin(), *odom);
@@ -190,7 +190,7 @@ private:
         odom_array_id.closest_obstacle.y = static_cast<double>(closest.y);
         odom_array_id.closest_obstacle.z = 0.0;
 
-        pubs_boit_info_[id]->publish(odom_array_id);
+        pubs_boid_info_[id]->publish(odom_array_id);
     }
 
     // saves map as private variable
