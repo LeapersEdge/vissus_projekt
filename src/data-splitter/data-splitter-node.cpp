@@ -135,45 +135,38 @@ private:
     * @param robot_odoms Array of all recorded odometries
     * @return Vector2 The coordinate of the closest obstacle.
     */
-    std::vector<Msg_Odom> get_neighbours(const std::vector<Msg_Odom>& robot_odoms, unsigned int id)
-    {
+    std::vector<Msg_Odom> get_neighbours(const std::vector<Msg_Odom>& robot_odoms, unsigned int id){
         if (id >= robot_odoms.size()) return {};
-
         const Msg_Odom& boid_id_odom = robot_odoms[id];
         Vector2 boid_pose{
             (float)boid_id_odom.pose.pose.position.x, 
             (float)boid_id_odom.pose.pose.position.y
         };
-
-        float yaw = getYawFromQuaternion(boid_id_odom.pose.pose.orientation);
+        float yaw = getYawFromQuaternion(boid_id_odom.pose.pose.orientation); //from rotation quaternion mathematical definition
 
         std::vector<Msg_Odom> true_neighbours;
 
-        for (size_t i = 0; i < robot_odoms.size(); ++i)
-        {
-            if (static_cast<unsigned int>(i) == id) continue;
-
+        for (size_t i = 0; i < robot_odoms.size(); ++i){
+            if (static_cast<unsigned int>(i) == id) continue;   
             const Msg_Odom& neighbour_i_odom = robot_odoms[i];
             Vector2 neighbour_i{
-                (float)neighbour_i_odom.pose.pose.position.x,
+                (float)neighbour_i_odom.pose.pose.position.x, 
                 (float)neighbour_i_odom.pose.pose.position.y
             };
-
             Vector2 diff{neighbour_i.x - boid_pose.x, neighbour_i.y - boid_pose.y};
             float distance_sq = squared_euclidan_norm(diff);
-            //float angle = atan2(diff.y, diff.x);   // ✅ fixed argument order
+            float angle = atan2(diff.y, diff.x);
+            float relative_angle = angle - yaw;
 
-            //float relative_angle = normalizeAngle(angle - yaw);  // ✅ wrap-around safe
-
-            //if (distance_sq < boid_vision_range_ * boid_vision_range_ &&
-            //    std::fabs(relative_angle) < boid_fov_ / 2.0f)
-            //{
+            if (distance_sq < boid_vision_range_ * boid_vision_range_ &&
+                ((relative_angle < (boid_fov_/2.0f)) && (relative_angle > (-boid_fov_/2.0f)))) {
                 true_neighbours.push_back(neighbour_i_odom);
-            }
+                }
+            true_neighbours.push_back(neighbour_i_odom);
+            
         }
         return true_neighbours;
-}
-
+    }
     /**
     * @brief Computes the closest obstacle to a given robot odometry.
     * 
