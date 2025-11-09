@@ -41,8 +41,7 @@ Pošto svaki pojedini boid ne zna sam po sebi gdje je svaki drugi boid, koristim
 
 `data-splitter`, dakle, uzme sve odometrije boidova i iz njih proizvede odmetry array kojeg šalje svakom pojedinačnom boidu. On je esencijalno centar informacije koji šalje svakom robotu informaciju potrebnu da napravi odluke.
 
-![alt text](https://github.com/LeapersEdge/vissus_projekt/blob/main/images/node_graph.png)
-Graph node za primjer s 6 boida
+![Graph node za primjer s 6 boida](https://github.com/LeapersEdge/vissus_projekt/blob/main/images/node_graph.png)
 
 ### How to use
 Pokrenite sustav pokretanjem simulation.launch.py skripte
