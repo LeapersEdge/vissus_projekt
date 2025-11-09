@@ -62,16 +62,16 @@ rqt
 #### Parameters
 It is advised to modify the parameters via rqt.
 `/tuning_params`
-`rotation_kp`: rotation rate amplification, `1`
-`cohesion_range`: radius in which to attempt cohesion, `3`
-`cohesion_factor`: strength with which cohesion is attempted, 5 (negative value for dispersion)
-`alignment_range`: radius in which to consider alignment partners, `2`
-`alignment_factor`: strength with which to maintain alignment, `10`
-`avoidance_range`: range at which to avoid running into other boids, `0.75`
-`avoidance_factor`: intensity with which to avoid running into other boids, `100`
-`obstacle_avoidance_range`: range within which to avoid obstacles & borders, `1`
-`obstacle_avoidance_factor`: intensity with which to avoid obstacles & borders, `100` (negative value for attraction)
-`goal_factor`: intensity with which to move towards the goal, `25`
+- `rotation_kp`: rotation rate amplification, `1`
+- `cohesion_range`: radius in which to attempt cohesion, `3`
+- `cohesion_factor`: strength with which cohesion is attempted, 5 (negative value for dispersion)
+- `alignment_range`: radius in which to consider alignment partners, `2`
+- `alignment_factor`: strength with which to maintain alignment, `10`
+- `avoidance_range`: range at which to avoid running into other boids, `0.75`
+- `avoidance_factor`: intensity with which to avoid running into other boids, `100`
+- `obstacle_avoidance_range`: range within which to avoid obstacles & borders, `1`
+- `obstacle_avoidance_factor`: intensity with which to avoid obstacles & borders, `100` (negative value for attraction)
+- `goal_factor`: intensity with which to move towards the goal, `25`
 
 ##### Rule of thumb for parameters
 1. `avoidance_factor` and `obstacle_avoidance_factor` should be very high; the highest of all parameters
