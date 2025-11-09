@@ -48,15 +48,15 @@ file(GLOB MY_SRC CONFIGURE_DEPENDS
 file(GLOB_RECURSE MY_SRC_GOAL_PUB CONFIGURE_DEPENDS
     "${CMAKE_CURRENT_SOURCE_DIR}/src/goal-pub/*.cpp"
 )
-file(GLOB_RECURSE MY_SRC_BOIT_CONTROL CONFIGURE_DEPENDS
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/boit-control/*.cpp"
+file(GLOB_RECURSE MY_SRC_BOID_CONTROL CONFIGURE_DEPENDS
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/boid-control/*.cpp"
 )
 file(GLOB_RECURSE MY_SRC_DATA_SPLITTER CONFIGURE_DEPENDS
     "${CMAKE_CURRENT_SOURCE_DIR}/src/data-splitter/*.cpp"
 )
 
 # compile and link boid_control
-add_executable(boid_control "${MY_SRC}" "${MY_SRC_BOIT_CONTROL}")
+add_executable(boid_control "${MY_SRC}" "${MY_SRC_BOID_CONTROL}")
 ament_target_dependencies(boid_control rclcpp std_msgs nav_msgs geometry_msgs)
 rosidl_target_interfaces(boid_control
   ${PROJECT_NAME} "rosidl_typesupport_cpp")
