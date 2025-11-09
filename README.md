@@ -48,7 +48,13 @@ Pokrenite sustav pokretanjem simulation.launch.py skripte
 ```shell
 ros2 launch vissus_projekt simulation.launch.py
 ```
-Parametre sustava namjestite tako da publishate poruku tipa TuningParams msg. Mi preporučujemo rqt za to.
+Parametre sustave morate podesiti na dva mjesta.
+Prvo u launch/launch_params.yaml morate podesiti: 
+  1. broj boida: 
+  2. FOV boida
+  3. Njegov vidni dosed
+
+Parametre sustava(koji su zapravo pojačanja reynolodsovih pravila) namještate tako da publishate poruku tipa TuningParams msg. Mi preporučujemo rqt za to, ali možete i lagano iskoristiti ros2 topic pub.
 ```shell
 rqt
 ```
