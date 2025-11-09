@@ -17,6 +17,12 @@
 #include "utils.h"
 #include "vector2.hpp"
 
+// ctrl+f sections:
+// DEFINES, GLOBALS FOR TUNNING
+// ROS2 NODE 
+// MAIN 
+// FUNCTION DEFINITIONS
+
 // --------------------------------------------------------------
 // DEFINES, GLOBALS FOR TUNNING
 
@@ -115,6 +121,9 @@ private:
     Msg_Odom goal_odom;
 };
 
+// --------------------------------------------------------------
+// MAIN 
+
 int main(int argc, char *argv[])
 {
     rclcpp::init(argc, argv);
@@ -123,7 +132,13 @@ int main(int argc, char *argv[])
     return 0;
 }
 
+// --------------------------------------------------------------
+// FUNCTION DEFINITIONS
+
 // ALL BOITS LOGIC HAPPENS HERE
+// TLDR: controls the boit based on boit_info message 
+// not TLDR: Calculates forces from all of the rules based on available information in Msg_Boit_Info
+// return: nothing 
 void Boit_Controller_Node::Subscription_Boit_Info_Callback(const Msg_Boit_Info::SharedPtr info)
 {
     assert(info->odometries.size() && "info odom array should never be completely empty, odom of boit self is always the first element");
@@ -132,13 +147,14 @@ void Boit_Controller_Node::Subscription_Boit_Info_Callback(const Msg_Boit_Info::
     if (!params_init)
         return;
 
-    // update information we have
+    // update information we have and which is required for later operations
     Msg_Odom self_odom = info->odometries[0];
     Msg_Point obstacle_point = info->closest_obstacle; 
     float z = self_odom.pose.pose.orientation.z;
     float w = self_odom.pose.pose.orientation.w;
     boit.last_rotation = atan2(2.0f * (w * z), w * w - z * z);
 
+    // we need this to function and the garantee that at least single iteration has passed
     if (!boit.initialized)
     {
         boit.last_time = clock();
@@ -232,6 +248,9 @@ void Boit_Controller_Node::Subscription_Boit_Info_Callback(const Msg_Boit_Info::
     boit.last_time = clock();  // this is for delta_time to work
 }
 
+// TLDR: calculates alignment rule influence 
+// not TLDR: Calculates acceleration based from alignment rule influence, with respect to odometries of self and other boits 
+// return: vector2 of acceleration 
 Vector2 Boit_Controller_Node::Calculate_Accel_Alignment(std::vector<Msg_Odom> odoms)
 {
     Vector2 force_alignment = {};
@@ -302,6 +321,7 @@ Vector2 Boit_Controller_Node::Calculate_Accel_Alignment(std::vector<Msg_Odom> od
         }
     }
     
+    // scale force
     if (alignment_neighbours_count != 0)
     {
         force_alignment.x /= alignment_neighbours_count;
@@ -314,6 +334,9 @@ Vector2 Boit_Controller_Node::Calculate_Accel_Alignment(std::vector<Msg_Odom> od
     return force_alignment;
 }
 
+// TLDR: calculates aboidence rule influence 
+// not TLDR: Calculates acceleration based from avoidence rule influence, with respect to odometries of self and other boits 
+// return: vector2 of acceleration 
 Vector2 Boit_Controller_Node::Calculate_Accel_Avoidence(std::vector<Msg_Odom> odoms)
 {
     Vector2 force_avoidence = {};
@@ -352,6 +375,9 @@ Vector2 Boit_Controller_Node::Calculate_Accel_Avoidence(std::vector<Msg_Odom> od
     return force_avoidence;
 }
 
+// TLDR: calculates cohesion rule influence 
+// not TLDR: Calculates acceleration based from cohesion rule influence, with respect to odometries of self and other boits 
+// return: vector2 of acceleration 
 Vector2 Boit_Controller_Node::Calculate_Accel_Cohesion(std::vector<Msg_Odom> odoms)
 {
     Vector2 force_cohesion = {};
@@ -377,6 +403,7 @@ Vector2 Boit_Controller_Node::Calculate_Accel_Cohesion(std::vector<Msg_Odom> odo
             boit_i_pose.y - boit_self_pose.y
         };
     
+        // is within range?
         if (squared_euclidan_norm(distance) <= (this->cohesion_range_ * this->cohesion_range_))
         {
             force_cohesion.x += distance.x;
@@ -385,6 +412,7 @@ Vector2 Boit_Controller_Node::Calculate_Accel_Cohesion(std::vector<Msg_Odom> odo
         }
     }
 
+    // scale force
     if (cohesion_neighbours_count != 0)
     {
         force_cohesion.x /= cohesion_neighbours_count;
@@ -397,6 +425,9 @@ Vector2 Boit_Controller_Node::Calculate_Accel_Cohesion(std::vector<Msg_Odom> odo
     return force_cohesion;
 }
 
+// TLDR: calculates obstacle avoidence rule influence 
+// not TLDR: Calculates acceleration based on closest obstacle point coordinates, with respect to odometry of self
+// return: vector2 of acceleration 
 Vector2 Boit_Controller_Node::Calculate_Accel_Obstacle_Avoid(const Msg_Odom& self_odom, const Msg_Point& closest_obstacle)
 {
     Vector2 force_obstacle = {};
@@ -415,7 +446,8 @@ Vector2 Boit_Controller_Node::Calculate_Accel_Obstacle_Avoid(const Msg_Odom& sel
         closest_obstacle_pose.x - boit_self_pose.x,
         closest_obstacle_pose.y - boit_self_pose.y
     };
-    
+   
+    // is within range?
     if (squared_euclidan_norm(distance) <= (this->obstacle_avoid_range_ * this->obstacle_avoid_range_))
     {
         force_obstacle.x += distance.x / (squared_euclidan_norm(distance));
@@ -427,6 +459,9 @@ Vector2 Boit_Controller_Node::Calculate_Accel_Obstacle_Avoid(const Msg_Odom& sel
     return force_obstacle;
 }
 
+// TLDR: updates tuning params 
+// not TLDR: Based on subscription of topic thats designed to update tuning params, updates tuning params 
+// return: nothing
 void Boit_Controller_Node::Subscription_Tuning_Params_Callback(const Msg_Tuning_Params::SharedPtr params)
 {
     params_init = true; 
@@ -444,11 +479,17 @@ void Boit_Controller_Node::Subscription_Tuning_Params_Callback(const Msg_Tuning_
     goal_factor_ = params->goal_factor; 
 }
 
+// TLDR: updates tuning params 
+// not TLDR: Based on subscription of topic thats designed to update tuning params, updates tuning params 
+// return: nothing
 void Boit_Controller_Node::Subscription_Goal_Odom_Callback(const Msg_Odom::SharedPtr odom)
 {
     goal_odom = *odom;
 }
 
+// TLDR: calculates goal following rule influence 
+// not TLDR: Calculates acceleration based from goal following rule influence, with respect to odometries of self and goal 
+// return: vector2 of acceleration 
 Vector2 Boit_Controller_Node::Calculate_Accel_Goal(const Msg_Odom& self_odom, const Msg_Odom& goal_odom)
 {
     Vector2 force_goal;
@@ -469,3 +510,4 @@ Vector2 Boit_Controller_Node::Calculate_Accel_Goal(const Msg_Odom& self_odom, co
     
     return force_goal;
 }
+
