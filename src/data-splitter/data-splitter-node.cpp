@@ -12,24 +12,32 @@
 
 using std::placeholders::_1;
 
+
+/**
+ * @class Data_Splitter_Node
+ * @brief ROS 2 node that collects odometry data from multiple robots and publishes 
+ *        Boid information as OddometryArray msg. This includes neighbours and closest obstacles.
+ */
 class Data_Splitter_Node : public rclcpp::Node
 {
 public:
+    //constructor
     Data_Splitter_Node() : Node("data_splitter_node")
     {
+        //ros parameters of node
         boid_fov_ = this->declare_parameter<float>("boid_fov", M_PI);
         boid_vision_range_ = this->declare_parameter<float>("boid_vision_range", 10.0f);
         num_boids_ = (unsigned int)this->declare_parameter<int>("boid_number", 1u);
 
         map_sub_ = this->create_subscription<Msg_Map>("/map", 10, std::bind(&Data_Splitter_Node::Map_Callback, this, _1));
-        
+
+        // construction of robot ids and topic array: /robot_<id>/odom, /robot_<id>/boit_info
+        // these topic will be used by publishers
         for (unsigned int i = 0; i < num_boids_; ++i) {
             robot_ids_.push_back(i);
         }
-
         std::vector<std::string> odom_topics;
         std::vector<std::string> cmd_vel_topics;
-
         for (unsigned int id : robot_ids_) {
             odom_topics.push_back("/robot_" + std::to_string(id) + "/odom");
             cmd_vel_topics.push_back("/robot_" + std::to_string(id) + "/boit_info");
@@ -37,6 +45,7 @@ public:
 
         robot_odoms_.resize(num_boids_);
 
+        // just declarations of publishers and suscriber 
         for (unsigned int i = 0; i < num_boids_; ++i)
         {
             Subscription_Odom sub = this->create_subscription<Msg_Odom>(
@@ -57,23 +66,27 @@ public:
     }
 
 private:
-    //void Subscription_Odom_Callback(const Msg_Odom::SharedPtr odom, unsigned int id);
-    //void Map_Callback(const Msg_Map::SharedPtr map);
-
     Subscription_Map map_sub_;
-    std::vector<Publisher_Twist> pubs_twist_;
-    std::vector<Publisher_Boit_Info> pubs_boit_info_;
+    std::vector<Publisher_Boit_Info> pubs_boit_info_; //OdometryArray msgs spublishers
     std::vector<Subscription_Odom> subs_odom_;
     Msg_Map map_;
 
-    float boid_fov_;
-    float boid_vision_range_;
-    unsigned int num_boids_;
-    std::vector<unsigned int> robot_ids_;
+    float boid_fov_; // field of view
+    float boid_vision_range_;  // how far can boid see obstacles and other boids(neighbours)
+    unsigned int num_boids_; 
+    std::vector<unsigned int> robot_ids_; //array of all robot ids
 
     std::vector<Msg_Odom> robot_odoms_;
 
-    //function that returns closest neighbour given the robot odometry, it does so by searching occupancy grid
+    /**
+    * @brief Computes the closest obstacle to a given robot odometry.
+    * 
+    * This function searches through the occupancy grid to find the nearest
+    * occupied cell (obstacle) within the robot's vision range.
+    * 
+    * @param robot_odom The odometry of the robot.
+    * @return Vector2 The coordinates of the closest obstacle.
+    */
     Vector2 get_closest_obstacle(const Msg_Odom& robot_odom){
         unsigned int W = map_.info.width;
         unsigned int H = map_.info.height;
@@ -113,7 +126,15 @@ private:
         }
         return closest_obstacle;
     }
-    //function that finds neighbours given id od the robot and array of robot odoemtries
+    /**
+    * @brief Computes the closest obstacle to a given robot odometry.
+    * 
+    * This function searches through the occupancy grid to find the nearest
+    * occupied cell (obstacle) within the robot's vision range.
+    *
+    * @param robot_odoms Array of all recorded odometries
+    * @return Vector2 The coordinate of the closest obstacle.
+    */
     std::vector<Msg_Odom> get_neighbours(const std::vector<Msg_Odom>& robot_odoms, unsigned int id){
         if (id >= robot_odoms.size()) return {};
         const Msg_Odom& boid_id_odom = robot_odoms[id];
@@ -141,6 +162,15 @@ private:
         }
         return true_neighbours;
     }
+    /**
+    * @brief Computes the closest obstacle to a given robot odometry.
+    * 
+    * This callback is called by boids/odom sub and constructs OdometryArray(boit_info)
+    * message.
+    * 
+    * @param odom Pointer to the robot odometry 
+    * @return unsigned_int id Robot id
+    */
     void Subscription_Odom_Callback(const Msg_Odom::SharedPtr odom, unsigned int id){
         if (id >= robot_odoms_.size()) return;
         robot_odoms_[id] = *odom;
@@ -148,6 +178,7 @@ private:
         Msg_Boit_Info odom_array_id;
 
         odom_array_id.odometries = neighbours;
+        odom_array_id.odometries.push_back(*odom);
         Vector2 closest = get_closest_obstacle(*odom);
         //potrebno je pretvoriti u double jer Point message koristi double
         odom_array_id.closest_obstacle.x = static_cast<double>(closest.x);
@@ -157,6 +188,7 @@ private:
         pubs_boit_info_[id]->publish(odom_array_id);
     }
 
+    // saves map as private variable
     void Map_Callback(const Msg_Map::SharedPtr map){
         map_ = *map;
     }

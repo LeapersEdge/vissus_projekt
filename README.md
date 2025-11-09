@@ -41,6 +41,19 @@ Pošto svaki pojedini boid ne zna sam po sebi gdje je svaki drugi boid, koristim
 
 `data-splitter`, dakle, uzme sve odometrije boidova i iz njih proizvede odmetry array kojeg šalje svakom pojedinačnom boidu. On je esencijalno centar informacije koji šalje svakom robotu informaciju potrebnu da napravi odluke.
 
+![alt text](https://github.com/LeapersEdge/vissus_projekt/blob/main/images/node_graph.png)
+Graph node za primjer s 6 boida
+
+### How to use
+Pokrenite sustav pokretanjem simulation.launch.py skripte
+```shell
+ros2 launch vissus_projekt simulation.launch.py
+```
+Parametre sustava namjestite tako da publishate poruku tipa TuningParams msg. Mi preporučujemo rqt za to.
+```shell
+rqt
+```
+
 #### To do
   1. Testirati simulaciju i isprobati razne parametre, parametri su definirani u msg/TuningParams.msg
   2. Provjeriti sve nazive
