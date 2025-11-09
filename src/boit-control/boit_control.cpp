@@ -223,12 +223,8 @@ void Boit_Controller_Node::Subscription_Boit_Info_Callback(const Msg_Boit_Info::
         // a koristiti dt=(t)-(t-1)
         //
         // Dinov komentar: mislim da je ok jer je simulation refresh rate nadam se capped na necemu
-        float delta_angular_z = p_controller_update(
-                    atan2(accel_total.y, accel_total.x), 
-                    boit.last_rotation, 
-                    this->rotation_kp_
-                );
-
+        float lin_twist = self_odom.twist.twist.linear.x;
+        float angular_velocity = (fmod(std::atan2(sin(boit.last_rotation)*lin_twist, cos(boit.last_rotation)*lin_twist) - boit.last_rotation + M_PI, 2 * M_PI) - M_PI) * rotation_kp_;  
 
         // construct message
         Msg_Twist twist_msg;
@@ -237,7 +233,7 @@ void Boit_Controller_Node::Subscription_Boit_Info_Callback(const Msg_Boit_Info::
         twist_msg.linear.z = 0.0f;
         twist_msg.angular.x = 0.0f;
         twist_msg.angular.y = 0.0f;
-        twist_msg.angular.z = self_odom.twist.twist.angular.z + delta_angular_z;
+        twist_msg.angular.z = self_odom.twist.twist.angular.z + angular_velocity;
 
         pub_twist->publish(twist_msg);
     }
