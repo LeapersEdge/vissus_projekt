@@ -54,7 +54,7 @@ public:
         std::string robot_twist_topic = "/robot_" + std::to_string(int(robot_id_)) + "/cmd_vel";
         std::string robot_boit_info_topic = "/robot_" + std::to_string(int(robot_id_)) + "/boit_info";
         std::string robot_tuning_params_topic = "/tuning_params";
-        std::string goal_odom_topic = "/goal_odom";
+        std::string goal_odom_topic = "/goal_point";
 
         // init subs
         sub_boit_info = this->create_subscription<Msg_Boit_Info>(
@@ -69,7 +69,7 @@ public:
             std::bind(&Boit_Controller_Node::Subscription_Tuning_Params_Callback, this, _1) 
         );
 
-        sub_goal_odom = this->create_subscription<Msg_Odom>(
+        sub_goal_odom = this->create_subscription<Msg_Point>(
             goal_odom_topic, 
             10, 
             std::bind(&Boit_Controller_Node::Subscription_Goal_Odom_Callback, this, _1) 
@@ -88,19 +88,19 @@ public:
 private:
     void Subscription_Boit_Info_Callback(const Msg_Boit_Info::SharedPtr info);   // ALL BOITS LOGIC HAPPENS HERE
     void Subscription_Tuning_Params_Callback(const Msg_Tuning_Params::SharedPtr params);
-    void Subscription_Goal_Odom_Callback(const Msg_Odom::SharedPtr odom);
+    void Subscription_Goal_Odom_Callback(const Msg_Point::SharedPtr point);
     Vector2 Calculate_Accel_Alignment(std::vector<Msg_Odom> odoms);
     Vector2 Calculate_Accel_Avoidence(std::vector<Msg_Odom> odoms);
     Vector2 Calculate_Accel_Cohesion(std::vector<Msg_Odom> odoms);
     Vector2 Calculate_Accel_Obstacle_Avoid(const Msg_Odom& self_odom, const Msg_Point& closest_obstacle);
-    Vector2 Calculate_Accel_Goal(const Msg_Odom& self_odom, const Msg_Odom& goal);
+    Vector2 Calculate_Accel_Goal(const Msg_Odom& self_odom, const Msg_Point& goal);
 
 private:
     Boit boit;
     Publisher_Twist pub_twist;
     Subscription_Boit_Info sub_boit_info;
     Subscription_Tuning_Params sub_tuning_params;
-    Subscription_Odom sub_goal_odom;
+    Subscription_Point sub_goal_odom;
 
     //parameters declarations 
     float robot_id_;
@@ -118,7 +118,7 @@ private:
     float obstacle_avoid_factor_;
     float goal_factor_;
 
-    Msg_Odom goal_odom;
+    Msg_Point goal_point;
 };
 
 // --------------------------------------------------------------
@@ -169,7 +169,7 @@ void Boit_Controller_Node::Subscription_Boit_Info_Callback(const Msg_Boit_Info::
     Vector2 accel_avoid = Calculate_Accel_Avoidence(info->odometries);
     Vector2 accel_cohes = Calculate_Accel_Cohesion(info->odometries);
     Vector2 accel_obsta = Calculate_Accel_Obstacle_Avoid(self_odom, obstacle_point);
-    Vector2 accel_goal  = Calculate_Accel_Goal(self_odom, goal_odom);
+    Vector2 accel_goal  = Calculate_Accel_Goal(self_odom, goal_point);
     Vector2 accel_total = {};
 
     // combine forces forces
@@ -482,15 +482,15 @@ void Boit_Controller_Node::Subscription_Tuning_Params_Callback(const Msg_Tuning_
 // TLDR: updates tuning params 
 // not TLDR: Based on subscription of topic thats designed to update tuning params, updates tuning params 
 // return: nothing
-void Boit_Controller_Node::Subscription_Goal_Odom_Callback(const Msg_Odom::SharedPtr odom)
+void Boit_Controller_Node::Subscription_Goal_Odom_Callback(const Msg_Point::SharedPtr point)
 {
-    goal_odom = *odom;
+    goal_point = *point;
 }
 
 // TLDR: calculates goal following rule influence 
 // not TLDR: Calculates acceleration based from goal following rule influence, with respect to odometries of self and goal 
 // return: vector2 of acceleration 
-Vector2 Boit_Controller_Node::Calculate_Accel_Goal(const Msg_Odom& self_odom, const Msg_Odom& goal_odom)
+Vector2 Boit_Controller_Node::Calculate_Accel_Goal(const Msg_Odom& self_odom, const Msg_Point& goal_point)
 {
     Vector2 force_goal;
 
@@ -500,8 +500,8 @@ Vector2 Boit_Controller_Node::Calculate_Accel_Goal(const Msg_Odom& self_odom, co
     };
 
     Vector2 goal_pose = {
-        (float)goal_odom.pose.pose.position.x,
-        (float)goal_odom.pose.pose.position.y,
+        (float)goal_point.x,
+        (float)goal_point.y,
     };
 
     Vector2 difference = goal_pose - self_pose;

@@ -40,12 +40,11 @@ public:
 
         goal_ = parseVector2(goal_str);
 
-        odom_msg_.header.frame_id = "world";
-        odom_msg_.pose.pose.position.x = goal_.x;
-        odom_msg_.pose.pose.position.y = goal_.y;
-        odom_msg_.pose.pose.position.z = 0.0;
+        point_msg_.x = goal_.x;
+        point_msg_.y = goal_.y;
+        point_msg_.z = 0.0;
 
-        publisher_ = this->create_publisher<Msg_Odom>("/goal_odom", 10);
+        publisher_ = this->create_publisher<Msg_Point>("/goal_point", 10);
 
         timer_ = this->create_wall_timer(
             500ms, std::bind(&MinimalPublisher::timer_callback, this));
@@ -58,19 +57,17 @@ public:
 private:
     void timer_callback()
     {
-        odom_msg_.header.stamp = this->now();
-
-        publisher_->publish(odom_msg_);
+        publisher_->publish(point_msg_);
 
         RCLCPP_INFO(this->get_logger(),
             "Published Odometry: position=(%.2f, %.2f)",
-            odom_msg_.pose.pose.position.x,
-            odom_msg_.pose.pose.position.y);
+            point_msg_.x,
+            point_msg_.y);
     }
 
-    rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr publisher_;
+    rclcpp::Publisher<Msg_Point>::SharedPtr publisher_;
     rclcpp::TimerBase::SharedPtr timer_;
-    nav_msgs::msg::Odometry odom_msg_;
+    Msg_Point point_msg_;
     Vector2 goal_;
 };
 

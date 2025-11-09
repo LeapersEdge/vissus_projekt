@@ -22,4 +22,5 @@ typedef rclcpp::Subscription<Msg_Boit_Info>::SharedPtr Subscription_Boit_Info;
 typedef rclcpp::Publisher<Msg_Boit_Info>::SharedPtr Publisher_Boit_Info;
 typedef rclcpp::Subscription<Msg_Map>::SharedPtr Subscription_Map;
 typedef rclcpp::Subscription<Msg_Tuning_Params>::SharedPtr Subscription_Tuning_Params;
+typedef rclcpp::Subscription<Msg_Point>::SharedPtr Subscription_Point;
 
