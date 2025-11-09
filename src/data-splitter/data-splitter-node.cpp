@@ -159,10 +159,12 @@ private:
 
             float relative_angle = normalize_angle(angle - yaw);
 
-            if (distance_sq < boid_vision_range_ * boid_vision_range_ &&
-                ((relative_angle < boid_fov_/2.0f) && (relative_angle > -boid_fov_/2.0f))) {
-                true_neighbours.push_back(neighbour_i_odom);
-            }
+            //if (distance_sq < boid_vision_range_ * boid_vision_range_ &&
+            //    ((relative_angle < (boid_fov_/2.0f)) && (relative_angle > (-boid_fov_/2.0f)))) {
+            //    true_neighbours.push_back(neighbour_i_odom);
+            //}
+            true_neighbours.push_back(neighbour_i_odom);
+            
         }
         return true_neighbours;
     }
