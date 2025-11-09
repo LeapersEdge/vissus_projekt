@@ -59,7 +59,28 @@ Parametre sustava(koji su zapravo pojačanja reynolodsovih pravila) namještate 
 rqt
 ```
 
-#### To do
+#### Parameters
+It is advised to modify the parameters via rqt; change the parameters in `/tuning_params`. The parameters and what they control are listed below, along with some values found to be acceptable while testing.
+- `rotation_kp`: rotation rate amplification, `1`
+- `cohesion_range`: radius in which to attempt cohesion, `3`
+- `cohesion_factor`: strength with which cohesion is attempted, `5` (negative value for dispersion)
+- `alignment_range`: radius in which to consider alignment partners, `2`
+- `alignment_factor`: strength with which to maintain alignment, `10`
+- `avoidance_range`: range at which to avoid running into other boids, `0.75`
+- `avoidance_factor`: intensity with which to avoid running into other boids, `100`
+- `obstacle_avoidance_range`: range within which to avoid obstacles & borders, `1`
+- `obstacle_avoidance_factor`: intensity with which to avoid obstacles & borders, `100` (negative value for attraction)
+- `goal_factor`: intensity with which to move towards the goal, `25`
+
+##### Rule of thumb for parameters
+1. `avoidance_factor` and `obstacle_avoidance_factor` should be very high; the highest of all parameters
+2. `avoidance_range` and `obstacle_avoidance_range` should be very small; the lowest of all parameters, somewhere around `1` or less
+3. `cohesion_range` should be equal to or slightly greater than `alignment_range` (i. e. 50% greater, `3` vs. `2`)
+4. `cohesion_factor` should be equal to or lesser than `alignment_factor` (i. e. 50% smaller, `5` vs. `10`)
+5. `goal_factor` should be greater than `cohesion_factor` and `alignment_factor`, but considerably lower than `avoidance_factor` and `obstacle_avoidance_factor`
+
+
+#### To-do
   1. Testirati simulaciju i isprobati razne parametre, parametri su definirani u msg/TuningParams.msg
   2. Provjeriti sve nazive
   3. Potencijalno pretvoriti sve floatove u double da ne moramo raditi konverziju
