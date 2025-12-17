@@ -29,18 +29,20 @@ public:
         boid_vision_range_ = this->declare_parameter<float>("boid_vision_range", 10.0f);
         num_boids_ = (unsigned int)this->declare_parameter<int>("boid_number", 1u);
 
-        map_sub_ = this->create_subscription<Msg_Map>("/map", 10, std::bind(&Data_Splitter_Node::Map_Callback, this, _1));
+        // map_sub_ = this->create_subscription<Msg_Map>("/map", 10, std::bind(&Data_Splitter_Node::Map_Callback, this, _1));
 
         // construction of robot ids and topic array: /robot_<id>/odom, /robot_<id>/boid_info
         // these topic will be used by publishers
         for (unsigned int i = 0; i < num_boids_; ++i) {
-            robot_ids_.push_back(i);
+            robot_cfIDs_.push_back(i);
         }
         std::vector<std::string> odom_topics;
-        std::vector<std::string> cmd_vel_topics;
-        for (unsigned int id : robot_ids_) {
+        std::vector<std::string> cfID_pose_topics;
+        std::vector<std::string> cfID_vel_topics;
+        for (unsigned int id : robot_cfIDs_) {
             odom_topics.push_back("/robot_" + std::to_string(id) + "/odom");
-            cmd_vel_topics.push_back("/robot_" + std::to_string(id) + "/boid_info");
+            cfID_pose_topics.push_back("/cf_" + std::to_string(id) + "/pose");
+            cfID_vel_topics.push_back("/cf_" + std::to_string(id) + "/cmd_vel");
         }
 
         robot_odoms_.resize(num_boids_);
@@ -48,33 +50,43 @@ public:
         // just declarations of publishers and suscriber 
         for (unsigned int i = 0; i < num_boids_; ++i)
         {
-            Subscription_Odom sub = this->create_subscription<Msg_Odom>(
-                    odom_topics[i], 
+            Subscription_PoseStamped sub_posestamped = this->create_subscription<Msg_PoseStamped>(
+                    cfID_pose_topics[i], 
                     10, 
-                    [this, i](const Msg_Odom::SharedPtr msg) {
-                        this->Subscription_Odom_Callback(msg, i);
+                    [this, i](const Msg_PoseStamped::SharedPtr msg) {
+                        this->Subscription_cfID_PoseStamped_Callback(msg, i);
                     }
                 ); 
-            subs_odom_.push_back(sub);
+            subs_posestamped_.push_back(sub_posestamped);
             
-            Publisher_Boid_Info pub = this->create_publisher<Msg_Boid_Info>(
-                    cmd_vel_topics[i], 
+            Subscription_Twist sub_twist = this->create_subscription<Msg_Twist>(
+                    cfID_pose_topics[i], 
+                    10, 
+                    [this, i](const Msg_Twist::SharedPtr msg) {
+                        this->Subscription_cfID_Twist_Callback(msg, i);
+                    }
+                ); 
+            subs_twist_.push_back(sub_twist);
+
+            Publisher_Boid_Info pub_boitinfo = this->create_publisher<Msg_Boid_Info>(
+                    cfID_vel_topics[i], 
                     10
                 ); 
-            pubs_boid_info_.push_back(pub);
+            pubs_boid_info_.push_back(pub_boitinfo);
         }
     }
 
 private:
     Subscription_Map map_sub_;
     std::vector<Publisher_Boid_Info> pubs_boid_info_; //OdometryArray msgs spublishers
-    std::vector<Subscription_Odom> subs_odom_;
+    std::vector<Subscription_PoseStamped> subs_posestamped_;
+    std::vector<Subscription_Twist> subs_twist_;
     Msg_Map map_;
 
     float boid_fov_; // field of view
     float boid_vision_range_;  // how far can boid see obstacles and other boids(neighbours)
     unsigned int num_boids_; 
-    std::vector<unsigned int> robot_ids_; //array of all robot ids
+    std::vector<unsigned int> robot_cfIDs_; //array of all robot ids
 
     std::vector<Msg_Odom> robot_odoms_;
 
@@ -191,6 +203,16 @@ private:
         odom_array_id.closest_obstacle.z = 0.0;
 
         pubs_boid_info_[id]->publish(odom_array_id);
+    }
+
+    void Subscription_cfID_PoseStamped_Callback(const Msg_PoseStamped::SharedPtr msg, unsigned int cfID)
+    {
+
+    }
+    
+    void Subscription_cfID_Twist_Callback(const Msg_Twist::SharedPtr msg, unsigned int cfID)
+    {
+
     }
 
     // saves map as private variable

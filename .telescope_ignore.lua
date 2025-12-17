@@ -1,5 +1,7 @@
 return {
     ignore_folders = {
-        "build"
+        "build",
+        "image",
+        "doc"
     }
 }
