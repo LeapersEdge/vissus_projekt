@@ -26,7 +26,7 @@ public:
         //ros parameters of node
         boid_fov_ = this->declare_parameter<float>("boid_fov", M_PI);
         boid_vision_range_ = this->declare_parameter<float>("boid_vision_range", 10.0f);
-        num_boids_ = static_cast<unsigned int>(this->declare_parameter<int>("boid_number", 1));
+        num_boids_ = static_cast<unsigned int>(this->declare_parameter<int>("boid_number", 4));
 
         for (unsigned int i = 0; i < num_boids_; ++i) {
             robot_cfIDs_.push_back(i);
@@ -34,10 +34,10 @@ public:
 
         std::vector<std::string> cfID_pose_topics;
         std::vector<std::string> cfID_vel_topics;
-	std::vector<std::string> cfID_odom_topics;
+	    std::vector<std::string> cfID_odom_topics;
 
         for (unsigned int id : robot_cfIDs_) {
-            cfID_odom_topics.push_back("/robot_" + std::to_string(id) + "/odom");
+            cfID_odom_topics.push_back("/robot_" + std::to_string(id) + "/boid_info");
             cfID_pose_topics.push_back("/cf_" + std::to_string(id) + "/pose");
             cfID_vel_topics.push_back("/cf_" + std::to_string(id) + "/velocity");
         }

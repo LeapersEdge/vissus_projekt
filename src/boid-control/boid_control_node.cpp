@@ -3,6 +3,7 @@
 #include <cmath>
 #include <csignal>
 #include <cstdio>
+#include <fstream>
 #include "defines.h"
 #include "rclcpp/rclcpp.hpp"
 #include "std_msgs/msg/string.hpp"
@@ -55,7 +56,7 @@ public:
         robot_id_ = this->declare_parameter<int>("robot_id", 0);
 
         // initialize all publishers, subscriptions and boids
-        std::string robot_twist_topic = "/robot_" + std::to_string(int(robot_id_)) + "/cmd_vel";
+        std::string robot_twist_topic = "/cf_" + std::to_string(int(robot_id_)) + "/cmd_vel";
         std::string robot_boid_info_topic = "/robot_" + std::to_string(int(robot_id_)) + "/boid_info";
         std::string robot_tuning_params_topic = "/tuning_params";
         std::string goal_odom_topic = "/goal_point";
@@ -187,6 +188,8 @@ void Boid_Controller_Node::Subscription_Boid_Info_Callback(const Msg_Boid_Info::
     Vector2 accel_goal  = Calculate_Accel_Goal(self_odom, goal_point);
     Vector2 accel_total = {};
 
+    Vector2 vel_consensus  = Calculate_Vel_Centroid_Consensus(self_odom, goal_point);
+
     // combine forces forces
     {
         accel_total.x = 
@@ -229,8 +232,8 @@ void Boid_Controller_Node::Subscription_Boid_Info_Callback(const Msg_Boid_Info::
         Msg_Twist twist_msg;
       
         {
-            twist_msg.linear.x = self_odom.twist.twist.linear.x + accel_total.x * delta_time;
-            twist_msg.linear.y = self_odom.twist.twist.linear.y + accel_total.y * delta_time;
+            twist_msg.linear.x = self_odom.twist.twist.linear.x + accel_total.x * delta_time + vel_consensus.x;
+            twist_msg.linear.y = self_odom.twist.twist.linear.y + accel_total.y * delta_time + vel_consensus.y;
             twist_msg.angular.z = 0.0f;
             float norm = sqrt(twist_msg.linear.x*twist_msg.linear.x + twist_msg.linear.y*twist_msg.linear.y);
             if (norm > max_speed_)
@@ -553,7 +556,7 @@ Vector2 Boid_Controller_Node::Calculate_Vel_Centroid_Consensus(const std::vector
         (float)0,
     };
 
-    for (int i = 0; i < odoms.size()); i++) {
+    for (int i = 0; i < odoms.size(); i++) {
         directed_total.x += (float)odoms[i].pose.pose.position.x - (float)odoms[robot_id_-1].pose.pose.position.x;
         directed_total.y += (float)odoms[i].pose.pose.position.y - (float)odoms[robot_id_-1].pose.pose.position.y;
     }

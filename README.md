@@ -16,6 +16,17 @@ ROS2 nema catkin; koristi colcon:
 colcon build
 ```
 
+###Zad 2.
+Pali se sa:
+```shell
+cd startup
+./start.sh
+ros2 launch vissus_projekt simulation.launch.py
+```
+
+### Što ne radi 
+Ne radi nam rendevous, topici rade
+
 ### Concept
 
 #### Nodes
@@ -84,3 +95,5 @@ It is advised to modify the parameters via rqt; change the parameters in `/tunin
   1. Testirati simulaciju i isprobati razne parametre, parametri su definirani u msg/TuningParams.msg
   2. Provjeriti sve nazive
   3. Potencijalno pretvoriti sve floatove u double da ne moramo raditi konverziju
+  
+

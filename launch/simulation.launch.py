@@ -17,14 +17,8 @@ def generate_launch_description():
     boid_vision_range = float(params['boid_vision_range'])
     boid_fov = float(params['boid_fov'])
 
-    start_launch_path = os.path.join(launch_dir, 'launch', 'start.launch.py')
-
-    start_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(start_launch_path)
-    )
-
     boid_controllers = []
-    for i in range(num_of_robots):
+    for i in range(1, num_of_robots+1):
         boid_controllers.append(
             Node(
                 package='vissus_projekt',
@@ -43,5 +37,5 @@ def generate_launch_description():
         parameters=[{'boid_number': num_of_robots}, {'boid_fov': boid_fov}, {'boid_vision_range': boid_vision_range}]
     )
 
-    return LaunchDescription([start_launch] + boid_controllers + [data_splitter])
+    return LaunchDescription(boid_controllers + [data_splitter])
 
