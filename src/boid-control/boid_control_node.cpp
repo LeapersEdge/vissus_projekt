@@ -55,12 +55,17 @@ public:
         // get all available topics and extract highest <number> from topics with "robot_<number>/odom" 
         robot_id_ = this->declare_parameter<int>("robot_id", 0);
 
+	std::string = "/ros2_ws/src/vissus_projekt/launch/topology"
+	int num_boids_ = 4;
+        adjacency_mat_ = Get_Adjacency_Matrix(filepath, 4);
+
         // initialize all publishers, subscriptions and boids
         std::string robot_twist_topic = "/cf_" + std::to_string(int(robot_id_)) + "/cmd_vel";
         std::string robot_boid_info_topic = "/robot_" + std::to_string(int(robot_id_)) + "/boid_info";
         std::string robot_tuning_params_topic = "/tuning_params";
         std::string goal_odom_topic = "/goal_point";
-
+    	std::string formation_topic = "/formation";
+	
         // init subs
         sub_boid_info = this->create_subscription<Msg_Boid_Info>(
             robot_boid_info_topic,
@@ -74,6 +79,12 @@ public:
             std::bind(&Boid_Controller_Node::Subscription_Tuning_Params_Callback, this, _1)
         );
 
+	sub_formation = this->create_subscription<Msg_Formation>(
+            robot_formation_topic, 
+            10, 
+            std::bind(&Boid_Controller_Node::Subscription_Formation_Callback, this, _1)
+        );
+	
         sub_goal_odom = this->create_subscription<Msg_Point>(
             goal_odom_topic, 
             10, 
@@ -117,6 +128,8 @@ private:
     Subscription_Boid_Info sub_boid_info;
     Subscription_Tuning_Params sub_tuning_params;
     Subscription_Point sub_goal_odom;
+
+    Bool_mat adjacency_mat_;
 
     // parameter declarations 
     float robot_id_;
@@ -188,7 +201,7 @@ void Boid_Controller_Node::Subscription_Boid_Info_Callback(const Msg_Boid_Info::
     Vector2 accel_goal  = Calculate_Accel_Goal(self_odom, goal_point);
     Vector2 accel_total = {};
 
-    Vector2 vel_consensus  = Calculate_Vel_Centroid_Consensus(self_odom, goal_point);
+    Vector2 vel_consensus  = Calculate_Vel_Centroid_Consensus(info->odometries);
 
     // combine forces forces
     {
@@ -502,6 +515,12 @@ void Boid_Controller_Node::Subscription_Goal_Odom_Callback(const Msg_Point::Shar
     goal_point = *point;
 }
 
+void Boid_Controller_Node::Subscription_Formation_Callback(const Msg_Formation::SharedPtr points)
+{
+    formation_points_ = points->formation_points;
+}
+
+
 // TLDR: calculates goal following rule influence 
 // not TLDR: Calculates acceleration based from goal following rule influence, with respect to odometries of self and goal 
 // return: vector2 of acceleration 
@@ -557,10 +576,12 @@ Vector2 Boid_Controller_Node::Calculate_Vel_Centroid_Consensus(const std::vector
     };
 
     for (int i = 0; i < odoms.size(); i++) {
-        directed_total.x += (float)odoms[i].pose.pose.position.x - (float)odoms[robot_id_-1].pose.pose.position.x;
-        directed_total.y += (float)odoms[i].pose.pose.position.y - (float)odoms[robot_id_-1].pose.pose.position.y;
-    }
-
+        if (adjacency_mat_[robot_id_][i]) {
+            directed_total.x += (float)odoms[i].pose.pose.position.x - (float)odoms[robot_id_-1].pose.pose.position.x;
+            directed_total.y += (float)odoms[i].pose.pose.position.y - (float)odoms[robot_id_-1].pose.pose.position.y;
+        } 
+     }
+	
     return directed_total * (float)((double)(clock() - boid.last_time) / CLOCKS_PER_SEC);
 }
 
@@ -585,7 +606,7 @@ Vector2 Boid_Controller_Node::Calculate_Vel_Centroid_Consensus(const std::vector
     return directed_total * (float)((double)(clock() - boid.last_time) / CLOCKS_PER_SEC);
 }
 
-std::vector<std::vector<bool>> Get_Adjancency_Matrix(std::string filepath, int num_boids)
+Bool_mat Get_Adjancency_Matrix(std::string filepath, int num_boids)
     {
         typedef std::vector<std::vector<bool>> bool_matrix;
         bool_matrix mat;
