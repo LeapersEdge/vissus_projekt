@@ -1,11 +1,9 @@
-#include "defines.h"
 #include "rclcpp/rclcpp.hpp"
 #include "utils.h"
 #include <vector>
 #include <string>
 #include <limits>
 #include <cmath>
-#include "utils.h"
 #include "vector2.hpp"
 
 #define _USE_MATH_DEFINES
@@ -24,199 +22,161 @@ class Data_Splitter_Node : public rclcpp::Node
 public:
     Data_Splitter_Node() : Node("data_splitter_node")
     {
+        std::string filepath = "/root/ros_ws/src/vissus_projekt/src/launch/directed_graph.config";
         //ros parameters of node
         boid_fov_ = this->declare_parameter<float>("boid_fov", M_PI);
         boid_vision_range_ = this->declare_parameter<float>("boid_vision_range", 10.0f);
-        num_boids_ = (unsigned int)this->declare_parameter<int>("boid_number", 1u);
+        num_boids_ = static_cast<unsigned int>(this->declare_parameter<int>("boid_number", 1));
 
-        // map_sub_ = this->create_subscription<Msg_Map>("/map", 10, std::bind(&Data_Splitter_Node::Map_Callback, this, _1));
-
-        // construction of robot ids and topic array: /robot_<id>/odom, /robot_<id>/boid_info
-        // these topic will be used by publishers
         for (unsigned int i = 0; i < num_boids_; ++i) {
             robot_cfIDs_.push_back(i);
         }
-        std::vector<std::string> odom_topics;
+
         std::vector<std::string> cfID_pose_topics;
         std::vector<std::string> cfID_vel_topics;
+	std::vector<std::string> cfID_odom_topics;
+
         for (unsigned int id : robot_cfIDs_) {
-            odom_topics.push_back("/robot_" + std::to_string(id) + "/odom");
+            cfID_odom_topics.push_back("/robot_" + std::to_string(id) + "/odom");
             cfID_pose_topics.push_back("/cf_" + std::to_string(id) + "/pose");
-            cfID_vel_topics.push_back("/cf_" + std::to_string(id) + "/cmd_vel");
+            cfID_vel_topics.push_back("/cf_" + std::to_string(id) + "/velocity");
         }
 
         robot_odoms_.resize(num_boids_);
 
-        // just declarations of publishers and suscriber 
         for (unsigned int i = 0; i < num_boids_; ++i)
         {
-            Subscription_PoseStamped sub_posestamped = this->create_subscription<Msg_PoseStamped>(
-                    cfID_pose_topics[i], 
-                    10, 
+            Subscription_PoseStamped sub_posestamped =
+                this->create_subscription<Msg_PoseStamped>(
+                    cfID_pose_topics[i],
+                    10,
                     [this, i](const Msg_PoseStamped::SharedPtr msg) {
                         this->Subscription_cfID_PoseStamped_Callback(msg, i);
-                    }
-                ); 
-            subs_posestamped_.push_back(sub_posestamped);
-            
-            Subscription_Twist sub_twist = this->create_subscription<Msg_Twist>(
-                    cfID_pose_topics[i], 
-                    10, 
-                    [this, i](const Msg_Twist::SharedPtr msg) {
-                        this->Subscription_cfID_Twist_Callback(msg, i);
-                    }
-                ); 
-            subs_twist_.push_back(sub_twist);
+                    });
 
-            Publisher_Boid_Info pub_boitinfo = this->create_publisher<Msg_Boid_Info>(
-                    cfID_vel_topics[i], 
-                    10
-                ); 
-            pubs_boid_info_.push_back(pub_boitinfo);
+            subs_posestamped_.push_back(sub_posestamped);
+
+            Subscription_LogDataGeneric sub_log_data =
+                this->create_subscription<Msg_LogDataGeneric>(
+                    cfID_vel_topics[i],
+                    10,
+                    [this, i](const Msg_LogDataGeneric::SharedPtr msg) {
+                        this->Subscription_cfID_LogDataGeneric_Callback(msg, i);
+                    });
+
+            subs_log_data_generic_.push_back(sub_log_data);
+
+            Publisher_Boid_Info pub_boidinfo =
+                this->create_publisher<Msg_Boid_Info>(
+                    cfID_odom_topics[i],
+                    10);
+
+            pubs_boid_info_.push_back(pub_boidinfo);
         }
     }
 
 private:
     Subscription_Map map_sub_;
-    std::vector<Publisher_Boid_Info> pubs_boid_info_; //OdometryArray msgs spublishers
+    std::vector<Publisher_Boid_Info> pubs_boid_info_;
     std::vector<Subscription_PoseStamped> subs_posestamped_;
-    std::vector<Subscription_Twist> subs_twist_;
+    std::vector<Subscription_LogDataGeneric> subs_log_data_generic_;
     Msg_Map map_;
 
-    float boid_fov_; // field of view
-    float boid_vision_range_;  // how far can boid see obstacles and other boids(neighbours)
-    unsigned int num_boids_; 
-    std::vector<unsigned int> robot_cfIDs_; //array of all robot ids
+    float boid_fov_;
+    float boid_vision_range_;
+    unsigned int num_boids_;
+    std::vector<unsigned int> robot_cfIDs_;
 
     std::vector<Msg_Odom> robot_odoms_;
 
-    /**
-    * @brief Computes the closest obstacle to a given robot odometry.
-    * 
-    * This function searches through the occupancy grid to find the nearest
-    * occupied cell (obstacle) within the robot's vision range.
-    * 
-    * @param robot_odom The odometry of the robot.
-    * @return Vector2 The coordinates of the closest obstacle.
-    */
-    Vector2 get_closest_obstacle(const Msg_Odom& robot_odom){
+    Vector2 get_closest_obstacle(const Msg_Odom& robot_odom)
+    {
         unsigned int W = map_.info.width;
         unsigned int H = map_.info.height;
         float resolution = map_.info.resolution;
         float origin_x = map_.info.origin.position.x;
         float origin_y = map_.info.origin.position.y;
 
-        float x_odom = robot_odom.pose.pose.position.x;
-        float y_odom = robot_odom.pose.pose.position.y;
-        Vector2 pose_odom{x_odom, y_odom};
+        Vector2 pose_odom{
+            robot_odom.pose.pose.position.x,
+            robot_odom.pose.pose.position.y};
 
         float smallest_distance = std::numeric_limits<float>::max();
         Vector2 closest_obstacle{0.0f, 0.0f};
 
         for (unsigned int i = 0; i < H; i++) {
             for (unsigned int j = 0; j < W; j++) {
-                size_t idx = static_cast<size_t>(i) * static_cast<size_t>(W) + static_cast<size_t>(j);
+                size_t idx = i * W + j;
                 if (idx >= map_.data.size()) continue;
                 if (map_.data[idx] <= 0) continue;
 
-                float cell_x = origin_x + j * resolution + resolution / 2.0f;
-                float cell_y = origin_y + i * resolution + resolution / 2.0f;
-                Vector2 cell_pos{cell_x, cell_y};
+                Vector2 cell_pos{
+                    origin_x + j * resolution + resolution / 2.0f,
+                    origin_y + i * resolution + resolution / 2.0f};
 
-                float dx = cell_pos.x - pose_odom.x;
-                float dy = cell_pos.y - pose_odom.y;
-                Vector2 cell_i{dx, dy};
-                float distance_sq = squared_euclidan_norm(cell_i);
+                Vector2 diff = cell_pos - pose_odom;
+                float dist_sq = squared_euclidan_norm(diff);
 
-                if (distance_sq < boid_vision_range_ * boid_vision_range_ &&
-                        distance_sq < smallest_distance) 
+                if (dist_sq < boid_vision_range_ * boid_vision_range_ &&
+                    dist_sq < smallest_distance)
                 {
-                    smallest_distance = distance_sq;
+                    smallest_distance = dist_sq;
                     closest_obstacle = cell_pos;
                 }
             }
         }
         return closest_obstacle;
     }
-    /**
-    * @brief Computes the closest obstacle to a given robot odometry.
-    * 
-    * This function searches through the occupancy grid to find the nearest
-    * occupied cell (obstacle) within the robot's vision range.
-    *
-    * @param robot_odoms Array of all recorded odometries
-    * @return Vector2 The coordinate of the closest obstacle.
-    */
-    std::vector<Msg_Odom> get_neighbours(const std::vector<Msg_Odom>& robot_odoms, unsigned int id){
+
+    std::vector<Msg_Odom> get_graph_neighbours(
+        const std::vector<Msg_Odom>& robot_odoms,
+        unsigned int id)
+    {
         if (id >= robot_odoms.size()) return {};
-        const Msg_Odom& boid_id_odom = robot_odoms[id];
-        Vector2 boid_pose{
-            (float)boid_id_odom.pose.pose.position.x, 
-            (float)boid_id_odom.pose.pose.position.y
-        };
-        float yaw = getYawFromQuaternion(boid_id_odom.pose.pose.orientation); //from rotation quaternion mathematical definition
 
-        std::vector<Msg_Odom> true_neighbours;
+        std::vector<Msg_Odom> neighbours;
+        neighbours.reserve(robot_odoms.size() - 1);
 
-        for (size_t i = 0; i < robot_odoms.size(); ++i){
-            if (static_cast<unsigned int>(i) == id) continue;   
-            const Msg_Odom& neighbour_i_odom = robot_odoms[i];
-            Vector2 neighbour_i{
-                (float)neighbour_i_odom.pose.pose.position.x, 
-                (float)neighbour_i_odom.pose.pose.position.y
-            };
-            Vector2 diff{neighbour_i.x - boid_pose.x, neighbour_i.y - boid_pose.y};
-            float distance_sq = squared_euclidan_norm(diff);
-            float angle = atan2(diff.y, diff.x);
-            float relative_angle = angle - yaw;
-
-            if (distance_sq < boid_vision_range_ * boid_vision_range_ &&
-                ((relative_angle < (boid_fov_/2.0f)) && (relative_angle > (-boid_fov_/2.0f)))) {
-                true_neighbours.push_back(neighbour_i_odom);
-                }
-            true_neighbours.push_back(neighbour_i_odom);
-            
+        for (size_t i = 0; i < robot_odoms.size(); ++i) {
+            if (i != id) neighbours.push_back(robot_odoms[i]);
         }
-        return true_neighbours;
+        return neighbours;
     }
-    /**
-    * @brief Computes the closest obstacle to a given robot odometry.
-    * 
-    * This callback is called by boids/odom sub and constructs OdometryArray(boid_info)
-    * message.
-    * 
-    * @param odom Pointer to the robot odometry 
-    * @return unsigned_int id Robot id
-    */
-    void Subscription_Odom_Callback(const Msg_Odom::SharedPtr odom, unsigned int id){
-        if (id >= robot_odoms_.size()) return;
-        robot_odoms_[id] = *odom;
-        std::vector<Msg_Odom> neighbours = get_neighbours(robot_odoms_, id); 
+
+    void Subscription_cfID_PoseStamped_Callback(
+        const Msg_PoseStamped::SharedPtr msg,
+        unsigned int cfID)
+    {
+        if (cfID >= robot_odoms_.size()) return;
+
+        robot_odoms_[cfID].pose.pose = msg->pose;
+
         Msg_Boid_Info odom_array_id;
+        odom_array_id.odometries =
+            get_graph_neighbours(robot_odoms_, cfID);
 
-        odom_array_id.odometries = neighbours;
-        odom_array_id.odometries.insert(odom_array_id.odometries.begin(), *odom);
-        Vector2 closest = get_closest_obstacle(*odom);
-        //potrebno je pretvoriti u double jer Point message koristi double
-        odom_array_id.closest_obstacle.x = static_cast<double>(closest.x);
-        odom_array_id.closest_obstacle.y = static_cast<double>(closest.y);
-        odom_array_id.closest_obstacle.z = 0.0;
+        odom_array_id.odometries.insert(
+            odom_array_id.odometries.begin(),
+            robot_odoms_[cfID]);
 
-        pubs_boid_info_[id]->publish(odom_array_id);
+        pubs_boid_info_[cfID]->publish(odom_array_id);
     }
 
-    void Subscription_cfID_PoseStamped_Callback(const Msg_PoseStamped::SharedPtr msg, unsigned int cfID)
+    void Subscription_cfID_LogDataGeneric_Callback(
+        const Msg_LogDataGeneric::SharedPtr msg,
+        unsigned int cfID)
     {
+        if (cfID >= robot_odoms_.size()) return;
 
+        if (msg->values.size() >= 3) {
+            robot_odoms_[cfID].twist.twist.linear.x = msg->values[0];
+            robot_odoms_[cfID].twist.twist.linear.y = msg->values[1];
+            robot_odoms_[cfID].twist.twist.linear.z = msg->values[2];
+        }
     }
-    
-    void Subscription_cfID_Twist_Callback(const Msg_Twist::SharedPtr msg, unsigned int cfID)
+
+    void Map_Callback(const Msg_Map::SharedPtr map)
     {
-
-    }
-
-    // saves map as private variable
-    void Map_Callback(const Msg_Map::SharedPtr map){
         map_ = *map;
     }
 };
@@ -227,24 +187,18 @@ int main(int argc, char *argv[])
     rclcpp::spin(std::make_shared<Data_Splitter_Node>());
     rclcpp::shutdown();
     return 0;
-}       
+}
 
 double getYawFromQuaternion(const geometry_msgs::msg::Quaternion& q)
 {
-    double x = q.x;
-    double y = q.y;
-    double z = q.z;
-    double w = q.w;
-
-    double yaw = std::atan2(2.0 * (w * z + x * y),
-                            1.0 - 2.0 * (y * y + z * z));
-
-    return yaw;
+    return std::atan2(
+        2.0 * (q.w * q.z + q.x * q.y),
+        1.0 - 2.0 * (q.y * q.y + q.z * q.z));
 }
 
 float normalize_angle(float angle)
 {
-    while (angle > M_PI)  angle -= 2.0f * M_PI;
+    while (angle > M_PI) angle -= 2.0f * M_PI;
     while (angle < -M_PI) angle += 2.0f * M_PI;
     return angle;
 }
