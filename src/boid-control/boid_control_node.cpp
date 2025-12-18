@@ -90,7 +90,8 @@ public:
         boid.initialized = false;
     }
 private:
-    void Subscription_Boid_Info_Callback(const Msg_Boid_Info::SharedPtr info);   // ALL BOITS LOGIC HAPPENS HERE
+    // Project 1:
+    void Subscription_Boid_Info_Callback(const Msg_Boid_Info::SharedPtr info);   // ALL BOID LOGIC HAPPENS HERE
     void Subscription_Tuning_Params_Callback(const Msg_Tuning_Params::SharedPtr params);
     void Subscription_Goal_Odom_Callback(const Msg_Point::SharedPtr point);
     Vector2 Calculate_Accel_Alignment(std::vector<Msg_Odom> odoms);
@@ -98,6 +99,16 @@ private:
     Vector2 Calculate_Accel_Cohesion(std::vector<Msg_Odom> odoms);
     Vector2 Calculate_Accel_Obstacle_Avoid(const Msg_Odom& self_odom, const Msg_Point& closest_obstacle);
     Vector2 Calculate_Accel_Goal(const Msg_Odom& self_odom, const Msg_Point& goal);
+    // Project 2:
+    // TODO: - Get_Adjacency_Matrix should read a line of the form "T: X" where X is the total number of boids to include in the consensus protocol (usually the same as the total number of boids presumably, but since only data_splitter gets to see the total number of boids and we could potentially say that some boids aren't part of the consensus protocol, these should be kept separate)
+    //       - Store the adjacency matrix in a private variable
+    //       - use Calculate_Vel_Centroid_Consensus to calculate consensus speeds and add it to the speeds at the end of Subscription_Boid_Info_Callback
+    //       - in testing, use the separation rule but switch all other boid rules off
+    //       - maybe implement using Goal on the Offset so that you can send the boids to a desired consensus-location without the boids' Go To Goal rule
+    //               - (optional) implement separation within consensus protocol (recommended by the instructions in the first place), instead of using the boid separation rules
+    std::vector<std::vector<bool>> Get_Adjancency_Matrix(std::string filepath, int num_boids);
+    Vector2 Calculate_Vel_Centroid_Consensus(const std::vector<Msg_Odom> odoms);
+    Vector2 Calculate_Vel_Centroid_Consensus(const std::vector<Msg_Odom> odoms, const std::vector<Vector2> offsets);
 
 private:
     Boid boid;
@@ -106,9 +117,9 @@ private:
     Subscription_Tuning_Params sub_tuning_params;
     Subscription_Point sub_goal_odom;
 
-    //parameters declarations 
+    // parameter declarations 
     float robot_id_;
-    // modefiable params
+    // modifiable params
     bool params_init = false;
     float rotation_kp_;
     float cohesion_range_;
@@ -234,6 +245,12 @@ void Boid_Controller_Node::Subscription_Boid_Info_Callback(const Msg_Boid_Info::
         twist_msg.linear.z = 0.0f;
         twist_msg.angular.x = 0.0f;
         twist_msg.angular.y = 0.0f;
+
+        // Project 2
+        //Vector2 vels = Calculate_Vel_Centroid_Consensus(odoms)
+        //twist_msg.linear.x += vels.x;
+        //twist_msg.linear.y += vels.y;
+
         pub_twist->publish(twist_msg);
     }
 
@@ -526,3 +543,131 @@ float normalize_angle(float angle)
     return angle;
 }
 
+/// @brief Computes velocities for current agent to move towards the centroid of the agents it has the information of
+/// @param odoms Array of all odometry messages that the robot can see.
+/// @return 
+Vector2 Boid_Controller_Node::Calculate_Vel_Centroid_Consensus(const std::vector<Msg_Odom> odoms)
+{
+    Vector2 directed_total = {
+        (float)0,
+        (float)0,
+    };
+
+    for (int i = 0; i < odoms.size()); i++) {
+        directed_total.x += (float)odoms[i].pose.pose.position.x - (float)odoms[robot_id_-1].pose.pose.position.x;
+        directed_total.y += (float)odoms[i].pose.pose.position.y - (float)odoms[robot_id_-1].pose.pose.position.y;
+    }
+
+    return directed_total * (float)((double)(clock() - boid.last_time) / CLOCKS_PER_SEC);
+}
+
+/// @brief Computes velocities for current agent to move towards the centroid of the agents it has the information of
+/// @param odoms Array of all odometry messages that the robot can see.
+/// @param offsets Array of all offsets that the robot should use in the formation.
+/// @return 
+Vector2 Boid_Controller_Node::Calculate_Vel_Centroid_Consensus(const std::vector<Msg_Odom> odoms, const std::vector<Vector2> offsets)
+{
+    Vector2 directed_total = {
+        (float)0,
+        (float)0,
+    };
+
+    for (int i = 0; i < odoms.size(); i++) {
+        directed_total.x += (float)odoms[i].pose.pose.position.x - (float)odoms[robot_id_-1].pose.pose.position.x;
+        directed_total.y += (float)odoms[i].pose.pose.position.y - (float)odoms[robot_id_-1].pose.pose.position.y;
+
+        directed_total -= offsets[i] - offsets[robot_id_-1];
+    }
+
+    return directed_total * (float)((double)(clock() - boid.last_time) / CLOCKS_PER_SEC);
+}
+
+std::vector<std::vector<bool>> Get_Adjancency_Matrix(std::string filepath, int num_boids)
+    {
+        typedef std::vector<std::vector<bool>> bool_matrix;
+        bool_matrix mat;
+        
+        std::ifstream in(filepath);
+
+        if (in.bad())
+        {
+            RCUTILS_LOG_FATAL("INPUT CONFIG FILE %s IS BAD", filepath.c_str());
+            return mat;
+        }
+
+        mat.reserve(num_boids);
+        for (auto& cell : mat)
+            cell.reserve(num_boids);
+
+        for (size_t y = 0; y < num_boids; y++)
+            for (size_t x = 0; x < num_boids; x++)
+                mat[y][x] = 0;
+
+        if (in.is_open())
+        {
+            std::string line = "";
+            while (!in.eof()) 
+            {
+                std::getline(in, line);
+                if (line.size() && !(line[0] >= '0' && line[0] <= '9'/* || line[0] == 'T' */)) // T: <num> compatibility for total number of bots to include in consensus (consensus protocol needs to be calculated in boid_control_node, so the building of the adjacency matrix needs to use boid_num but since that's not present in boid_control we have to get it manually)
+                    continue;
+                
+                std::string temp;
+
+                int left = -1;
+                std::vector<int> right; 
+                // parsing stages
+                // line "left:right"
+                // stage 1, find "left:"
+                // stage 2, find ":right"
+                {
+                    size_t i = 0;
+
+                    // stage 1
+                    {
+                        temp = "";
+                        while (left == -1 && i < line.size())
+                        {
+                            char c = line[i++];
+                            if (c == ':')
+                                left = std::stoi(temp);
+                            else
+                                temp += c;
+                        }
+                    }
+
+                    // stage 2
+                    {
+                        temp = "";
+                        while (i < line.size()) 
+                        {
+                            char c = line[i++];
+                            if (c == ' ')
+                            {
+                                right.push_back(std::stoi(temp));
+                                temp = "";
+                            }
+                            else
+                                temp += c;
+                        }
+
+                        if (temp != "")
+                        {
+                            right.push_back(std::stoi(temp));
+                            temp = "";
+                        }
+                    }
+                } 
+            
+                for (const int r : right)
+                {
+                    mat[left][r] = '1';
+                    mat[r][left] = '1';
+                }
+            }
+        }
+
+        in.close();
+
+        return mat;
+    }
