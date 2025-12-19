@@ -1,0 +1,53 @@
+-- Found ament_cmake: 1.3.12 (/opt/ros/humble/share/ament_cmake/cmake)
+-- Override CMake install command with custom implementation using symlinks instead of copying resources
+-- Found rclcpp: 16.0.16 (/opt/ros/humble/share/rclcpp/cmake)
+-- Found rosidl_generator_c: 3.1.7 (/opt/ros/humble/share/rosidl_generator_c/cmake)
+-- Found rosidl_adapter: 3.1.7 (/opt/ros/humble/share/rosidl_adapter/cmake)
+-- Found rosidl_generator_cpp: 3.1.7 (/opt/ros/humble/share/rosidl_generator_cpp/cmake)
+-- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c
+-- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp
+-- Found rmw_implementation_cmake: 6.1.2 (/opt/ros/humble/share/rmw_implementation_cmake/cmake)
+-- Found rmw_fastrtps_cpp: 6.2.9 (/opt/ros/humble/share/rmw_fastrtps_cpp/cmake)
+-- Using RMW implementation 'rmw_fastrtps_cpp' as default
+-- Found rclpy: 3.3.19 (/opt/ros/humble/share/rclpy/cmake)
+-- Found nav_msgs: 4.9.0 (/opt/ros/humble/share/nav_msgs/cmake)
+-- Found rosidl_default_generators: 1.2.0 (/opt/ros/humble/share/rosidl_default_generators/cmake)
+-- Found message_filters: 4.3.11 (/opt/ros/humble/share/message_filters/cmake)
+-- Found crazyflie_interfaces: 1.0.3 (/root/ros2_ws/install/crazyflie_interfaces/share/crazyflie_interfaces/cmake)
+-- Found ament_lint_auto: 0.12.14 (/opt/ros/humble/share/ament_lint_auto/cmake)
+-- Found ament_cmake_ros: 0.10.0 (/opt/ros/humble/share/ament_cmake_ros/cmake)
+-- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c
+-- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp
+-- Found python_cmake_module: 0.10.0 (/opt/ros/humble/share/python_cmake_module/cmake)
+-- Using PYTHON_EXECUTABLE: /usr/bin/python3
+-- Using PYTHON_INCLUDE_DIRS: /usr/include/python3.10
+-- Using PYTHON_LIBRARIES: /usr/lib/x86_64-linux-gnu/libpython3.10.so
+-- Added test 'cppcheck' to perform static code analysis on C / C++ code
+-- Configured cppcheck include dirs: $<BUILD_INTERFACE:/root/ros2_ws/src/vissus_projekt/build/vissus_projekt/rosidl_generator_c>;$<BUILD_INTERFACE:/root/ros2_ws/src/vissus_projekt/build/vissus_projekt/rosidl_typesupport_fastrtps_c>;$<BUILD_INTERFACE:/root/ros2_ws/src/vissus_projekt/build/vissus_projekt/rosidl_generator_cpp>;$<BUILD_INTERFACE:/root/ros2_ws/src/vissus_projekt/build/vissus_projekt/rosidl_typesupport_fastrtps_cpp>;$<BUILD_INTERFACE:/root/ros2_ws/src/vissus_projekt/build/vissus_projekt/rosidl_typesupport_introspection_c>;$<BUILD_INTERFACE:/root/ros2_ws/src/vissus_projekt/build/vissus_projekt/rosidl_typesupport_introspection_cpp>;/root/ros2_ws/src/vissus_projekt/build/vissus_projekt/rosidl_generator_c;/root/ros2_ws/src/vissus_projekt/build/vissus_projekt/rosidl_generator_py;/root/ros2_ws/src/vissus_projekt/include/;$<BUILD_INTERFACE:/root/ros2_ws/src/vissus_projekt/include>
+-- Configured cppcheck exclude dirs and/or files: 
+-- Added test 'flake8' to check Python code syntax and style conventions
+-- Added test 'lint_cmake' to check CMake code style
+-- Added test 'pep257' to check Python code against some of the docstring style conventions in PEP 257
+-- Added test 'uncrustify' to check C / C++ code style
+-- Configured uncrustify additional arguments: 
+-- Added test 'xmllint' to check XML markup files
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /root/ros2_ws/src/vissus_projekt/build/vissus_projekt
+[35m[1mConsolidate compiler generated dependencies of target vissus_projekt__rosidl_generator_c[0m
+[  1%] Built target vissus_projekt__cpp
+[  3%] [32mBuilding C object CMakeFiles/vissus_projekt__rosidl_generator_c.dir/rosidl_generator_c/vissus_projekt/msg/detail/formation__functions.c.o[0m
+[  3%] Built target ament_cmake_python_symlink_vissus_projekt
+[35m[1mConsolidate compiler generated dependencies of target vissus_projekt__rosidl_typesupport_cpp[0m
+[35m[1mConsolidate compiler generated dependencies of target vissus_projekt__rosidl_typesupport_introspection_cpp[0m
+[35m[1mConsolidate compiler generated dependencies of target vissus_projekt__rosidl_typesupport_fastrtps_cpp[0m
+[  7%] [32mBuilding CXX object CMakeFiles/vissus_projekt__rosidl_typesupport_cpp.dir/rosidl_typesupport_cpp/vissus_projekt/msg/formation__type_support.cpp.o[0m
+[  7%] [32mBuilding CXX object CMakeFiles/vissus_projekt__rosidl_typesupport_introspection_cpp.dir/rosidl_typesupport_introspection_cpp/vissus_projekt/msg/detail/formation__type_support.cpp.o[0m
+[  8%] [32mBuilding CXX object CMakeFiles/vissus_projekt__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/vissus_projekt/msg/detail/dds_fastrtps/formation__type_support.cpp.o[0m
+running egg_info
+writing vissus_projekt.egg-info/PKG-INFO
+writing dependency_links to vissus_projekt.egg-info/dependency_links.txt
+writing top-level names to vissus_projekt.egg-info/top_level.txt
+reading manifest file 'vissus_projekt.egg-info/SOURCES.txt'
+writing manifest file 'vissus_projekt.egg-info/SOURCES.txt'
+[  8%] Built target ament_cmake_python_build_vissus_projekt_egg

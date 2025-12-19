@@ -1,0 +1,108 @@
+[0.016s] Invoking command in '/root/ros2_ws/src/vissus_projekt/build/vissus_projekt': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/root/ros2_ws/install/crazyflie_py:/opt/ros/humble /usr/bin/cmake --build /root/ros2_ws/src/vissus_projekt/build/vissus_projekt -- -j16 -l16
+[0.075s] -- Found ament_cmake: 1.3.12 (/opt/ros/humble/share/ament_cmake/cmake)
+[0.260s] -- Override CMake install command with custom implementation using symlinks instead of copying resources
+[0.273s] -- Found rclcpp: 16.0.16 (/opt/ros/humble/share/rclcpp/cmake)
+[0.320s] -- Found rosidl_generator_c: 3.1.7 (/opt/ros/humble/share/rosidl_generator_c/cmake)
+[0.323s] -- Found rosidl_adapter: 3.1.7 (/opt/ros/humble/share/rosidl_adapter/cmake)
+[0.332s] -- Found rosidl_generator_cpp: 3.1.7 (/opt/ros/humble/share/rosidl_generator_cpp/cmake)
+[0.347s] -- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c
+[0.365s] -- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp
+[0.409s] -- Found rmw_implementation_cmake: 6.1.2 (/opt/ros/humble/share/rmw_implementation_cmake/cmake)
+[0.411s] -- Found rmw_fastrtps_cpp: 6.2.9 (/opt/ros/humble/share/rmw_fastrtps_cpp/cmake)
+[0.631s] -- Using RMW implementation 'rmw_fastrtps_cpp' as default
+[0.697s] -- Found rclpy: 3.3.19 (/opt/ros/humble/share/rclpy/cmake)
+[0.698s] -- Found nav_msgs: 4.9.0 (/opt/ros/humble/share/nav_msgs/cmake)
+[0.738s] -- Found rosidl_default_generators: 1.2.0 (/opt/ros/humble/share/rosidl_default_generators/cmake)
+[0.749s] -- Found message_filters: 4.3.11 (/opt/ros/humble/share/message_filters/cmake)
+[0.753s] -- Found crazyflie_interfaces: 1.0.3 (/root/ros2_ws/install/crazyflie_interfaces/share/crazyflie_interfaces/cmake)
+[0.776s] -- Found ament_lint_auto: 0.12.14 (/opt/ros/humble/share/ament_lint_auto/cmake)
+[1.230s] -- Found ament_cmake_ros: 0.10.0 (/opt/ros/humble/share/ament_cmake_ros/cmake)
+[1.887s] -- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c
+[2.146s] -- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp
+[2.181s] -- Found python_cmake_module: 0.10.0 (/opt/ros/humble/share/python_cmake_module/cmake)
+[2.216s] -- Using PYTHON_EXECUTABLE: /usr/bin/python3
+[2.216s] -- Using PYTHON_INCLUDE_DIRS: /usr/include/python3.10
+[2.216s] -- Using PYTHON_LIBRARIES: /usr/lib/x86_64-linux-gnu/libpython3.10.so
+[2.290s] [0mCMake Deprecation Warning at /opt/ros/humble/share/rosidl_cmake/cmake/rosidl_target_interfaces.cmake:32 (message):
+[2.290s]   Use rosidl_get_typesupport_target() and target_link_libraries() instead of
+[2.290s]   rosidl_target_interfaces()
+[2.291s] Call Stack (most recent call first):
+[2.291s]   CMakeLists.txt:64 (rosidl_target_interfaces)
+[2.291s] 
+[2.291s] [0m
+[2.294s] [0mCMake Deprecation Warning at /opt/ros/humble/share/rosidl_cmake/cmake/rosidl_target_interfaces.cmake:32 (message):
+[2.294s]   Use rosidl_get_typesupport_target() and target_link_libraries() instead of
+[2.294s]   rosidl_target_interfaces()
+[2.294s] Call Stack (most recent call first):
+[2.294s]   CMakeLists.txt:71 (rosidl_target_interfaces)
+[2.294s] 
+[2.294s] [0m
+[2.297s] [0mCMake Deprecation Warning at /opt/ros/humble/share/rosidl_cmake/cmake/rosidl_target_interfaces.cmake:32 (message):
+[2.297s]   Use rosidl_get_typesupport_target() and target_link_libraries() instead of
+[2.297s]   rosidl_target_interfaces()
+[2.297s] Call Stack (most recent call first):
+[2.298s]   CMakeLists.txt:77 (rosidl_target_interfaces)
+[2.298s] 
+[2.298s] [0m
+[2.429s] -- Added test 'cppcheck' to perform static code analysis on C / C++ code
+[2.431s] -- Configured cppcheck include dirs: $<BUILD_INTERFACE:/root/ros2_ws/src/vissus_projekt/build/vissus_projekt/rosidl_generator_c>;$<BUILD_INTERFACE:/root/ros2_ws/src/vissus_projekt/build/vissus_projekt/rosidl_typesupport_fastrtps_c>;$<BUILD_INTERFACE:/root/ros2_ws/src/vissus_projekt/build/vissus_projekt/rosidl_generator_cpp>;$<BUILD_INTERFACE:/root/ros2_ws/src/vissus_projekt/build/vissus_projekt/rosidl_typesupport_fastrtps_cpp>;$<BUILD_INTERFACE:/root/ros2_ws/src/vissus_projekt/build/vissus_projekt/rosidl_typesupport_introspection_c>;$<BUILD_INTERFACE:/root/ros2_ws/src/vissus_projekt/build/vissus_projekt/rosidl_typesupport_introspection_cpp>;/root/ros2_ws/src/vissus_projekt/build/vissus_projekt/rosidl_generator_c;/root/ros2_ws/src/vissus_projekt/build/vissus_projekt/rosidl_generator_py;/root/ros2_ws/src/vissus_projekt/include/;$<BUILD_INTERFACE:/root/ros2_ws/src/vissus_projekt/include>
+[2.431s] -- Configured cppcheck exclude dirs and/or files: 
+[2.448s] -- Added test 'flake8' to check Python code syntax and style conventions
+[2.480s] -- Added test 'lint_cmake' to check CMake code style
+[2.497s] -- Added test 'pep257' to check Python code against some of the docstring style conventions in PEP 257
+[2.622s] -- Added test 'uncrustify' to check C / C++ code style
+[2.622s] -- Configured uncrustify additional arguments: 
+[2.638s] -- Added test 'xmllint' to check XML markup files
+[2.646s] -- Configuring done
+[2.742s] -- Generating done
+[2.771s] -- Build files have been written to: /root/ros2_ws/src/vissus_projekt/build/vissus_projekt
+[2.815s] [35m[1mConsolidate compiler generated dependencies of target vissus_projekt__rosidl_generator_c[0m
+[2.830s] [  1%] Built target vissus_projekt__cpp
+[2.838s] [  3%] [32mBuilding C object CMakeFiles/vissus_projekt__rosidl_generator_c.dir/rosidl_generator_c/vissus_projekt/msg/detail/formation__functions.c.o[0m
+[2.843s] [  3%] Built target ament_cmake_python_symlink_vissus_projekt
+[2.850s] [35m[1mConsolidate compiler generated dependencies of target vissus_projekt__rosidl_typesupport_cpp[0m
+[2.850s] [35m[1mConsolidate compiler generated dependencies of target vissus_projekt__rosidl_typesupport_introspection_cpp[0m
+[2.850s] [35m[1mConsolidate compiler generated dependencies of target vissus_projekt__rosidl_typesupport_fastrtps_cpp[0m
+[2.868s] In file included from [01m[K/root/ros2_ws/src/vissus_projekt/build/vissus_projekt/rosidl_generator_c/vissus_projekt/msg/detail/formation__functions.h:19[m[K,
+[2.868s]                  from [01m[K/root/ros2_ws/src/vissus_projekt/build/vissus_projekt/rosidl_generator_c/vissus_projekt/msg/detail/formation__functions.c:4[m[K:
+[2.868s] [01m[K/root/ros2_ws/src/vissus_projekt/build/vissus_projekt/rosidl_generator_c/vissus_projekt/msg/detail/formation__struct.h:22:10:[m[K [01;31m[Kfatal error: [m[Kvissus_projekt/msg/detail/point__struct.h: No such file or directory
+[2.868s]    22 | #include [01;31m[K"vissus_projekt/msg/detail/point__struct.h"[m[K
+[2.868s]       |          [01;31m[K^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[m[K
+[2.868s] compilation terminated.
+[2.869s] gmake[2]: *** [CMakeFiles/vissus_projekt__rosidl_generator_c.dir/build.make:239: CMakeFiles/vissus_projekt__rosidl_generator_c.dir/rosidl_generator_c/vissus_projekt/msg/detail/formation__functions.c.o] Error 1
+[2.869s] gmake[1]: *** [CMakeFiles/Makefile2:219: CMakeFiles/vissus_projekt__rosidl_generator_c.dir/all] Error 2
+[2.869s] gmake[1]: *** Waiting for unfinished jobs....
+[2.878s] [  7%] [32mBuilding CXX object CMakeFiles/vissus_projekt__rosidl_typesupport_cpp.dir/rosidl_typesupport_cpp/vissus_projekt/msg/formation__type_support.cpp.o[0m
+[2.878s] [  7%] [32mBuilding CXX object CMakeFiles/vissus_projekt__rosidl_typesupport_introspection_cpp.dir/rosidl_typesupport_introspection_cpp/vissus_projekt/msg/detail/formation__type_support.cpp.o[0m
+[2.878s] [  8%] [32mBuilding CXX object CMakeFiles/vissus_projekt__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/vissus_projekt/msg/detail/dds_fastrtps/formation__type_support.cpp.o[0m
+[2.997s] In file included from [01m[K/root/ros2_ws/src/vissus_projekt/build/vissus_projekt/rosidl_typesupport_fastrtps_cpp/vissus_projekt/msg/detail/formation__rosidl_typesupport_fastrtps_cpp.hpp:11[m[K,
+[2.997s]                  from [01m[K/root/ros2_ws/src/vissus_projekt/build/vissus_projekt/rosidl_typesupport_fastrtps_cpp/vissus_projekt/msg/detail/dds_fastrtps/formation__type_support.cpp:4[m[K:
+[2.997s] [01m[K/root/ros2_ws/src/vissus_projekt/build/vissus_projekt/rosidl_generator_cpp/vissus_projekt/msg/detail/formation__struct.hpp:20:10:[m[K [01;31m[Kfatal error: [m[Kvissus_projekt/msg/detail/point__struct.hpp: No such file or directory
+[2.998s]    20 | #include [01;31m[K"vissus_projekt/msg/detail/point__struct.hpp"[m[K
+[2.998s]       |          [01;31m[K^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[m[K
+[2.998s] compilation terminated.
+[2.998s] In file included from [01m[K/root/ros2_ws/src/vissus_projekt/build/vissus_projekt/rosidl_typesupport_cpp/vissus_projekt/msg/formation__type_support.cpp:7[m[K:
+[2.998s] [01m[K/root/ros2_ws/src/vissus_projekt/build/vissus_projekt/rosidl_generator_cpp/vissus_projekt/msg/detail/formation__struct.hpp:20:10:[m[K [01;31m[Kfatal error: [m[Kvissus_projekt/msg/detail/point__struct.hpp: No such file or directory
+[2.998s]    20 | #include [01;31m[K"vissus_projekt/msg/detail/point__struct.hpp"[m[K
+[2.998s]       |          [01;31m[K^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[m[K
+[2.998s] compilation terminated.
+[3.001s] gmake[2]: *** [CMakeFiles/vissus_projekt__rosidl_typesupport_fastrtps_cpp.dir/build.make:207: CMakeFiles/vissus_projekt__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/vissus_projekt/msg/detail/dds_fastrtps/formation__type_support.cpp.o] Error 1
+[3.001s] gmake[2]: *** [CMakeFiles/vissus_projekt__rosidl_typesupport_cpp.dir/build.make:196: CMakeFiles/vissus_projekt__rosidl_typesupport_cpp.dir/rosidl_typesupport_cpp/vissus_projekt/msg/formation__type_support.cpp.o] Error 1
+[3.001s] gmake[1]: *** [CMakeFiles/Makefile2:297: CMakeFiles/vissus_projekt__rosidl_typesupport_fastrtps_cpp.dir/all] Error 2
+[3.001s] gmake[1]: *** [CMakeFiles/Makefile2:401: CMakeFiles/vissus_projekt__rosidl_typesupport_cpp.dir/all] Error 2
+[3.007s] In file included from [01m[K/root/ros2_ws/src/vissus_projekt/build/vissus_projekt/rosidl_typesupport_introspection_cpp/vissus_projekt/msg/detail/formation__type_support.cpp:12[m[K:
+[3.007s] [01m[K/root/ros2_ws/src/vissus_projekt/build/vissus_projekt/rosidl_generator_cpp/vissus_projekt/msg/detail/formation__struct.hpp:20:10:[m[K [01;31m[Kfatal error: [m[Kvissus_projekt/msg/detail/point__struct.hpp: No such file or directory
+[3.007s]    20 | #include [01;31m[K"vissus_projekt/msg/detail/point__struct.hpp"[m[K
+[3.007s]       |          [01;31m[K^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[m[K
+[3.007s] compilation terminated.
+[3.010s] gmake[2]: *** [CMakeFiles/vissus_projekt__rosidl_typesupport_introspection_cpp.dir/build.make:207: CMakeFiles/vissus_projekt__rosidl_typesupport_introspection_cpp.dir/rosidl_typesupport_introspection_cpp/vissus_projekt/msg/detail/formation__type_support.cpp.o] Error 1
+[3.010s] gmake[1]: *** [CMakeFiles/Makefile2:375: CMakeFiles/vissus_projekt__rosidl_typesupport_introspection_cpp.dir/all] Error 2
+[3.275s] running egg_info
+[3.275s] writing vissus_projekt.egg-info/PKG-INFO
+[3.276s] writing dependency_links to vissus_projekt.egg-info/dependency_links.txt
+[3.276s] writing top-level names to vissus_projekt.egg-info/top_level.txt
+[3.281s] reading manifest file 'vissus_projekt.egg-info/SOURCES.txt'
+[3.282s] writing manifest file 'vissus_projekt.egg-info/SOURCES.txt'
+[3.320s] [  8%] Built target ament_cmake_python_build_vissus_projekt_egg
+[3.322s] gmake: *** [Makefile:146: all] Error 2
+[3.325s] Invoked command in '/root/ros2_ws/src/vissus_projekt/build/vissus_projekt' returned '2': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/root/ros2_ws/install/crazyflie_py:/opt/ros/humble /usr/bin/cmake --build /root/ros2_ws/src/vissus_projekt/build/vissus_projekt -- -j16 -l16

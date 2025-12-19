@@ -1,0 +1,179 @@
+[0.000000] (-) TimerEvent: {}
+[0.000759] (vissus_projekt) JobQueued: {'identifier': 'vissus_projekt', 'dependencies': OrderedDict()}
+[0.000869] (vissus_projekt) JobStarted: {'identifier': 'vissus_projekt'}
+[0.013810] (vissus_projekt) JobProgress: {'identifier': 'vissus_projekt', 'progress': 'cmake'}
+[0.014684] (vissus_projekt) JobProgress: {'identifier': 'vissus_projekt', 'progress': 'build'}
+[0.015485] (vissus_projekt) Command: {'cmd': ['/usr/bin/cmake', '--build', '/root/ros2_ws/src/vissus_projekt/build/vissus_projekt', '--', '-j16', '-l16'], 'cwd': '/root/ros2_ws/src/vissus_projekt/build/vissus_projekt', 'env': OrderedDict([('DOCKER_BUILDKIT', '1'), ('LESSOPEN', '| /usr/bin/lesspipe %s'), ('TMUX', '/tmp/tmux-0/default,384721,2'), ('GIT_SSH_COMMAND', 'ssh -v'), ('HOSTNAME', '344eeae1eb99'), ('ENV_NAME', 'empty_borderless'), ('SHLVL', '2'), ('LD_LIBRARY_PATH', '/root/ros2_ws/install/vissus_projekt/lib:/root/ros2_ws/install/crazyflie_interfaces/lib:/root/ros2_ws/install/lib:/opt/ros/humble/opt/rviz_ogre_vendor/lib:/opt/ros/humble/lib/x86_64-linux-gnu:/opt/ros/humble/lib'), ('HOME', '/root'), ('OLDPWD', '/root/ros2_ws'), ('TERM_PROGRAM_VERSION', '3.2a'), ('ROS_PYTHON_VERSION', '3'), ('DEBUGINFOD_URLS', ''), ('COLCON_PREFIX_PATH', '/root/ros2_ws/install'), ('ROS_DISTRO', 'humble'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('NVIDIA_DRIVER_CAPABILITIES', 'graphics,utility,compute'), ('TERM', 'screen-256color'), ('SPAWN_POSE_DOC', 'four_example.txt'), ('ROS_LOCALHOST_ONLY', '1'), ('QT_X11_NO_MITSHM', '1'), ('PATH', '/opt/ros/humble/bin:/root/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'), ('DISPLAY', ':0'), ('LANG', 'C.UTF-8'), ('LS_COLORS', 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'), ('ROS2_DISTRO', 'humble'), ('TERM_PROGRAM', 'tmux'), ('ROS_DOMAIN_ID', '24'), ('AMENT_PREFIX_PATH', '/root/ros2_ws/install/vissus_projekt:/root/ros2_ws/install/mrs_crazyflies:/root/ros2_ws/install/crazyflie_sim:/root/ros2_ws/install/crazyflie_examples:/root/ros2_ws/install/crazyflie_py:/root/ros2_ws/install/crazyflie:/root/ros2_ws/install/crazyflie_interfaces:/root/ros2_ws/install:/opt/ros/humble'), ('SHELL', '/bin/bash'), ('NUM_ROBOTS', '4'), ('LESSCLOSE', '/usr/bin/lesspipe %s %s'), ('PWD', '/root/ros2_ws/src/vissus_projekt/build/vissus_projekt'), ('GZ_RELEASE', 'garden'), ('LC_AL', 'C.UTF-8'), ('PYTHONPATH', '/root/ros2_ws/install/vissus_projekt/local/lib/python3.10/dist-packages:/root/ros2_ws/install/mrs_crazyflies/local/lib/python3.10/dist-packages:/root/ros2_ws/install/crazyflie_sim/local/lib/python3.10/dist-packages:/root/ros2_ws/install/crazyflie_examples/local/lib/python3.10/dist-packages:/root/ros2_ws/install/crazyflie_py/lib/python3.10/site-packages:/root/ros2_ws/install/crazyflie_interfaces/local/lib/python3.10/dist-packages:/root/ros2_ws/build/crazyflie_py:/root/ros2_ws/install/lib/python3.10/site-packages:/root/ros2_ws/install/local/lib/python3.10/dist-packages:/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages'), ('NVIDIA_VISIBLE_DEVICES', 'all'), ('TZ', 'Europe/Zagreb'), ('COLCON', '1'), ('TMUX_PANE', '%16'), ('CMAKE_PREFIX_PATH', '/root/ros2_ws/install/vissus_projekt:/root/ros2_ws/install/mrs_crazyflies:/root/ros2_ws/install/crazyflie_sim:/root/ros2_ws/install/crazyflie_examples:/root/ros2_ws/install/crazyflie:/root/ros2_ws/install/crazyflie_interfaces:/root/ros2_ws/install:/root/ros2_ws/install/crazyflie_py:/opt/ros/humble')]), 'shell': False}
+[0.099545] (-) TimerEvent: {}
+[0.114248] (vissus_projekt) StdoutLine: {'line': b'[  1%] Built target vissus_projekt__cpp\n'}
+[0.117042] (vissus_projekt) StdoutLine: {'line': b'[ 10%] Built target vissus_projekt__rosidl_generator_c\n'}
+[0.127649] (vissus_projekt) StdoutLine: {'line': b'[ 10%] Built target ament_cmake_python_symlink_vissus_projekt\n'}
+[0.155868] (vissus_projekt) StdoutLine: {'line': b'[ 21%] Built target vissus_projekt__rosidl_typesupport_c\n'}
+[0.156258] (vissus_projekt) StdoutLine: {'line': b'[ 30%] Built target vissus_projekt__rosidl_typesupport_introspection_c\n'}
+[0.156614] (vissus_projekt) StdoutLine: {'line': b'[ 37%] Built target vissus_projekt__rosidl_typesupport_introspection_cpp\n'}
+[0.157042] (vissus_projekt) StdoutLine: {'line': b'[ 55%] Built target vissus_projekt__rosidl_typesupport_fastrtps_cpp\n'}
+[0.157196] (vissus_projekt) StdoutLine: {'line': b'[ 55%] Built target vissus_projekt__rosidl_typesupport_cpp\n'}
+[0.158920] (vissus_projekt) StdoutLine: {'line': b'[ 64%] Built target vissus_projekt__rosidl_typesupport_fastrtps_c\n'}
+[0.189283] (vissus_projekt) StdoutLine: {'line': b'[ 64%] Built target vissus_projekt\n'}
+[0.199658] (-) TimerEvent: {}
+[0.213177] (vissus_projekt) StdoutLine: {'line': b'\x1b[35m\x1b[1mConsolidate compiler generated dependencies of target boid_control\x1b[0m\n'}
+[0.228576] (vissus_projekt) StdoutLine: {'line': b'[ 66%] Built target vissus_projekt__py\n'}
+[0.239973] (vissus_projekt) StdoutLine: {'line': b'[ 71%] Built target data_splitter\n'}
+[0.240531] (vissus_projekt) StdoutLine: {'line': b'[ 76%] Built target goal_pub\n'}
+[0.255930] (vissus_projekt) StdoutLine: {'line': b'[ 78%] \x1b[32mBuilding CXX object CMakeFiles/boid_control.dir/src/boid-control/boid_control_node.cpp.o\x1b[0m\n'}
+[0.268509] (vissus_projekt) StdoutLine: {'line': b'[ 85%] Built target vissus_projekt__rosidl_generator_py\n'}
+[0.299768] (-) TimerEvent: {}
+[0.307869] (vissus_projekt) StdoutLine: {'line': b'[ 92%] Built target vissus_projekt__rosidl_typesupport_introspection_c__pyext\n'}
+[0.308101] (vissus_projekt) StdoutLine: {'line': b'[ 94%] Built target vissus_projekt__rosidl_typesupport_fastrtps_c__pyext\n'}
+[0.308227] (vissus_projekt) StdoutLine: {'line': b'[ 96%] Built target vissus_projekt__rosidl_typesupport_c__pyext\n'}
+[0.399870] (-) TimerEvent: {}
+[0.500191] (-) TimerEvent: {}
+[0.543996] (vissus_projekt) StdoutLine: {'line': b'running egg_info\n'}
+[0.544911] (vissus_projekt) StdoutLine: {'line': b'writing vissus_projekt.egg-info/PKG-INFO\n'}
+[0.545193] (vissus_projekt) StdoutLine: {'line': b'writing dependency_links to vissus_projekt.egg-info/dependency_links.txt\n'}
+[0.545511] (vissus_projekt) StdoutLine: {'line': b'writing top-level names to vissus_projekt.egg-info/top_level.txt\n'}
+[0.550550] (vissus_projekt) StdoutLine: {'line': b"reading manifest file 'vissus_projekt.egg-info/SOURCES.txt'\n"}
+[0.551470] (vissus_projekt) StdoutLine: {'line': b"writing manifest file 'vissus_projekt.egg-info/SOURCES.txt'\n"}
+[0.586016] (vissus_projekt) StdoutLine: {'line': b'[ 96%] Built target ament_cmake_python_build_vissus_projekt_egg\n'}
+[0.600298] (-) TimerEvent: {}
+[0.700527] (-) TimerEvent: {}
+[0.800826] (-) TimerEvent: {}
+[0.901200] (-) TimerEvent: {}
+[1.001509] (-) TimerEvent: {}
+[1.101850] (-) TimerEvent: {}
+[1.202197] (-) TimerEvent: {}
+[1.302520] (-) TimerEvent: {}
+[1.402805] (-) TimerEvent: {}
+[1.503101] (-) TimerEvent: {}
+[1.603474] (-) TimerEvent: {}
+[1.703788] (-) TimerEvent: {}
+[1.804091] (-) TimerEvent: {}
+[1.904424] (-) TimerEvent: {}
+[2.004759] (-) TimerEvent: {}
+[2.105056] (-) TimerEvent: {}
+[2.205402] (-) TimerEvent: {}
+[2.305711] (-) TimerEvent: {}
+[2.406064] (-) TimerEvent: {}
+[2.506384] (-) TimerEvent: {}
+[2.606700] (-) TimerEvent: {}
+[2.706992] (-) TimerEvent: {}
+[2.807276] (-) TimerEvent: {}
+[2.907534] (-) TimerEvent: {}
+[3.007846] (-) TimerEvent: {}
+[3.108180] (-) TimerEvent: {}
+[3.208521] (-) TimerEvent: {}
+[3.308834] (-) TimerEvent: {}
+[3.409146] (-) TimerEvent: {}
+[3.509469] (-) TimerEvent: {}
+[3.609785] (-) TimerEvent: {}
+[3.710089] (-) TimerEvent: {}
+[3.810421] (-) TimerEvent: {}
+[3.837801] (vissus_projekt) StderrLine: {'line': b'\x1b[01m\x1b[K/root/ros2_ws/src/vissus_projekt/src/boid-control/boid_control_node.cpp:\x1b[m\x1b[K In constructor \xe2\x80\x98\x1b[01m\x1b[KBoid_Controller_Node::Boid_Controller_Node()\x1b[m\x1b[K\xe2\x80\x99:\n'}
+[3.838171] (vissus_projekt) StderrLine: {'line': b'\x1b[01m\x1b[K/root/ros2_ws/src/vissus_projekt/src/boid-control/boid_control_node.cpp:59:9:\x1b[m\x1b[K \x1b[01;31m\x1b[Kerror: \x1b[m\x1b[Kexpected \xe2\x80\x98\x1b[01m\x1b[K,\x1b[m\x1b[K\xe2\x80\x99 or \xe2\x80\x98\x1b[01m\x1b[K;\x1b[m\x1b[K\xe2\x80\x99 before \xe2\x80\x98\x1b[01m\x1b[Kint\x1b[m\x1b[K\xe2\x80\x99\n'}
+[3.838341] (vissus_projekt) StderrLine: {'line': b'   59 |         \x1b[01;31m\x1b[Kint\x1b[m\x1b[K num_boids_ = 4;\n'}
+[3.838470] (vissus_projekt) StderrLine: {'line': b'      |         \x1b[01;31m\x1b[K^~~\x1b[m\x1b[K\n'}
+[3.865609] (vissus_projekt) StderrLine: {'line': b'\x1b[01m\x1b[K/root/ros2_ws/src/vissus_projekt/src/boid-control/boid_control_node.cpp:\x1b[m\x1b[K In member function \xe2\x80\x98\x1b[01m\x1b[Kvoid Boid_Controller_Node::Subscription_Boid_Info_Callback(vissus_projekt::msg::OdometryArray_<std::allocator<void> >::SharedPtr)\x1b[m\x1b[K\xe2\x80\x99:\n'}
+[3.865842] (vissus_projekt) StderrLine: {'line': b'\x1b[01m\x1b[K/root/ros2_ws/src/vissus_projekt/src/boid-control/boid_control_node.cpp:232:15:\x1b[m\x1b[K \x1b[01;35m\x1b[Kwarning: \x1b[m\x1b[Kunused variable \xe2\x80\x98\x1b[01m\x1b[Kdelta_linear_x\x1b[m\x1b[K\xe2\x80\x99 [\x1b[01;35m\x1b[K\x1b]8;;https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wunused-variable\x07-Wunused-variable\x1b]8;;\x07\x1b[m\x1b[K]\n'}
+[3.865955] (vissus_projekt) StderrLine: {'line': b'  232 |         float \x1b[01;35m\x1b[Kdelta_linear_x\x1b[m\x1b[K = sqrt(accel_total.x*accel_total.x + accel_total.y*accel_total.y);\n'}
+[3.866051] (vissus_projekt) StderrLine: {'line': b'      |               \x1b[01;35m\x1b[K^~~~~~~~~~~~~~\x1b[m\x1b[K\n'}
+[3.866140] (vissus_projekt) StderrLine: {'line': b'\x1b[01m\x1b[K/root/ros2_ws/src/vissus_projekt/src/boid-control/boid_control_node.cpp:239:15:\x1b[m\x1b[K \x1b[01;35m\x1b[Kwarning: \x1b[m\x1b[Kunused variable \xe2\x80\x98\x1b[01m\x1b[Krelative_angle\x1b[m\x1b[K\xe2\x80\x99 [\x1b[01;35m\x1b[K\x1b]8;;https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wunused-variable\x07-Wunused-variable\x1b]8;;\x07\x1b[m\x1b[K]\n'}
+[3.866237] (vissus_projekt) StderrLine: {'line': b'  239 |         float \x1b[01;35m\x1b[Krelative_angle\x1b[m\x1b[K = normalize_angle(atan2(accel_total.y, accel_total.x) - yaw);\n'}
+[3.866320] (vissus_projekt) StderrLine: {'line': b'      |               \x1b[01;35m\x1b[K^~~~~~~~~~~~~~\x1b[m\x1b[K\n'}
+[3.866398] (vissus_projekt) StderrLine: {'line': b'\x1b[01m\x1b[K/root/ros2_ws/src/vissus_projekt/src/boid-control/boid_control_node.cpp:240:15:\x1b[m\x1b[K \x1b[01;35m\x1b[Kwarning: \x1b[m\x1b[Kunused variable \xe2\x80\x98\x1b[01m\x1b[Kdelta_angular_z\x1b[m\x1b[K\xe2\x80\x99 [\x1b[01;35m\x1b[K\x1b]8;;https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wunused-variable\x07-Wunused-variable\x1b]8;;\x07\x1b[m\x1b[K]\n'}
+[3.866484] (vissus_projekt) StderrLine: {'line': b'  240 |         float \x1b[01;35m\x1b[Kdelta_angular_z\x1b[m\x1b[K = p_controller_update(\n'}
+[3.866618] (vissus_projekt) StderrLine: {'line': b'      |               \x1b[01;35m\x1b[K^~~~~~~~~~~~~~~\x1b[m\x1b[K\n'}
+[3.885932] (vissus_projekt) StderrLine: {'line': b'\x1b[01m\x1b[K/root/ros2_ws/src/vissus_projekt/src/boid-control/boid_control_node.cpp:\x1b[m\x1b[K In member function \xe2\x80\x98\x1b[01m\x1b[Kvoid Boid_Controller_Node::Subscription_Formation_Callback(vissus_projekt::msg::Formation_<std::allocator<void> >::SharedPtr)\x1b[m\x1b[K\xe2\x80\x99:\n'}
+[3.886137] (vissus_projekt) StderrLine: {'line': b'\x1b[01m\x1b[K/root/ros2_ws/src/vissus_projekt/src/boid-control/boid_control_node.cpp:522:5:\x1b[m\x1b[K \x1b[01;31m\x1b[Kerror: \x1b[m\x1b[K\xe2\x80\x98\x1b[01m\x1b[Kformation_points_\x1b[m\x1b[K\xe2\x80\x99 was not declared in this scope\n'}
+[3.886253] (vissus_projekt) StderrLine: {'line': b'  522 |     \x1b[01;31m\x1b[Kformation_points_\x1b[m\x1b[K = points->formation_points;\n'}
+[3.886362] (vissus_projekt) StderrLine: {'line': b'      |     \x1b[01;31m\x1b[K^~~~~~~~~~~~~~~~~\x1b[m\x1b[K\n'}
+[3.886532] (vissus_projekt) StderrLine: {'line': b'\x1b[01m\x1b[K/root/ros2_ws/src/vissus_projekt/src/boid-control/boid_control_node.cpp:\x1b[m\x1b[K In member function \xe2\x80\x98\x1b[01m\x1b[KVector2 Boid_Controller_Node::Calculate_Vel_Centroid_Consensus(std::vector<nav_msgs::msg::Odometry_<std::allocator<void> >, std::allocator<nav_msgs::msg::Odometry_<std::allocator<void> > > >)\x1b[m\x1b[K\xe2\x80\x99:\n'}
+[3.886630] (vissus_projekt) StderrLine: {'line': b'\x1b[01m\x1b[K/root/ros2_ws/src/vissus_projekt/src/boid-control/boid_control_node.cpp:580:23:\x1b[m\x1b[K \x1b[01;35m\x1b[Kwarning: \x1b[m\x1b[Kcomparison of integer expressions of different signedness: \xe2\x80\x98\x1b[01m\x1b[Kint\x1b[m\x1b[K\xe2\x80\x99 and \xe2\x80\x98\x1b[01m\x1b[Kstd::vector<nav_msgs::msg::Odometry_<std::allocator<void> >, std::allocator<nav_msgs::msg::Odometry_<std::allocator<void> > > >::size_type\x1b[m\x1b[K\xe2\x80\x99 {aka \xe2\x80\x98\x1b[01m\x1b[Klong unsigned int\x1b[m\x1b[K\xe2\x80\x99} [\x1b[01;35m\x1b[K\x1b]8;;https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wsign-compare\x07-Wsign-compare\x1b]8;;\x07\x1b[m\x1b[K]\n'}
+[3.886760] (vissus_projekt) StderrLine: {'line': b'  580 |     for (int i = 0; \x1b[01;35m\x1b[Ki < odoms.size()\x1b[m\x1b[K; i++) {\n'}
+[3.886839] (vissus_projekt) StderrLine: {'line': b'      |                     \x1b[01;35m\x1b[K~~^~~~~~~~~~~~~~\x1b[m\x1b[K\n'}
+[3.889613] (vissus_projekt) StderrLine: {'line': b'\x1b[01m\x1b[K/root/ros2_ws/src/vissus_projekt/src/boid-control/boid_control_node.cpp:\x1b[m\x1b[K In member function \xe2\x80\x98\x1b[01m\x1b[KVector2 Boid_Controller_Node::Calculate_Vel_Centroid_Consensus(std::vector<nav_msgs::msg::Odometry_<std::allocator<void> >, std::allocator<nav_msgs::msg::Odometry_<std::allocator<void> > > >, std::vector<Vector2>)\x1b[m\x1b[K\xe2\x80\x99:\n'}
+[3.889798] (vissus_projekt) StderrLine: {'line': b'\x1b[01m\x1b[K/root/ros2_ws/src/vissus_projekt/src/boid-control/boid_control_node.cpp:601:23:\x1b[m\x1b[K \x1b[01;35m\x1b[Kwarning: \x1b[m\x1b[Kcomparison of integer expressions of different signedness: \xe2\x80\x98\x1b[01m\x1b[Kint\x1b[m\x1b[K\xe2\x80\x99 and \xe2\x80\x98\x1b[01m\x1b[Kstd::vector<nav_msgs::msg::Odometry_<std::allocator<void> >, std::allocator<nav_msgs::msg::Odometry_<std::allocator<void> > > >::size_type\x1b[m\x1b[K\xe2\x80\x99 {aka \xe2\x80\x98\x1b[01m\x1b[Klong unsigned int\x1b[m\x1b[K\xe2\x80\x99} [\x1b[01;35m\x1b[K\x1b]8;;https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wsign-compare\x07-Wsign-compare\x1b]8;;\x07\x1b[m\x1b[K]\n'}
+[3.889953] (vissus_projekt) StderrLine: {'line': b'  601 |     for (int i = 0; \x1b[01;35m\x1b[Ki < odoms.size()\x1b[m\x1b[K; i++) {\n'}
+[3.890112] (vissus_projekt) StderrLine: {'line': b'      |                     \x1b[01;35m\x1b[K~~^~~~~~~~~~~~~~\x1b[m\x1b[K\n'}
+[3.891385] (vissus_projekt) StderrLine: {'line': b'\x1b[01m\x1b[K/root/ros2_ws/src/vissus_projekt/src/boid-control/boid_control_node.cpp:\x1b[m\x1b[K In function \xe2\x80\x98\x1b[01m\x1b[KBool_mat Get_Adjancency_Matrix(std::string, int)\x1b[m\x1b[K\xe2\x80\x99:\n'}
+[3.891560] (vissus_projekt) StderrLine: {'line': b'\x1b[01m\x1b[K/root/ros2_ws/src/vissus_projekt/src/boid-control/boid_control_node.cpp:628:30:\x1b[m\x1b[K \x1b[01;35m\x1b[Kwarning: \x1b[m\x1b[Kcomparison of integer expressions of different signedness: \xe2\x80\x98\x1b[01m\x1b[Ksize_t\x1b[m\x1b[K\xe2\x80\x99 {aka \xe2\x80\x98\x1b[01m\x1b[Klong unsigned int\x1b[m\x1b[K\xe2\x80\x99} and \xe2\x80\x98\x1b[01m\x1b[Kint\x1b[m\x1b[K\xe2\x80\x99 [\x1b[01;35m\x1b[K\x1b]8;;https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wsign-compare\x07-Wsign-compare\x1b]8;;\x07\x1b[m\x1b[K]\n'}
+[3.891666] (vissus_projekt) StderrLine: {'line': b'  628 |         for (size_t y = 0; \x1b[01;35m\x1b[Ky < num_boids\x1b[m\x1b[K; y++)\n'}
+[3.891758] (vissus_projekt) StderrLine: {'line': b'      |                            \x1b[01;35m\x1b[K~~^~~~~~~~~~~\x1b[m\x1b[K\n'}
+[3.891853] (vissus_projekt) StderrLine: {'line': b'\x1b[01m\x1b[K/root/ros2_ws/src/vissus_projekt/src/boid-control/boid_control_node.cpp:629:34:\x1b[m\x1b[K \x1b[01;35m\x1b[Kwarning: \x1b[m\x1b[Kcomparison of integer expressions of different signedness: \xe2\x80\x98\x1b[01m\x1b[Ksize_t\x1b[m\x1b[K\xe2\x80\x99 {aka \xe2\x80\x98\x1b[01m\x1b[Klong unsigned int\x1b[m\x1b[K\xe2\x80\x99} and \xe2\x80\x98\x1b[01m\x1b[Kint\x1b[m\x1b[K\xe2\x80\x99 [\x1b[01;35m\x1b[K\x1b]8;;https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wsign-compare\x07-Wsign-compare\x1b]8;;\x07\x1b[m\x1b[K]\n'}
+[3.891953] (vissus_projekt) StderrLine: {'line': b'  629 |             for (size_t x = 0; \x1b[01;35m\x1b[Kx < num_boids\x1b[m\x1b[K; x++)\n'}
+[3.892106] (vissus_projekt) StderrLine: {'line': b'      |                                \x1b[01;35m\x1b[K~~^~~~~~~~~~~\x1b[m\x1b[K\n'}
+[3.910515] (-) TimerEvent: {}
+[4.010802] (-) TimerEvent: {}
+[4.111112] (-) TimerEvent: {}
+[4.211432] (-) TimerEvent: {}
+[4.311751] (-) TimerEvent: {}
+[4.412057] (-) TimerEvent: {}
+[4.512439] (-) TimerEvent: {}
+[4.612845] (-) TimerEvent: {}
+[4.713162] (-) TimerEvent: {}
+[4.813492] (-) TimerEvent: {}
+[4.913794] (-) TimerEvent: {}
+[5.014075] (-) TimerEvent: {}
+[5.114381] (-) TimerEvent: {}
+[5.214691] (-) TimerEvent: {}
+[5.315044] (-) TimerEvent: {}
+[5.415348] (-) TimerEvent: {}
+[5.515687] (-) TimerEvent: {}
+[5.615975] (-) TimerEvent: {}
+[5.716302] (-) TimerEvent: {}
+[5.816625] (-) TimerEvent: {}
+[5.916946] (-) TimerEvent: {}
+[6.017264] (-) TimerEvent: {}
+[6.117597] (-) TimerEvent: {}
+[6.217908] (-) TimerEvent: {}
+[6.318273] (-) TimerEvent: {}
+[6.418614] (-) TimerEvent: {}
+[6.518937] (-) TimerEvent: {}
+[6.619230] (-) TimerEvent: {}
+[6.719564] (-) TimerEvent: {}
+[6.819928] (-) TimerEvent: {}
+[6.920246] (-) TimerEvent: {}
+[7.020522] (-) TimerEvent: {}
+[7.120827] (-) TimerEvent: {}
+[7.221298] (-) TimerEvent: {}
+[7.321636] (-) TimerEvent: {}
+[7.421961] (-) TimerEvent: {}
+[7.522275] (-) TimerEvent: {}
+[7.622700] (-) TimerEvent: {}
+[7.723041] (-) TimerEvent: {}
+[7.823353] (-) TimerEvent: {}
+[7.923685] (-) TimerEvent: {}
+[8.023976] (-) TimerEvent: {}
+[8.124282] (-) TimerEvent: {}
+[8.224665] (-) TimerEvent: {}
+[8.345073] (-) TimerEvent: {}
+[8.445427] (-) TimerEvent: {}
+[8.545777] (-) TimerEvent: {}
+[8.646121] (-) TimerEvent: {}
+[8.746439] (-) TimerEvent: {}
+[8.846782] (-) TimerEvent: {}
+[8.947087] (-) TimerEvent: {}
+[9.047392] (-) TimerEvent: {}
+[9.147724] (-) TimerEvent: {}
+[9.248091] (-) TimerEvent: {}
+[9.348494] (-) TimerEvent: {}
+[9.448793] (-) TimerEvent: {}
+[9.549105] (-) TimerEvent: {}
+[9.649480] (-) TimerEvent: {}
+[9.749798] (-) TimerEvent: {}
+[9.850087] (-) TimerEvent: {}
+[9.950379] (-) TimerEvent: {}
+[10.050739] (-) TimerEvent: {}
+[10.151035] (-) TimerEvent: {}
+[10.251403] (-) TimerEvent: {}
+[10.351762] (-) TimerEvent: {}
+[10.452124] (-) TimerEvent: {}
+[10.552469] (-) TimerEvent: {}
+[10.652832] (-) TimerEvent: {}
+[10.753177] (-) TimerEvent: {}
+[10.845130] (vissus_projekt) StderrLine: {'line': b'gmake[2]: *** [CMakeFiles/boid_control.dir/build.make:90: CMakeFiles/boid_control.dir/src/boid-control/boid_control_node.cpp.o] Error 1\n'}
+[10.845500] (vissus_projekt) StderrLine: {'line': b'gmake[1]: *** [CMakeFiles/Makefile2:598: CMakeFiles/boid_control.dir/all] Error 2\n'}
+[10.845818] (vissus_projekt) StderrLine: {'line': b'gmake: *** [Makefile:146: all] Error 2\n'}
+[10.849535] (vissus_projekt) CommandEnded: {'returncode': 2}
+[10.853424] (-) TimerEvent: {}
+[10.863099] (vissus_projekt) JobEnded: {'identifier': 'vissus_projekt', 'rc': 2}
+[10.873680] (-) EventReactorShutdown: {}

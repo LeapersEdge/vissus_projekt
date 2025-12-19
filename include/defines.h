@@ -7,7 +7,8 @@
 #include "nav_msgs/msg/odometry.hpp"
 #include "nav_msgs/msg/occupancy_grid.hpp"
 #include "vissus_projekt/msg/odometry_array.hpp"
-#include "vissus_projekt/msg/tuning_params.hpp" 
+#include "vissus_projekt/msg/tuning_params.hpp"
+#include "vissus_projekt/msg/formation.hpp"
 #include <message_filters/subscriber.h>
 #include <message_filters/sync_policies/approximate_time.h>
 #include "crazyflie_interfaces/msg/log_data_generic.hpp"
@@ -23,7 +24,7 @@ typedef geometry_msgs::msg::Point Msg_Point;
 typedef vissus_projekt::msg::TuningParams Msg_Tuning_Params; 
 typedef geometry_msgs::msg::PoseStamped Msg_PoseStamped;
 typedef crazyflie_interfaces::msg::LogDataGeneric Msg_LogDataGeneric;
-typedef vissus_projekt::msg::FormationMsg Formation_Msg;ž
+typedef vissus_projekt::msg::Formation Msg_Formation;
 
 // pubs typedef
 typedef rclcpp::Publisher<Msg_Twist>::SharedPtr Publisher_Twist;
@@ -39,6 +40,7 @@ typedef rclcpp::Subscription<Msg_Point>::SharedPtr Subscription_Point;
 typedef rclcpp::Subscription<Msg_PoseStamped>::SharedPtr Subscription_PoseStamped;
 typedef rclcpp::Subscription<Msg_Twist>::SharedPtr Subscription_Twist;
 typedef rclcpp::Subscription<Msg_LogDataGeneric>::SharedPtr Subscription_LogDataGeneric;
+typedef rclcpp::Subscription<Msg_Formation>::SharedPtr Subscription_Formation;
 
 typedef message_filters::Subscriber<Msg_Twist> Sub_Filter_Twist;
 typedef message_filters::Subscriber<Msg_PoseStamped> Sub_Filter_PoseStamped;

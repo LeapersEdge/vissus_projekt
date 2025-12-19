@@ -1,0 +1,56 @@
+[0.000000] (-) TimerEvent: {}
+[0.000798] (vissus_projekt) JobQueued: {'identifier': 'vissus_projekt', 'dependencies': OrderedDict()}
+[0.000886] (vissus_projekt) JobStarted: {'identifier': 'vissus_projekt'}
+[0.013535] (vissus_projekt) JobProgress: {'identifier': 'vissus_projekt', 'progress': 'cmake'}
+[0.014435] (vissus_projekt) JobProgress: {'identifier': 'vissus_projekt', 'progress': 'build'}
+[0.015245] (vissus_projekt) Command: {'cmd': ['/usr/bin/cmake', '--build', '/root/ros2_ws/src/vissus_projekt/build/vissus_projekt', '--', '-j16', '-l16'], 'cwd': '/root/ros2_ws/src/vissus_projekt/build/vissus_projekt', 'env': OrderedDict([('DOCKER_BUILDKIT', '1'), ('LESSOPEN', '| /usr/bin/lesspipe %s'), ('TMUX', '/tmp/tmux-0/default,384721,2'), ('GIT_SSH_COMMAND', 'ssh -v'), ('HOSTNAME', '344eeae1eb99'), ('ENV_NAME', 'empty_borderless'), ('SHLVL', '2'), ('LD_LIBRARY_PATH', '/root/ros2_ws/install/vissus_projekt/lib:/root/ros2_ws/install/crazyflie_interfaces/lib:/root/ros2_ws/install/lib:/opt/ros/humble/opt/rviz_ogre_vendor/lib:/opt/ros/humble/lib/x86_64-linux-gnu:/opt/ros/humble/lib'), ('HOME', '/root'), ('OLDPWD', '/root/ros2_ws'), ('TERM_PROGRAM_VERSION', '3.2a'), ('ROS_PYTHON_VERSION', '3'), ('DEBUGINFOD_URLS', ''), ('COLCON_PREFIX_PATH', '/root/ros2_ws/install'), ('ROS_DISTRO', 'humble'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('NVIDIA_DRIVER_CAPABILITIES', 'graphics,utility,compute'), ('TERM', 'screen-256color'), ('SPAWN_POSE_DOC', 'four_example.txt'), ('ROS_LOCALHOST_ONLY', '1'), ('QT_X11_NO_MITSHM', '1'), ('PATH', '/opt/ros/humble/bin:/root/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'), ('DISPLAY', ':0'), ('LANG', 'C.UTF-8'), ('LS_COLORS', 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'), ('ROS2_DISTRO', 'humble'), ('TERM_PROGRAM', 'tmux'), ('ROS_DOMAIN_ID', '24'), ('AMENT_PREFIX_PATH', '/root/ros2_ws/install/vissus_projekt:/root/ros2_ws/install/mrs_crazyflies:/root/ros2_ws/install/crazyflie_sim:/root/ros2_ws/install/crazyflie_examples:/root/ros2_ws/install/crazyflie_py:/root/ros2_ws/install/crazyflie:/root/ros2_ws/install/crazyflie_interfaces:/root/ros2_ws/install:/opt/ros/humble'), ('SHELL', '/bin/bash'), ('NUM_ROBOTS', '4'), ('LESSCLOSE', '/usr/bin/lesspipe %s %s'), ('PWD', '/root/ros2_ws/src/vissus_projekt/build/vissus_projekt'), ('GZ_RELEASE', 'garden'), ('LC_AL', 'C.UTF-8'), ('PYTHONPATH', '/root/ros2_ws/install/vissus_projekt/local/lib/python3.10/dist-packages:/root/ros2_ws/install/mrs_crazyflies/local/lib/python3.10/dist-packages:/root/ros2_ws/install/crazyflie_sim/local/lib/python3.10/dist-packages:/root/ros2_ws/install/crazyflie_examples/local/lib/python3.10/dist-packages:/root/ros2_ws/install/crazyflie_py/lib/python3.10/site-packages:/root/ros2_ws/install/crazyflie_interfaces/local/lib/python3.10/dist-packages:/root/ros2_ws/build/crazyflie_py:/root/ros2_ws/install/lib/python3.10/site-packages:/root/ros2_ws/install/local/lib/python3.10/dist-packages:/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages'), ('NVIDIA_VISIBLE_DEVICES', 'all'), ('TZ', 'Europe/Zagreb'), ('COLCON', '1'), ('TMUX_PANE', '%16'), ('CMAKE_PREFIX_PATH', '/root/ros2_ws/install/vissus_projekt:/root/ros2_ws/install/mrs_crazyflies:/root/ros2_ws/install/crazyflie_sim:/root/ros2_ws/install/crazyflie_examples:/root/ros2_ws/install/crazyflie:/root/ros2_ws/install/crazyflie_interfaces:/root/ros2_ws/install:/root/ros2_ws/install/crazyflie_py:/opt/ros/humble')]), 'shell': False}
+[0.099478] (-) TimerEvent: {}
+[0.133684] (vissus_projekt) StdoutLine: {'line': b'[  1%] Built target vissus_projekt__cpp\n'}
+[0.137226] (vissus_projekt) StdoutLine: {'line': b'[ 10%] Built target vissus_projekt__rosidl_generator_c\n'}
+[0.150479] (vissus_projekt) StdoutLine: {'line': b'[ 10%] Built target ament_cmake_python_symlink_vissus_projekt\n'}
+[0.181473] (vissus_projekt) StdoutLine: {'line': b'[ 28%] Built target vissus_projekt__rosidl_typesupport_c\n'}
+[0.181759] (vissus_projekt) StdoutLine: {'line': b'[ 28%] Built target vissus_projekt__rosidl_typesupport_cpp\n'}
+[0.182393] (vissus_projekt) StdoutLine: {'line': b'[ 39%] Built target vissus_projekt__rosidl_typesupport_introspection_c\n'}
+[0.182738] (vissus_projekt) StdoutLine: {'line': b'[ 46%] Built target vissus_projekt__rosidl_typesupport_introspection_cpp\n'}
+[0.183948] (vissus_projekt) StdoutLine: {'line': b'[ 55%] Built target vissus_projekt__rosidl_typesupport_fastrtps_cpp\n'}
+[0.184408] (vissus_projekt) StdoutLine: {'line': b'[ 64%] Built target vissus_projekt__rosidl_typesupport_fastrtps_c\n'}
+[0.199567] (-) TimerEvent: {}
+[0.220969] (vissus_projekt) StdoutLine: {'line': b'[ 64%] Built target vissus_projekt\n'}
+[0.246872] (vissus_projekt) StdoutLine: {'line': b'\x1b[35m\x1b[1mConsolidate compiler generated dependencies of target boid_control\x1b[0m\n'}
+[0.261582] (vissus_projekt) StdoutLine: {'line': b'[ 66%] Built target vissus_projekt__py\n'}
+[0.277068] (vissus_projekt) StdoutLine: {'line': b'[ 76%] Built target data_splitter\n'}
+[0.277394] (vissus_projekt) StdoutLine: {'line': b'[ 76%] Built target goal_pub\n'}
+[0.291395] (vissus_projekt) StdoutLine: {'line': b'[ 78%] \x1b[32m\x1b[1mLinking CXX executable boid_control\x1b[0m\n'}
+[0.299727] (-) TimerEvent: {}
+[0.304164] (vissus_projekt) StdoutLine: {'line': b'[ 85%] Built target vissus_projekt__rosidl_generator_py\n'}
+[0.348323] (vissus_projekt) StdoutLine: {'line': b'[ 92%] Built target vissus_projekt__rosidl_typesupport_introspection_c__pyext\n'}
+[0.348790] (vissus_projekt) StdoutLine: {'line': b'[ 92%] Built target vissus_projekt__rosidl_typesupport_fastrtps_c__pyext\n'}
+[0.349369] (vissus_projekt) StdoutLine: {'line': b'[ 96%] Built target vissus_projekt__rosidl_typesupport_c__pyext\n'}
+[0.399747] (-) TimerEvent: {}
+[0.500077] (-) TimerEvent: {}
+[0.600394] (-) TimerEvent: {}
+[0.601431] (vissus_projekt) StdoutLine: {'line': b'running egg_info\n'}
+[0.603239] (vissus_projekt) StdoutLine: {'line': b'writing vissus_projekt.egg-info/PKG-INFO\n'}
+[0.603554] (vissus_projekt) StdoutLine: {'line': b'writing dependency_links to vissus_projekt.egg-info/dependency_links.txt\n'}
+[0.603872] (vissus_projekt) StdoutLine: {'line': b'writing top-level names to vissus_projekt.egg-info/top_level.txt\n'}
+[0.610949] (vissus_projekt) StdoutLine: {'line': b"reading manifest file 'vissus_projekt.egg-info/SOURCES.txt'\n"}
+[0.612251] (vissus_projekt) StdoutLine: {'line': b"writing manifest file 'vissus_projekt.egg-info/SOURCES.txt'\n"}
+[0.671217] (vissus_projekt) StdoutLine: {'line': b'[ 96%] Built target ament_cmake_python_build_vissus_projekt_egg\n'}
+[0.700508] (-) TimerEvent: {}
+[0.800920] (-) TimerEvent: {}
+[0.901277] (-) TimerEvent: {}
+[1.001583] (-) TimerEvent: {}
+[1.101900] (-) TimerEvent: {}
+[1.202227] (-) TimerEvent: {}
+[1.302557] (-) TimerEvent: {}
+[1.400903] (vissus_projekt) StderrLine: {'line': b"/usr/bin/ld: CMakeFiles/boid_control.dir/src/boid-control/boid_control_node.cpp.o: in function `Boid_Controller_Node::Boid_Controller_Node()':\n"}
+[1.401172] (vissus_projekt) StderrLine: {'line': b"boid_control_node.cpp:(.text._ZN20Boid_Controller_NodeC2Ev[_ZN20Boid_Controller_NodeC5Ev]+0x305): undefined reference to `Boid_Controller_Node::Get_Adjancency_Matrix(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int)'\n"}
+[1.402645] (-) TimerEvent: {}
+[1.503008] (-) TimerEvent: {}
+[1.552272] (vissus_projekt) StderrLine: {'line': b'collect2: error: ld returned 1 exit status\n'}
+[1.554863] (vissus_projekt) StderrLine: {'line': b'gmake[2]: *** [CMakeFiles/boid_control.dir/build.make:201: boid_control] Error 1\n'}
+[1.555233] (vissus_projekt) StderrLine: {'line': b'gmake[1]: *** [CMakeFiles/Makefile2:598: CMakeFiles/boid_control.dir/all] Error 2\n'}
+[1.555562] (vissus_projekt) StderrLine: {'line': b'gmake: *** [Makefile:146: all] Error 2\n'}
+[1.559010] (vissus_projekt) CommandEnded: {'returncode': 2}
+[1.572222] (vissus_projekt) JobEnded: {'identifier': 'vissus_projekt', 'rc': 2}
+[1.582707] (-) EventReactorShutdown: {}

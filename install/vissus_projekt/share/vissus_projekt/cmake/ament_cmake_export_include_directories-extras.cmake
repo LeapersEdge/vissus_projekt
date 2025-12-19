@@ -1,0 +1,1 @@
+/root/ros2_ws/src/vissus_projekt/build/vissus_projekt/ament_cmake_export_include_directories/ament_cmake_export_include_directories-extras.cmake

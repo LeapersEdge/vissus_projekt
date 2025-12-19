@@ -1,0 +1,1 @@
+/root/ros2_ws/src/vissus_projekt/build/vissus_projekt/rosidl_typesupport_fastrtps_c/vissus_projekt/msg/rosidl_typesupport_fastrtps_c__visibility_control.h

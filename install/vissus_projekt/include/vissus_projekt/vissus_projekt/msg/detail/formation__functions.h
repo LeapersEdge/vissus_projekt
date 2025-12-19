@@ -1,0 +1,1 @@
+/root/ros2_ws/src/vissus_projekt/build/vissus_projekt/rosidl_generator_c/vissus_projekt/msg/detail/formation__functions.h

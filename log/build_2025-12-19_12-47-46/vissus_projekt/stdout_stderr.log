@@ -1,0 +1,209 @@
+[  1%] Built target vissus_projekt__cpp
+[ 10%] Built target vissus_projekt__rosidl_generator_c
+[ 10%] Built target ament_cmake_python_symlink_vissus_projekt
+[ 19%] Built target vissus_projekt__rosidl_typesupport_c
+[ 33%] Built target vissus_projekt__rosidl_typesupport_cpp
+[ 37%] Built target vissus_projekt__rosidl_typesupport_introspection_cpp
+[ 46%] Built target vissus_projekt__rosidl_typesupport_fastrtps_cpp
+[ 55%] Built target vissus_projekt__rosidl_typesupport_fastrtps_c
+[ 64%] Built target vissus_projekt__rosidl_typesupport_introspection_c
+[ 64%] Built target vissus_projekt
+[35m[1mConsolidate compiler generated dependencies of target boid_control[0m
+[ 66%] Built target vissus_projekt__py
+[ 71%] Built target goal_pub
+[ 76%] Built target data_splitter
+[ 78%] [32mBuilding CXX object CMakeFiles/boid_control.dir/src/boid-control/boid_control_node.cpp.o[0m
+[ 85%] Built target vissus_projekt__rosidl_generator_py
+[ 89%] Built target vissus_projekt__rosidl_typesupport_c__pyext
+[ 92%] Built target vissus_projekt__rosidl_typesupport_fastrtps_c__pyext
+[ 96%] Built target vissus_projekt__rosidl_typesupport_introspection_c__pyext
+running egg_info
+writing vissus_projekt.egg-info/PKG-INFO
+writing dependency_links to vissus_projekt.egg-info/dependency_links.txt
+writing top-level names to vissus_projekt.egg-info/top_level.txt
+reading manifest file 'vissus_projekt.egg-info/SOURCES.txt'
+writing manifest file 'vissus_projekt.egg-info/SOURCES.txt'
+[ 96%] Built target ament_cmake_python_build_vissus_projekt_egg
+[01m[K/root/ros2_ws/src/vissus_projekt/src/boid-control/boid_control_node.cpp:[m[K In constructor ‘[01m[KBoid_Controller_Node::Boid_Controller_Node()[m[K’:
+[01m[K/root/ros2_ws/src/vissus_projekt/src/boid-control/boid_control_node.cpp:59:17:[m[K [01;35m[Kwarning: [m[Kunused variable ‘[01m[Knum_boids_[m[K’ [[01;35m[K]8;;https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wunused-variable-Wunused-variable]8;;[m[K]
+   59 |             int [01;35m[Knum_boids_[m[K = 4;
+      |                 [01;35m[K^~~~~~~~~~[m[K
+[01m[K/root/ros2_ws/src/vissus_projekt/src/boid-control/boid_control_node.cpp:[m[K In member function ‘[01m[Kvoid Boid_Controller_Node::Subscription_Boid_Info_Callback(vissus_projekt::msg::OdometryArray_<std::allocator<void> >::SharedPtr)[m[K’:
+[01m[K/root/ros2_ws/src/vissus_projekt/src/boid-control/boid_control_node.cpp:233:15:[m[K [01;35m[Kwarning: [m[Kunused variable ‘[01m[Kdelta_linear_x[m[K’ [[01;35m[K]8;;https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wunused-variable-Wunused-variable]8;;[m[K]
+  233 |         float [01;35m[Kdelta_linear_x[m[K = sqrt(accel_total.x*accel_total.x + accel_total.y*accel_total.y);
+      |               [01;35m[K^~~~~~~~~~~~~~[m[K
+[01m[K/root/ros2_ws/src/vissus_projekt/src/boid-control/boid_control_node.cpp:240:15:[m[K [01;35m[Kwarning: [m[Kunused variable ‘[01m[Krelative_angle[m[K’ [[01;35m[K]8;;https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wunused-variable-Wunused-variable]8;;[m[K]
+  240 |         float [01;35m[Krelative_angle[m[K = normalize_angle(atan2(accel_total.y, accel_total.x) - yaw);
+      |               [01;35m[K^~~~~~~~~~~~~~[m[K
+[01m[K/root/ros2_ws/src/vissus_projekt/src/boid-control/boid_control_node.cpp:241:15:[m[K [01;35m[Kwarning: [m[Kunused variable ‘[01m[Kdelta_angular_z[m[K’ [[01;35m[K]8;;https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wunused-variable-Wunused-variable]8;;[m[K]
+  241 |         float [01;35m[Kdelta_angular_z[m[K = p_controller_update(
+      |               [01;35m[K^~~~~~~~~~~~~~~[m[K
+[01m[K/root/ros2_ws/src/vissus_projekt/src/boid-control/boid_control_node.cpp:[m[K In member function ‘[01m[KVector2 Boid_Controller_Node::Calculate_Vel_Centroid_Consensus(std::vector<nav_msgs::msg::Odometry_<std::allocator<void> >, std::allocator<nav_msgs::msg::Odometry_<std::allocator<void> > > >)[m[K’:
+[01m[K/root/ros2_ws/src/vissus_projekt/src/boid-control/boid_control_node.cpp:586:23:[m[K [01;35m[Kwarning: [m[Kcomparison of integer expressions of different signedness: ‘[01m[Kint[m[K’ and ‘[01m[Kstd::vector<nav_msgs::msg::Odometry_<std::allocator<void> >, std::allocator<nav_msgs::msg::Odometry_<std::allocator<void> > > >::size_type[m[K’ {aka ‘[01m[Klong unsigned int[m[K’} [[01;35m[K]8;;https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wsign-compare-Wsign-compare]8;;[m[K]
+  586 |     for (int i = 0; [01;35m[Ki < odoms.size()[m[K; i++) {
+      |                     [01;35m[K~~^~~~~~~~~~~~~~[m[K
+[01m[K/root/ros2_ws/src/vissus_projekt/src/boid-control/boid_control_node.cpp:[m[K In member function ‘[01m[KVector2 Boid_Controller_Node::Calculate_Vel_Centroid_Consensus(std::vector<nav_msgs::msg::Odometry_<std::allocator<void> >, std::allocator<nav_msgs::msg::Odometry_<std::allocator<void> > > >, std::vector<Vector2>)[m[K’:
+[01m[K/root/ros2_ws/src/vissus_projekt/src/boid-control/boid_control_node.cpp:607:23:[m[K [01;35m[Kwarning: [m[Kcomparison of integer expressions of different signedness: ‘[01m[Kint[m[K’ and ‘[01m[Kstd::vector<nav_msgs::msg::Odometry_<std::allocator<void> >, std::allocator<nav_msgs::msg::Odometry_<std::allocator<void> > > >::size_type[m[K’ {aka ‘[01m[Klong unsigned int[m[K’} [[01;35m[K]8;;https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wsign-compare-Wsign-compare]8;;[m[K]
+  607 |     for (int i = 0; [01;35m[Ki < odoms.size()[m[K; i++) {
+      |                     [01;35m[K~~^~~~~~~~~~~~~~[m[K
+[01m[K/root/ros2_ws/src/vissus_projekt/src/boid-control/boid_control_node.cpp:[m[K In member function ‘[01m[KBool_mat Boid_Controller_Node::Get_Adjancency_Matrix(std::string, int)[m[K’:
+[01m[K/root/ros2_ws/src/vissus_projekt/src/boid-control/boid_control_node.cpp:634:30:[m[K [01;35m[Kwarning: [m[Kcomparison of integer expressions of different signedness: ‘[01m[Ksize_t[m[K’ {aka ‘[01m[Klong unsigned int[m[K’} and ‘[01m[Kint[m[K’ [[01;35m[K]8;;https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wsign-compare-Wsign-compare]8;;[m[K]
+  634 |         for (size_t y = 0; [01;35m[Ky < num_boids[m[K; y++)
+      |                            [01;35m[K~~^~~~~~~~~~~[m[K
+[01m[K/root/ros2_ws/src/vissus_projekt/src/boid-control/boid_control_node.cpp:635:34:[m[K [01;35m[Kwarning: [m[Kcomparison of integer expressions of different signedness: ‘[01m[Ksize_t[m[K’ {aka ‘[01m[Klong unsigned int[m[K’} and ‘[01m[Kint[m[K’ [[01;35m[K]8;;https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Wsign-compare-Wsign-compare]8;;[m[K]
+  635 |             for (size_t x = 0; [01;35m[Kx < num_boids[m[K; x++)
+      |                                [01;35m[K~~^~~~~~~~~~~[m[K
+[ 98%] [32m[1mLinking CXX executable boid_control[0m
+[100%] Built target boid_control
+-- Install configuration: ""
+-- Execute custom install script
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/share/ament_index/resource_index/rosidl_interfaces/vissus_projekt
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/include/vissus_projekt/vissus_projekt/msg/detail/formation__functions.h
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/include/vissus_projekt/vissus_projekt/msg/detail/formation__struct.h
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/include/vissus_projekt/vissus_projekt/msg/detail/formation__type_support.h
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/include/vissus_projekt/vissus_projekt/msg/detail/odometry_array__functions.h
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/include/vissus_projekt/vissus_projekt/msg/detail/odometry_array__struct.h
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/include/vissus_projekt/vissus_projekt/msg/detail/odometry_array__type_support.h
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/include/vissus_projekt/vissus_projekt/msg/detail/tuning_params__functions.h
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/include/vissus_projekt/vissus_projekt/msg/detail/tuning_params__struct.h
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/include/vissus_projekt/vissus_projekt/msg/detail/tuning_params__type_support.h
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/include/vissus_projekt/vissus_projekt/msg/formation.h
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/include/vissus_projekt/vissus_projekt/msg/odometry_array.h
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/include/vissus_projekt/vissus_projekt/msg/rosidl_generator_c__visibility_control.h
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/include/vissus_projekt/vissus_projekt/msg/tuning_params.h
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/share/vissus_projekt/environment/library_path.sh
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/share/vissus_projekt/environment/library_path.dsv
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/include/vissus_projekt/vissus_projekt/msg/detail/formation__rosidl_typesupport_fastrtps_c.h
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/include/vissus_projekt/vissus_projekt/msg/detail/odometry_array__rosidl_typesupport_fastrtps_c.h
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/include/vissus_projekt/vissus_projekt/msg/detail/tuning_params__rosidl_typesupport_fastrtps_c.h
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/include/vissus_projekt/vissus_projekt/msg/rosidl_typesupport_fastrtps_c__visibility_control.h
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/include/vissus_projekt/vissus_projekt/msg/detail/formation__builder.hpp
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/include/vissus_projekt/vissus_projekt/msg/detail/formation__struct.hpp
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/include/vissus_projekt/vissus_projekt/msg/detail/formation__traits.hpp
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/include/vissus_projekt/vissus_projekt/msg/detail/formation__type_support.hpp
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/include/vissus_projekt/vissus_projekt/msg/detail/odometry_array__builder.hpp
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/include/vissus_projekt/vissus_projekt/msg/detail/odometry_array__struct.hpp
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/include/vissus_projekt/vissus_projekt/msg/detail/odometry_array__traits.hpp
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/include/vissus_projekt/vissus_projekt/msg/detail/odometry_array__type_support.hpp
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/include/vissus_projekt/vissus_projekt/msg/detail/tuning_params__builder.hpp
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/include/vissus_projekt/vissus_projekt/msg/detail/tuning_params__struct.hpp
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/include/vissus_projekt/vissus_projekt/msg/detail/tuning_params__traits.hpp
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/include/vissus_projekt/vissus_projekt/msg/detail/tuning_params__type_support.hpp
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/include/vissus_projekt/vissus_projekt/msg/formation.hpp
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/include/vissus_projekt/vissus_projekt/msg/odometry_array.hpp
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/include/vissus_projekt/vissus_projekt/msg/rosidl_generator_cpp__visibility_control.hpp
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/include/vissus_projekt/vissus_projekt/msg/tuning_params.hpp
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/include/vissus_projekt/vissus_projekt/msg/detail/formation__rosidl_typesupport_fastrtps_cpp.hpp
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/include/vissus_projekt/vissus_projekt/msg/detail/odometry_array__rosidl_typesupport_fastrtps_cpp.hpp
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/include/vissus_projekt/vissus_projekt/msg/detail/tuning_params__rosidl_typesupport_fastrtps_cpp.hpp
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/include/vissus_projekt/vissus_projekt/msg/rosidl_typesupport_fastrtps_cpp__visibility_control.h
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/include/vissus_projekt/vissus_projekt/msg/detail/formation__rosidl_typesupport_introspection_c.h
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/include/vissus_projekt/vissus_projekt/msg/detail/odometry_array__rosidl_typesupport_introspection_c.h
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/include/vissus_projekt/vissus_projekt/msg/detail/tuning_params__rosidl_typesupport_introspection_c.h
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/include/vissus_projekt/vissus_projekt/msg/rosidl_typesupport_introspection_c__visibility_control.h
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/include/vissus_projekt/vissus_projekt/msg/detail/formation__rosidl_typesupport_introspection_cpp.hpp
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/include/vissus_projekt/vissus_projekt/msg/detail/odometry_array__rosidl_typesupport_introspection_cpp.hpp
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/include/vissus_projekt/vissus_projekt/msg/detail/tuning_params__rosidl_typesupport_introspection_cpp.hpp
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/share/vissus_projekt/environment/pythonpath.sh
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/share/vissus_projekt/environment/pythonpath.dsv
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/local/lib/python3.10/dist-packages/vissus_projekt-0.0.0-py3.10.egg-info/PKG-INFO
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/local/lib/python3.10/dist-packages/vissus_projekt-0.0.0-py3.10.egg-info/SOURCES.txt
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/local/lib/python3.10/dist-packages/vissus_projekt-0.0.0-py3.10.egg-info/dependency_links.txt
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/local/lib/python3.10/dist-packages/vissus_projekt-0.0.0-py3.10.egg-info/top_level.txt
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/local/lib/python3.10/dist-packages/vissus_projekt/__init__.py
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/local/lib/python3.10/dist-packages/vissus_projekt/_vissus_projekt_s.ep.rosidl_typesupport_c.c
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/local/lib/python3.10/dist-packages/vissus_projekt/_vissus_projekt_s.ep.rosidl_typesupport_fastrtps_c.c
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/local/lib/python3.10/dist-packages/vissus_projekt/_vissus_projekt_s.ep.rosidl_typesupport_introspection_c.c
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/local/lib/python3.10/dist-packages/vissus_projekt/libvissus_projekt__rosidl_generator_py.so
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/local/lib/python3.10/dist-packages/vissus_projekt/msg/__init__.py
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/local/lib/python3.10/dist-packages/vissus_projekt/msg/_formation.py
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/local/lib/python3.10/dist-packages/vissus_projekt/msg/_formation_s.c
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/local/lib/python3.10/dist-packages/vissus_projekt/msg/_odometry_array.py
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/local/lib/python3.10/dist-packages/vissus_projekt/msg/_odometry_array_s.c
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/local/lib/python3.10/dist-packages/vissus_projekt/msg/_tuning_params.py
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/local/lib/python3.10/dist-packages/vissus_projekt/msg/_tuning_params_s.c
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/local/lib/python3.10/dist-packages/vissus_projekt/vissus_projekt_s__rosidl_typesupport_c.cpython-310-x86_64-linux-gnu.so
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/local/lib/python3.10/dist-packages/vissus_projekt/vissus_projekt_s__rosidl_typesupport_fastrtps_c.cpython-310-x86_64-linux-gnu.so
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/local/lib/python3.10/dist-packages/vissus_projekt/vissus_projekt_s__rosidl_typesupport_introspection_c.cpython-310-x86_64-linux-gnu.so
+-- Up-to-date symlink: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/local/lib/python3.10/dist-packages/vissus_projekt/vissus_projekt_s__rosidl_typesupport_fastrtps_c.cpython-310-x86_64-linux-gnu.so
+-- Up-to-date symlink: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/local/lib/python3.10/dist-packages/vissus_projekt/vissus_projekt_s__rosidl_typesupport_introspection_c.cpython-310-x86_64-linux-gnu.so
+-- Up-to-date symlink: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/local/lib/python3.10/dist-packages/vissus_projekt/vissus_projekt_s__rosidl_typesupport_c.cpython-310-x86_64-linux-gnu.so
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/share/vissus_projekt/msg/OdometryArray.idl
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/share/vissus_projekt/msg/TuningParams.idl
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/share/vissus_projekt/msg/Formation.idl
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/share/vissus_projekt/msg/OdometryArray.msg
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/share/vissus_projekt/msg/TuningParams.msg
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/share/vissus_projekt/msg/Formation.msg
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/lib/vissus_projekt/boid_control
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/lib/vissus_projekt/goal_pub
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/lib/vissus_projekt/data_splitter
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/lib/vissus_projekt/test_node.py
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/share/vissus_projekt//launch/example.yml
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/share/vissus_projekt//launch/launch_params.yaml
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/share/vissus_projekt//launch/simulation.launch.py
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/share/vissus_projekt//launch/sphero_sim.rviz
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/share/vissus_projekt//launch/start.launch.py
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/share/vissus_projekt//launch/topology
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/share/vissus_projekt//launch/topology~
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/share/ament_index/resource_index/package_run_dependencies/vissus_projekt
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/share/ament_index/resource_index/parent_prefix_path/vissus_projekt
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/share/vissus_projekt/environment/ament_prefix_path.sh
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/share/vissus_projekt/environment/ament_prefix_path.dsv
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/share/vissus_projekt/environment/path.sh
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/share/vissus_projekt/environment/path.dsv
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/share/vissus_projekt/local_setup.bash
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/share/vissus_projekt/local_setup.sh
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/share/vissus_projekt/local_setup.zsh
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/share/vissus_projekt/local_setup.dsv
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/share/vissus_projekt/package.dsv
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/share/ament_index/resource_index/packages/vissus_projekt
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/share/vissus_projekt/cmake/rosidl_cmake-extras.cmake
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/share/vissus_projekt/cmake/ament_cmake_export_dependencies-extras.cmake
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/share/vissus_projekt/cmake/ament_cmake_export_include_directories-extras.cmake
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/share/vissus_projekt/cmake/ament_cmake_export_libraries-extras.cmake
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/share/vissus_projekt/cmake/ament_cmake_export_targets-extras.cmake
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/share/vissus_projekt/cmake/rosidl_cmake_export_typesupport_targets-extras.cmake
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/share/vissus_projekt/cmake/rosidl_cmake_export_typesupport_libraries-extras.cmake
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/share/vissus_projekt/cmake/vissus_projektConfig.cmake
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/share/vissus_projekt/cmake/vissus_projektConfig-version.cmake
+-- Symlinking: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/share/vissus_projekt/package.xml
+-- Installing: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/lib/libvissus_projekt__rosidl_generator_c.so
+-- Set runtime path of "/root/ros2_ws/src/vissus_projekt/install/vissus_projekt/lib/libvissus_projekt__rosidl_generator_c.so" to ""
+-- Installing: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/lib/libvissus_projekt__rosidl_typesupport_fastrtps_c.so
+-- Set runtime path of "/root/ros2_ws/src/vissus_projekt/install/vissus_projekt/lib/libvissus_projekt__rosidl_typesupport_fastrtps_c.so" to ""
+-- Installing: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/lib/libvissus_projekt__rosidl_typesupport_fastrtps_cpp.so
+-- Set runtime path of "/root/ros2_ws/src/vissus_projekt/install/vissus_projekt/lib/libvissus_projekt__rosidl_typesupport_fastrtps_cpp.so" to ""
+-- Installing: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/lib/libvissus_projekt__rosidl_typesupport_introspection_c.so
+-- Set runtime path of "/root/ros2_ws/src/vissus_projekt/install/vissus_projekt/lib/libvissus_projekt__rosidl_typesupport_introspection_c.so" to ""
+-- Installing: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/lib/libvissus_projekt__rosidl_typesupport_c.so
+-- Set runtime path of "/root/ros2_ws/src/vissus_projekt/install/vissus_projekt/lib/libvissus_projekt__rosidl_typesupport_c.so" to ""
+-- Installing: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/lib/libvissus_projekt__rosidl_typesupport_introspection_cpp.so
+-- Set runtime path of "/root/ros2_ws/src/vissus_projekt/install/vissus_projekt/lib/libvissus_projekt__rosidl_typesupport_introspection_cpp.so" to ""
+-- Installing: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/lib/libvissus_projekt__rosidl_typesupport_cpp.so
+-- Set runtime path of "/root/ros2_ws/src/vissus_projekt/install/vissus_projekt/lib/libvissus_projekt__rosidl_typesupport_cpp.so" to ""
+Listing '/root/ros2_ws/src/vissus_projekt/install/vissus_projekt/local/lib/python3.10/dist-packages/vissus_projekt'...
+Compiling '/root/ros2_ws/src/vissus_projekt/install/vissus_projekt/local/lib/python3.10/dist-packages/vissus_projekt/__init__.py'...
+Listing '/root/ros2_ws/src/vissus_projekt/install/vissus_projekt/local/lib/python3.10/dist-packages/vissus_projekt/msg'...
+Compiling '/root/ros2_ws/src/vissus_projekt/install/vissus_projekt/local/lib/python3.10/dist-packages/vissus_projekt/msg/__init__.py'...
+Compiling '/root/ros2_ws/src/vissus_projekt/install/vissus_projekt/local/lib/python3.10/dist-packages/vissus_projekt/msg/_formation.py'...
+Compiling '/root/ros2_ws/src/vissus_projekt/install/vissus_projekt/local/lib/python3.10/dist-packages/vissus_projekt/msg/_odometry_array.py'...
+Compiling '/root/ros2_ws/src/vissus_projekt/install/vissus_projekt/local/lib/python3.10/dist-packages/vissus_projekt/msg/_tuning_params.py'...
+-- Installing: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/lib/libvissus_projekt__rosidl_generator_py.so
+-- Set runtime path of "/root/ros2_ws/src/vissus_projekt/install/vissus_projekt/lib/libvissus_projekt__rosidl_generator_py.so" to ""
+-- Installing: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/share/vissus_projekt/cmake/export_vissus_projekt__rosidl_generator_cExport.cmake
+-- Installing: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/share/vissus_projekt/cmake/export_vissus_projekt__rosidl_generator_cExport-noconfig.cmake
+-- Installing: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/share/vissus_projekt/cmake/export_vissus_projekt__rosidl_typesupport_fastrtps_cExport.cmake
+-- Installing: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/share/vissus_projekt/cmake/export_vissus_projekt__rosidl_typesupport_fastrtps_cExport-noconfig.cmake
+-- Installing: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/share/vissus_projekt/cmake/export_vissus_projekt__rosidl_generator_cppExport.cmake
+-- Installing: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/share/vissus_projekt/cmake/export_vissus_projekt__rosidl_typesupport_fastrtps_cppExport.cmake
+-- Installing: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/share/vissus_projekt/cmake/export_vissus_projekt__rosidl_typesupport_fastrtps_cppExport-noconfig.cmake
+-- Installing: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/share/vissus_projekt/cmake/vissus_projekt__rosidl_typesupport_introspection_cExport.cmake
+-- Installing: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/share/vissus_projekt/cmake/vissus_projekt__rosidl_typesupport_introspection_cExport-noconfig.cmake
+-- Installing: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/share/vissus_projekt/cmake/vissus_projekt__rosidl_typesupport_cExport.cmake
+-- Installing: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/share/vissus_projekt/cmake/vissus_projekt__rosidl_typesupport_cExport-noconfig.cmake
+-- Installing: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/share/vissus_projekt/cmake/vissus_projekt__rosidl_typesupport_introspection_cppExport.cmake
+-- Installing: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/share/vissus_projekt/cmake/vissus_projekt__rosidl_typesupport_introspection_cppExport-noconfig.cmake
+-- Installing: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/share/vissus_projekt/cmake/vissus_projekt__rosidl_typesupport_cppExport.cmake
+-- Installing: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/share/vissus_projekt/cmake/vissus_projekt__rosidl_typesupport_cppExport-noconfig.cmake
+-- Installing: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/share/vissus_projekt/cmake/export_vissus_projekt__rosidl_generator_pyExport.cmake
+-- Installing: /root/ros2_ws/src/vissus_projekt/install/vissus_projekt/share/vissus_projekt/cmake/export_vissus_projekt__rosidl_generator_pyExport-noconfig.cmake

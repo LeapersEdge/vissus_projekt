@@ -55,9 +55,9 @@ public:
         // get all available topics and extract highest <number> from topics with "robot_<number>/odom" 
         robot_id_ = this->declare_parameter<int>("robot_id", 0);
 
-	std::string = "/ros2_ws/src/vissus_projekt/launch/topology"
-	int num_boids_ = 4;
-        adjacency_mat_ = Get_Adjacency_Matrix(filepath, 4);
+	    std::string filepath = "/ros2_ws/src/vissus_projekt/launch/topology";
+	    int num_boids_ = 4;
+        adjacency_mat_ = Boid_Controller_Node::Get_Adjancency_Matrix(filepath, 4);
 
         // initialize all publishers, subscriptions and boids
         std::string robot_twist_topic = "/cf_" + std::to_string(int(robot_id_)) + "/cmd_vel";
@@ -79,8 +79,8 @@ public:
             std::bind(&Boid_Controller_Node::Subscription_Tuning_Params_Callback, this, _1)
         );
 
-	sub_formation = this->create_subscription<Msg_Formation>(
-            robot_formation_topic, 
+	    sub_formation = this->create_subscription<Msg_Formation>(
+            formation_topic, 
             10, 
             std::bind(&Boid_Controller_Node::Subscription_Formation_Callback, this, _1)
         );
@@ -105,7 +105,8 @@ private:
     // Project 1:
     void Subscription_Boid_Info_Callback(const Msg_Boid_Info::SharedPtr info);   // ALL BOID LOGIC HAPPENS HERE
     void Subscription_Tuning_Params_Callback(const Msg_Tuning_Params::SharedPtr params);
-    void Subscription_Goal_Odom_Callback(const Msg_Point::SharedPtr point);
+    void Subscription_Goal_Odom_Callback(const Msg_Point::SharedPtr points);
+    void Subscription_Formation_Callback(const Msg_Formation::SharedPtr points) ;
     Vector2 Calculate_Accel_Alignment(std::vector<Msg_Odom> odoms);
     Vector2 Calculate_Accel_Avoidence(std::vector<Msg_Odom> odoms);
     Vector2 Calculate_Accel_Cohesion(std::vector<Msg_Odom> odoms);
@@ -118,7 +119,7 @@ private:
     //       - in testing, use the separation rule but switch all other boid rules off
     //       - maybe implement using Goal on the Offset so that you can send the boids to a desired consensus-location without the boids' Go To Goal rule
     //               - (optional) implement separation within consensus protocol (recommended by the instructions in the first place), instead of using the boid separation rules
-    std::vector<std::vector<bool>> Get_Adjancency_Matrix(std::string filepath, int num_boids);
+    Bool_mat Get_Adjancency_Matrix(std::string filepath, int num_boids);
     Vector2 Calculate_Vel_Centroid_Consensus(const std::vector<Msg_Odom> odoms);
     Vector2 Calculate_Vel_Centroid_Consensus(const std::vector<Msg_Odom> odoms, const std::vector<Vector2> offsets);
 
@@ -128,6 +129,7 @@ private:
     Subscription_Boid_Info sub_boid_info;
     Subscription_Tuning_Params sub_tuning_params;
     Subscription_Point sub_goal_odom;
+    Subscription_Formation sub_formation;
 
     Bool_mat adjacency_mat_;
 
@@ -148,6 +150,7 @@ private:
     float max_speed_;
 
     Msg_Point goal_point;
+    std::vector<Vector2> offsets_;   
 };
 
 // --------------------------------------------------------------
@@ -516,8 +519,13 @@ void Boid_Controller_Node::Subscription_Goal_Odom_Callback(const Msg_Point::Shar
 }
 
 void Boid_Controller_Node::Subscription_Formation_Callback(const Msg_Formation::SharedPtr points)
-{
-    formation_points_ = points->formation_points;
+{   
+  for (auto point : points->formation_points){
+    Vector2 vpoint;
+    vpoint.x = point.x;
+    vpoint.y = point.y;
+    offsets_.push_back(vpoint);        
+  }
 }
 
 
@@ -606,7 +614,7 @@ Vector2 Boid_Controller_Node::Calculate_Vel_Centroid_Consensus(const std::vector
     return directed_total * (float)((double)(clock() - boid.last_time) / CLOCKS_PER_SEC);
 }
 
-Bool_mat Get_Adjancency_Matrix(std::string filepath, int num_boids)
+Bool_mat Boid_Controller_Node::Get_Adjancency_Matrix(std::string filepath, int num_boids)
     {
         typedef std::vector<std::vector<bool>> bool_matrix;
         bool_matrix mat;

@@ -1,0 +1,214 @@
+[0.000000] (-) TimerEvent: {}
+[0.000632] (vissus_projekt) JobQueued: {'identifier': 'vissus_projekt', 'dependencies': OrderedDict()}
+[0.000684] (vissus_projekt) JobStarted: {'identifier': 'vissus_projekt'}
+[0.013514] (vissus_projekt) JobProgress: {'identifier': 'vissus_projekt', 'progress': 'cmake'}
+[0.014429] (vissus_projekt) Command: {'cmd': ['/usr/bin/cmake', '/root/ros2_ws/src/vissus_projekt', '-DAMENT_CMAKE_SYMLINK_INSTALL=1', '-DCMAKE_INSTALL_PREFIX=/root/ros2_ws/src/vissus_projekt/install/vissus_projekt'], 'cwd': '/root/ros2_ws/src/vissus_projekt/build/vissus_projekt', 'env': OrderedDict([('DOCKER_BUILDKIT', '1'), ('LESSOPEN', '| /usr/bin/lesspipe %s'), ('TMUX', '/tmp/tmux-0/default,384721,2'), ('GIT_SSH_COMMAND', 'ssh -v'), ('HOSTNAME', '344eeae1eb99'), ('ENV_NAME', 'empty_borderless'), ('SHLVL', '2'), ('LD_LIBRARY_PATH', '/root/ros2_ws/install/vissus_projekt/lib:/root/ros2_ws/install/crazyflie_interfaces/lib:/root/ros2_ws/install/lib:/opt/ros/humble/opt/rviz_ogre_vendor/lib:/opt/ros/humble/lib/x86_64-linux-gnu:/opt/ros/humble/lib'), ('HOME', '/root'), ('OLDPWD', '/root/ros2_ws'), ('TERM_PROGRAM_VERSION', '3.2a'), ('ROS_PYTHON_VERSION', '3'), ('DEBUGINFOD_URLS', ''), ('COLCON_PREFIX_PATH', '/root/ros2_ws/install'), ('ROS_DISTRO', 'humble'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('NVIDIA_DRIVER_CAPABILITIES', 'graphics,utility,compute'), ('TERM', 'screen-256color'), ('SPAWN_POSE_DOC', 'four_example.txt'), ('ROS_LOCALHOST_ONLY', '1'), ('QT_X11_NO_MITSHM', '1'), ('PATH', '/opt/ros/humble/bin:/root/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'), ('DISPLAY', ':0'), ('LANG', 'C.UTF-8'), ('LS_COLORS', 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'), ('ROS2_DISTRO', 'humble'), ('TERM_PROGRAM', 'tmux'), ('ROS_DOMAIN_ID', '24'), ('AMENT_PREFIX_PATH', '/root/ros2_ws/install/vissus_projekt:/root/ros2_ws/install/mrs_crazyflies:/root/ros2_ws/install/crazyflie_sim:/root/ros2_ws/install/crazyflie_examples:/root/ros2_ws/install/crazyflie_py:/root/ros2_ws/install/crazyflie:/root/ros2_ws/install/crazyflie_interfaces:/root/ros2_ws/install:/opt/ros/humble'), ('SHELL', '/bin/bash'), ('NUM_ROBOTS', '4'), ('LESSCLOSE', '/usr/bin/lesspipe %s %s'), ('PWD', '/root/ros2_ws/src/vissus_projekt/build/vissus_projekt'), ('GZ_RELEASE', 'garden'), ('LC_AL', 'C.UTF-8'), ('PYTHONPATH', '/root/ros2_ws/install/vissus_projekt/local/lib/python3.10/dist-packages:/root/ros2_ws/install/mrs_crazyflies/local/lib/python3.10/dist-packages:/root/ros2_ws/install/crazyflie_sim/local/lib/python3.10/dist-packages:/root/ros2_ws/install/crazyflie_examples/local/lib/python3.10/dist-packages:/root/ros2_ws/install/crazyflie_py/lib/python3.10/site-packages:/root/ros2_ws/install/crazyflie_interfaces/local/lib/python3.10/dist-packages:/root/ros2_ws/build/crazyflie_py:/root/ros2_ws/install/lib/python3.10/site-packages:/root/ros2_ws/install/local/lib/python3.10/dist-packages:/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages'), ('NVIDIA_VISIBLE_DEVICES', 'all'), ('TZ', 'Europe/Zagreb'), ('COLCON', '1'), ('TMUX_PANE', '%16'), ('CMAKE_PREFIX_PATH', '/root/ros2_ws/install/vissus_projekt:/root/ros2_ws/install/mrs_crazyflies:/root/ros2_ws/install/crazyflie_sim:/root/ros2_ws/install/crazyflie_examples:/root/ros2_ws/install/crazyflie:/root/ros2_ws/install/crazyflie_interfaces:/root/ros2_ws/install:/root/ros2_ws/install/crazyflie_py:/opt/ros/humble')]), 'shell': False}
+[0.099219] (vissus_projekt) StdoutLine: {'line': b'-- The C compiler identification is GNU 11.4.0\n'}
+[0.099509] (-) TimerEvent: {}
+[0.177753] (vissus_projekt) StdoutLine: {'line': b'-- The CXX compiler identification is GNU 11.4.0\n'}
+[0.188465] (vissus_projekt) StdoutLine: {'line': b'-- Detecting C compiler ABI info\n'}
+[0.199647] (-) TimerEvent: {}
+[0.296891] (vissus_projekt) StdoutLine: {'line': b'-- Detecting C compiler ABI info - done\n'}
+[0.299760] (-) TimerEvent: {}
+[0.306881] (vissus_projekt) StdoutLine: {'line': b'-- Check for working C compiler: /usr/bin/cc - skipped\n'}
+[0.307195] (vissus_projekt) StdoutLine: {'line': b'-- Detecting C compile features\n'}
+[0.307808] (vissus_projekt) StdoutLine: {'line': b'-- Detecting C compile features - done\n'}
+[0.312771] (vissus_projekt) StdoutLine: {'line': b'-- Detecting CXX compiler ABI info\n'}
+[0.399881] (-) TimerEvent: {}
+[0.438407] (vissus_projekt) StdoutLine: {'line': b'-- Detecting CXX compiler ABI info - done\n'}
+[0.448464] (vissus_projekt) StdoutLine: {'line': b'-- Check for working CXX compiler: /usr/bin/c++ - skipped\n'}
+[0.448838] (vissus_projekt) StdoutLine: {'line': b'-- Detecting CXX compile features\n'}
+[0.449462] (vissus_projekt) StdoutLine: {'line': b'-- Detecting CXX compile features - done\n'}
+[0.456884] (vissus_projekt) StdoutLine: {'line': b'-- Found ament_cmake: 1.3.12 (/opt/ros/humble/share/ament_cmake/cmake)\n'}
+[0.499988] (-) TimerEvent: {}
+[0.600272] (-) TimerEvent: {}
+[0.695707] (vissus_projekt) StdoutLine: {'line': b'-- Found Python3: /usr/bin/python3 (found version "3.10.12") found components: Interpreter \n'}
+[0.700357] (-) TimerEvent: {}
+[0.788810] (vissus_projekt) StdoutLine: {'line': b'-- Override CMake install command with custom implementation using symlinks instead of copying resources\n'}
+[0.800457] (-) TimerEvent: {}
+[0.868759] (vissus_projekt) StdoutLine: {'line': b'-- Found rclcpp: 16.0.16 (/opt/ros/humble/share/rclcpp/cmake)\n'}
+[0.900640] (-) TimerEvent: {}
+[0.988718] (vissus_projekt) StdoutLine: {'line': b'-- Found rosidl_generator_c: 3.1.7 (/opt/ros/humble/share/rosidl_generator_c/cmake)\n'}
+[1.000762] (-) TimerEvent: {}
+[1.002828] (vissus_projekt) StdoutLine: {'line': b'-- Found rosidl_adapter: 3.1.7 (/opt/ros/humble/share/rosidl_adapter/cmake)\n'}
+[1.024746] (vissus_projekt) StdoutLine: {'line': b'-- Found rosidl_generator_cpp: 3.1.7 (/opt/ros/humble/share/rosidl_generator_cpp/cmake)\n'}
+[1.052558] (vissus_projekt) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c\n'}
+[1.089701] (vissus_projekt) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp\n'}
+[1.100884] (-) TimerEvent: {}
+[1.191790] (vissus_projekt) StdoutLine: {'line': b'-- Found rmw_implementation_cmake: 6.1.2 (/opt/ros/humble/share/rmw_implementation_cmake/cmake)\n'}
+[1.199097] (vissus_projekt) StdoutLine: {'line': b'-- Found rmw_fastrtps_cpp: 6.2.9 (/opt/ros/humble/share/rmw_fastrtps_cpp/cmake)\n'}
+[1.200903] (-) TimerEvent: {}
+[1.301157] (-) TimerEvent: {}
+[1.362899] (vissus_projekt) StdoutLine: {'line': b'-- Found OpenSSL: /usr/lib/x86_64-linux-gnu/libcrypto.so (found version "3.0.2")  \n'}
+[1.401287] (-) TimerEvent: {}
+[1.423285] (vissus_projekt) StdoutLine: {'line': b'-- Found FastRTPS: /opt/ros/humble/include  \n'}
+[1.501420] (-) TimerEvent: {}
+[1.516670] (vissus_projekt) StdoutLine: {'line': b"-- Using RMW implementation 'rmw_fastrtps_cpp' as default\n"}
+[1.538786] (vissus_projekt) StdoutLine: {'line': b'-- Looking for pthread.h\n'}
+[1.601544] (-) TimerEvent: {}
+[1.655578] (vissus_projekt) StdoutLine: {'line': b'-- Looking for pthread.h - found\n'}
+[1.655983] (vissus_projekt) StdoutLine: {'line': b'-- Performing Test CMAKE_HAVE_LIBC_PTHREAD\n'}
+[1.701683] (-) TimerEvent: {}
+[1.776141] (vissus_projekt) StdoutLine: {'line': b'-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success\n'}
+[1.777857] (vissus_projekt) StdoutLine: {'line': b'-- Found Threads: TRUE  \n'}
+[1.801804] (-) TimerEvent: {}
+[1.870648] (vissus_projekt) StdoutLine: {'line': b'-- Found rclpy: 3.3.19 (/opt/ros/humble/share/rclpy/cmake)\n'}
+[1.875811] (vissus_projekt) StdoutLine: {'line': b'-- Found nav_msgs: 4.9.0 (/opt/ros/humble/share/nav_msgs/cmake)\n'}
+[1.901925] (-) TimerEvent: {}
+[1.932090] (vissus_projekt) StdoutLine: {'line': b'-- Found rosidl_default_generators: 1.2.0 (/opt/ros/humble/share/rosidl_default_generators/cmake)\n'}
+[1.952906] (vissus_projekt) StdoutLine: {'line': b'-- Found message_filters: 4.3.11 (/opt/ros/humble/share/message_filters/cmake)\n'}
+[1.959748] (vissus_projekt) StdoutLine: {'line': b'-- Found crazyflie_interfaces: 1.0.3 (/root/ros2_ws/install/crazyflie_interfaces/share/crazyflie_interfaces/cmake)\n'}
+[1.987411] (vissus_projekt) StdoutLine: {'line': b'-- Found ament_lint_auto: 0.12.14 (/opt/ros/humble/share/ament_lint_auto/cmake)\n'}
+[2.002011] (-) TimerEvent: {}
+[2.102294] (-) TimerEvent: {}
+[2.202613] (-) TimerEvent: {}
+[2.302932] (-) TimerEvent: {}
+[2.403261] (-) TimerEvent: {}
+[2.478969] (vissus_projekt) StdoutLine: {'line': b'-- Found ament_cmake_ros: 0.10.0 (/opt/ros/humble/share/ament_cmake_ros/cmake)\n'}
+[2.503362] (-) TimerEvent: {}
+[2.603654] (-) TimerEvent: {}
+[2.703973] (-) TimerEvent: {}
+[2.804298] (-) TimerEvent: {}
+[2.904616] (-) TimerEvent: {}
+[3.004957] (-) TimerEvent: {}
+[3.105253] (-) TimerEvent: {}
+[3.161861] (vissus_projekt) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c\n'}
+[3.205374] (-) TimerEvent: {}
+[3.305726] (-) TimerEvent: {}
+[3.406068] (-) TimerEvent: {}
+[3.434444] (vissus_projekt) StdoutLine: {'line': b'-- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp\n'}
+[3.470247] (vissus_projekt) StdoutLine: {'line': b'-- Found PythonInterp: /usr/bin/python3 (found suitable version "3.10.12", minimum required is "3.6") \n'}
+[3.475460] (vissus_projekt) StdoutLine: {'line': b'-- Found python_cmake_module: 0.10.0 (/opt/ros/humble/share/python_cmake_module/cmake)\n'}
+[3.506176] (-) TimerEvent: {}
+[3.515656] (vissus_projekt) StdoutLine: {'line': b'-- Found PythonLibs: /usr/lib/x86_64-linux-gnu/libpython3.10.so (found suitable version "3.10.12", minimum required is "3.5") \n'}
+[3.515989] (vissus_projekt) StdoutLine: {'line': b'-- Using PYTHON_EXECUTABLE: /usr/bin/python3\n'}
+[3.516109] (vissus_projekt) StdoutLine: {'line': b'-- Using PYTHON_INCLUDE_DIRS: /usr/include/python3.10\n'}
+[3.516213] (vissus_projekt) StdoutLine: {'line': b'-- Using PYTHON_LIBRARIES: /usr/lib/x86_64-linux-gnu/libpython3.10.so\n'}
+[3.549340] (vissus_projekt) StdoutLine: {'line': b'-- Found PythonExtra: .so  \n'}
+[3.606300] (-) TimerEvent: {}
+[3.658503] (vissus_projekt) StderrLine: {'line': b'\x1b[0mCMake Deprecation Warning at /opt/ros/humble/share/rosidl_cmake/cmake/rosidl_target_interfaces.cmake:32 (message):\n'}
+[3.658772] (vissus_projekt) StderrLine: {'line': b'  Use rosidl_get_typesupport_target() and target_link_libraries() instead of\n'}
+[3.658908] (vissus_projekt) StderrLine: {'line': b'  rosidl_target_interfaces()\n'}
+[3.659020] (vissus_projekt) StderrLine: {'line': b'Call Stack (most recent call first):\n'}
+[3.659119] (vissus_projekt) StderrLine: {'line': b'  CMakeLists.txt:64 (rosidl_target_interfaces)\n'}
+[3.659210] (vissus_projekt) StderrLine: {'line': b'\n'}
+[3.659302] (vissus_projekt) StderrLine: {'line': b'\x1b[0m\n'}
+[3.662471] (vissus_projekt) StderrLine: {'line': b'\x1b[0mCMake Deprecation Warning at /opt/ros/humble/share/rosidl_cmake/cmake/rosidl_target_interfaces.cmake:32 (message):\n'}
+[3.662635] (vissus_projekt) StderrLine: {'line': b'  Use rosidl_get_typesupport_target() and target_link_libraries() instead of\n'}
+[3.662748] (vissus_projekt) StderrLine: {'line': b'  rosidl_target_interfaces()\n'}
+[3.662837] (vissus_projekt) StderrLine: {'line': b'Call Stack (most recent call first):\n'}
+[3.662930] (vissus_projekt) StderrLine: {'line': b'  CMakeLists.txt:71 (rosidl_target_interfaces)\n'}
+[3.663011] (vissus_projekt) StderrLine: {'line': b'\n'}
+[3.663084] (vissus_projekt) StderrLine: {'line': b'\x1b[0m\n'}
+[3.665656] (vissus_projekt) StderrLine: {'line': b'\x1b[0mCMake Deprecation Warning at /opt/ros/humble/share/rosidl_cmake/cmake/rosidl_target_interfaces.cmake:32 (message):\n'}
+[3.665814] (vissus_projekt) StderrLine: {'line': b'  Use rosidl_get_typesupport_target() and target_link_libraries() instead of\n'}
+[3.665970] (vissus_projekt) StderrLine: {'line': b'  rosidl_target_interfaces()\n'}
+[3.666057] (vissus_projekt) StderrLine: {'line': b'Call Stack (most recent call first):\n'}
+[3.666131] (vissus_projekt) StderrLine: {'line': b'  CMakeLists.txt:77 (rosidl_target_interfaces)\n'}
+[3.666229] (vissus_projekt) StderrLine: {'line': b'\n'}
+[3.666316] (vissus_projekt) StderrLine: {'line': b'\x1b[0m\n'}
+[3.706397] (-) TimerEvent: {}
+[3.731297] (vissus_projekt) StdoutLine: {'line': b"-- Added test 'cppcheck' to perform static code analysis on C / C++ code\n"}
+[3.732799] (vissus_projekt) StdoutLine: {'line': b'-- Configured cppcheck include dirs: $<BUILD_INTERFACE:/root/ros2_ws/src/vissus_projekt/build/vissus_projekt/rosidl_generator_c>;$<BUILD_INTERFACE:/root/ros2_ws/src/vissus_projekt/build/vissus_projekt/rosidl_typesupport_fastrtps_c>;$<BUILD_INTERFACE:/root/ros2_ws/src/vissus_projekt/build/vissus_projekt/rosidl_generator_cpp>;$<BUILD_INTERFACE:/root/ros2_ws/src/vissus_projekt/build/vissus_projekt/rosidl_typesupport_fastrtps_cpp>;$<BUILD_INTERFACE:/root/ros2_ws/src/vissus_projekt/build/vissus_projekt/rosidl_typesupport_introspection_c>;$<BUILD_INTERFACE:/root/ros2_ws/src/vissus_projekt/build/vissus_projekt/rosidl_typesupport_introspection_cpp>;/root/ros2_ws/src/vissus_projekt/build/vissus_projekt/rosidl_generator_c;/root/ros2_ws/src/vissus_projekt/build/vissus_projekt/rosidl_generator_py;/root/ros2_ws/src/vissus_projekt/include/;$<BUILD_INTERFACE:/root/ros2_ws/src/vissus_projekt/include>\n'}
+[3.732992] (vissus_projekt) StdoutLine: {'line': b'-- Configured cppcheck exclude dirs and/or files: \n'}
+[3.740924] (vissus_projekt) StdoutLine: {'line': b"-- Added test 'flake8' to check Python code syntax and style conventions\n"}
+[3.756524] (vissus_projekt) StdoutLine: {'line': b"-- Added test 'lint_cmake' to check CMake code style\n"}
+[3.764355] (vissus_projekt) StdoutLine: {'line': b"-- Added test 'pep257' to check Python code against some of the docstring style conventions in PEP 257\n"}
+[3.806500] (-) TimerEvent: {}
+[3.817820] (vissus_projekt) StdoutLine: {'line': b"-- Added test 'uncrustify' to check C / C++ code style\n"}
+[3.818048] (vissus_projekt) StdoutLine: {'line': b'-- Configured uncrustify additional arguments: \n'}
+[3.825570] (vissus_projekt) StdoutLine: {'line': b"-- Added test 'xmllint' to check XML markup files\n"}
+[3.837620] (vissus_projekt) StdoutLine: {'line': b'-- Configuring done\n'}
+[3.906626] (-) TimerEvent: {}
+[3.940739] (vissus_projekt) StdoutLine: {'line': b'-- Generating done\n'}
+[3.967839] (vissus_projekt) StdoutLine: {'line': b'-- Build files have been written to: /root/ros2_ws/src/vissus_projekt/build/vissus_projekt\n'}
+[3.986187] (vissus_projekt) CommandEnded: {'returncode': 0}
+[3.986948] (vissus_projekt) JobProgress: {'identifier': 'vissus_projekt', 'progress': 'build'}
+[3.987950] (vissus_projekt) Command: {'cmd': ['/usr/bin/cmake', '--build', '/root/ros2_ws/src/vissus_projekt/build/vissus_projekt', '--', '-j16', '-l16'], 'cwd': '/root/ros2_ws/src/vissus_projekt/build/vissus_projekt', 'env': OrderedDict([('DOCKER_BUILDKIT', '1'), ('LESSOPEN', '| /usr/bin/lesspipe %s'), ('TMUX', '/tmp/tmux-0/default,384721,2'), ('GIT_SSH_COMMAND', 'ssh -v'), ('HOSTNAME', '344eeae1eb99'), ('ENV_NAME', 'empty_borderless'), ('SHLVL', '2'), ('LD_LIBRARY_PATH', '/root/ros2_ws/install/vissus_projekt/lib:/root/ros2_ws/install/crazyflie_interfaces/lib:/root/ros2_ws/install/lib:/opt/ros/humble/opt/rviz_ogre_vendor/lib:/opt/ros/humble/lib/x86_64-linux-gnu:/opt/ros/humble/lib'), ('HOME', '/root'), ('OLDPWD', '/root/ros2_ws'), ('TERM_PROGRAM_VERSION', '3.2a'), ('ROS_PYTHON_VERSION', '3'), ('DEBUGINFOD_URLS', ''), ('COLCON_PREFIX_PATH', '/root/ros2_ws/install'), ('ROS_DISTRO', 'humble'), ('_', '/usr/bin/colcon'), ('ROS_VERSION', '2'), ('NVIDIA_DRIVER_CAPABILITIES', 'graphics,utility,compute'), ('TERM', 'screen-256color'), ('SPAWN_POSE_DOC', 'four_example.txt'), ('ROS_LOCALHOST_ONLY', '1'), ('QT_X11_NO_MITSHM', '1'), ('PATH', '/opt/ros/humble/bin:/root/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'), ('DISPLAY', ':0'), ('LANG', 'C.UTF-8'), ('LS_COLORS', 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:'), ('ROS2_DISTRO', 'humble'), ('TERM_PROGRAM', 'tmux'), ('ROS_DOMAIN_ID', '24'), ('AMENT_PREFIX_PATH', '/root/ros2_ws/install/vissus_projekt:/root/ros2_ws/install/mrs_crazyflies:/root/ros2_ws/install/crazyflie_sim:/root/ros2_ws/install/crazyflie_examples:/root/ros2_ws/install/crazyflie_py:/root/ros2_ws/install/crazyflie:/root/ros2_ws/install/crazyflie_interfaces:/root/ros2_ws/install:/opt/ros/humble'), ('SHELL', '/bin/bash'), ('NUM_ROBOTS', '4'), ('LESSCLOSE', '/usr/bin/lesspipe %s %s'), ('PWD', '/root/ros2_ws/src/vissus_projekt/build/vissus_projekt'), ('GZ_RELEASE', 'garden'), ('LC_AL', 'C.UTF-8'), ('PYTHONPATH', '/root/ros2_ws/install/vissus_projekt/local/lib/python3.10/dist-packages:/root/ros2_ws/install/mrs_crazyflies/local/lib/python3.10/dist-packages:/root/ros2_ws/install/crazyflie_sim/local/lib/python3.10/dist-packages:/root/ros2_ws/install/crazyflie_examples/local/lib/python3.10/dist-packages:/root/ros2_ws/install/crazyflie_py/lib/python3.10/site-packages:/root/ros2_ws/install/crazyflie_interfaces/local/lib/python3.10/dist-packages:/root/ros2_ws/build/crazyflie_py:/root/ros2_ws/install/lib/python3.10/site-packages:/root/ros2_ws/install/local/lib/python3.10/dist-packages:/opt/ros/humble/lib/python3.10/site-packages:/opt/ros/humble/local/lib/python3.10/dist-packages'), ('NVIDIA_VISIBLE_DEVICES', 'all'), ('TZ', 'Europe/Zagreb'), ('COLCON', '1'), ('TMUX_PANE', '%16'), ('CMAKE_PREFIX_PATH', '/root/ros2_ws/install/vissus_projekt:/root/ros2_ws/install/mrs_crazyflies:/root/ros2_ws/install/crazyflie_sim:/root/ros2_ws/install/crazyflie_examples:/root/ros2_ws/install/crazyflie:/root/ros2_ws/install/crazyflie_interfaces:/root/ros2_ws/install:/root/ros2_ws/install/crazyflie_py:/opt/ros/humble')]), 'shell': False}
+[4.006739] (-) TimerEvent: {}
+[4.073324] (vissus_projekt) StdoutLine: {'line': b'[  1%] \x1b[34m\x1b[1mGenerating C code for ROS interfaces\x1b[0m\n'}
+[4.092706] (vissus_projekt) StdoutLine: {'line': b'[  3%] \x1b[34m\x1b[1mGenerating C++ code for ROS interfaces\x1b[0m\n'}
+[4.106872] (-) TimerEvent: {}
+[4.107372] (vissus_projekt) StdoutLine: {'line': b'[  3%] Built target ament_cmake_python_symlink_vissus_projekt\n'}
+[4.206976] (-) TimerEvent: {}
+[4.307300] (-) TimerEvent: {}
+[4.407660] (-) TimerEvent: {}
+[4.507985] (-) TimerEvent: {}
+[4.573558] (vissus_projekt) StdoutLine: {'line': b'running egg_info\n'}
+[4.574378] (vissus_projekt) StdoutLine: {'line': b'creating vissus_projekt.egg-info\n'}
+[4.574713] (vissus_projekt) StdoutLine: {'line': b'writing vissus_projekt.egg-info/PKG-INFO\n'}
+[4.574961] (vissus_projekt) StdoutLine: {'line': b'writing dependency_links to vissus_projekt.egg-info/dependency_links.txt\n'}
+[4.575251] (vissus_projekt) StdoutLine: {'line': b'writing top-level names to vissus_projekt.egg-info/top_level.txt\n'}
+[4.577626] (vissus_projekt) StdoutLine: {'line': b"writing manifest file 'vissus_projekt.egg-info/SOURCES.txt'\n"}
+[4.580725] (vissus_projekt) StdoutLine: {'line': b"reading manifest file 'vissus_projekt.egg-info/SOURCES.txt'\n"}
+[4.581591] (vissus_projekt) StdoutLine: {'line': b"writing manifest file 'vissus_projekt.egg-info/SOURCES.txt'\n"}
+[4.609301] (-) TimerEvent: {}
+[4.633705] (vissus_projekt) StdoutLine: {'line': b'[  3%] Built target ament_cmake_python_build_vissus_projekt_egg\n'}
+[4.668492] (vissus_projekt) StdoutLine: {'line': b'[  3%] Built target vissus_projekt__cpp\n'}
+[4.688651] (vissus_projekt) StdoutLine: {'line': b'[ 10%] \x1b[34m\x1b[1mGenerating C++ introspection for ROS interfaces\x1b[0m\n'}
+[4.688989] (vissus_projekt) StdoutLine: {'line': b'[ 10%] \x1b[34m\x1b[1mGenerating C++ type support dispatch for ROS interfaces\x1b[0m\n'}
+[4.689269] (vissus_projekt) StdoutLine: {'line': b'[ 10%] \x1b[32mBuilding C object CMakeFiles/vissus_projekt__rosidl_generator_c.dir/rosidl_generator_c/vissus_projekt/msg/detail/odometry_array__functions.c.o\x1b[0m\n'}
+[4.689436] (vissus_projekt) StdoutLine: {'line': b'[ 10%] \x1b[34m\x1b[1mGenerating C++ type support for eProsima Fast-RTPS\x1b[0m\n'}
+[4.690938] (vissus_projekt) StdoutLine: {'line': b'[ 12%] \x1b[32mBuilding C object CMakeFiles/vissus_projekt__rosidl_generator_c.dir/rosidl_generator_c/vissus_projekt/msg/detail/tuning_params__functions.c.o\x1b[0m\n'}
+[4.691116] (vissus_projekt) StdoutLine: {'line': b'[ 14%] \x1b[32mBuilding C object CMakeFiles/vissus_projekt__rosidl_generator_c.dir/rosidl_generator_c/vissus_projekt/msg/detail/formation__functions.c.o\x1b[0m\n'}
+[4.712257] (-) TimerEvent: {}
+[4.722444] (vissus_projekt) StderrLine: {'line': b'In file included from \x1b[01m\x1b[K/root/ros2_ws/src/vissus_projekt/build/vissus_projekt/rosidl_generator_c/vissus_projekt/msg/detail/formation__functions.h:19\x1b[m\x1b[K,\n'}
+[4.722701] (vissus_projekt) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/root/ros2_ws/src/vissus_projekt/build/vissus_projekt/rosidl_generator_c/vissus_projekt/msg/detail/formation__functions.c:4\x1b[m\x1b[K:\n'}
+[4.722849] (vissus_projekt) StderrLine: {'line': b'\x1b[01m\x1b[K/root/ros2_ws/src/vissus_projekt/build/vissus_projekt/rosidl_generator_c/vissus_projekt/msg/detail/formation__struct.h:22:10:\x1b[m\x1b[K \x1b[01;31m\x1b[Kfatal error: \x1b[m\x1b[Kvissus_projekt/msg/detail/point__struct.h: No such file or directory\n'}
+[4.722962] (vissus_projekt) StderrLine: {'line': b'   22 | #include \x1b[01;31m\x1b[K"vissus_projekt/msg/detail/point__struct.h"\x1b[m\x1b[K\n'}
+[4.723066] (vissus_projekt) StderrLine: {'line': b'      |          \x1b[01;31m\x1b[K^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\x1b[m\x1b[K\n'}
+[4.723174] (vissus_projekt) StderrLine: {'line': b'compilation terminated.\n'}
+[4.725322] (vissus_projekt) StderrLine: {'line': b'gmake[2]: *** [CMakeFiles/vissus_projekt__rosidl_generator_c.dir/build.make:239: CMakeFiles/vissus_projekt__rosidl_generator_c.dir/rosidl_generator_c/vissus_projekt/msg/detail/formation__functions.c.o] Error 1\n'}
+[4.725617] (vissus_projekt) StderrLine: {'line': b'gmake[2]: *** Waiting for unfinished jobs....\n'}
+[4.768312] (vissus_projekt) StderrLine: {'line': b'gmake[1]: *** [CMakeFiles/Makefile2:219: CMakeFiles/vissus_projekt__rosidl_generator_c.dir/all] Error 2\n'}
+[4.768598] (vissus_projekt) StderrLine: {'line': b'gmake[1]: *** Waiting for unfinished jobs....\n'}
+[4.812376] (-) TimerEvent: {}
+[4.912662] (-) TimerEvent: {}
+[5.012989] (-) TimerEvent: {}
+[5.114439] (-) TimerEvent: {}
+[5.119468] (vissus_projekt) StdoutLine: {'line': b'[ 17%] \x1b[32mBuilding CXX object CMakeFiles/vissus_projekt__rosidl_typesupport_cpp.dir/rosidl_typesupport_cpp/vissus_projekt/msg/tuning_params__type_support.cpp.o\x1b[0m\n'}
+[5.119764] (vissus_projekt) StdoutLine: {'line': b'[ 17%] \x1b[32mBuilding CXX object CMakeFiles/vissus_projekt__rosidl_typesupport_cpp.dir/rosidl_typesupport_cpp/vissus_projekt/msg/odometry_array__type_support.cpp.o\x1b[0m\n'}
+[5.119944] (vissus_projekt) StdoutLine: {'line': b'[ 19%] \x1b[32mBuilding CXX object CMakeFiles/vissus_projekt__rosidl_typesupport_cpp.dir/rosidl_typesupport_cpp/vissus_projekt/msg/formation__type_support.cpp.o\x1b[0m\n'}
+[5.162753] (vissus_projekt) StdoutLine: {'line': b'[ 23%] \x1b[32mBuilding CXX object CMakeFiles/vissus_projekt__rosidl_typesupport_introspection_cpp.dir/rosidl_typesupport_introspection_cpp/vissus_projekt/msg/detail/odometry_array__type_support.cpp.o\x1b[0m\n'}
+[5.163049] (vissus_projekt) StdoutLine: {'line': b'[ 23%] \x1b[32mBuilding CXX object CMakeFiles/vissus_projekt__rosidl_typesupport_introspection_cpp.dir/rosidl_typesupport_introspection_cpp/vissus_projekt/msg/detail/tuning_params__type_support.cpp.o\x1b[0m\n'}
+[5.163309] (vissus_projekt) StdoutLine: {'line': b'[ 25%] \x1b[32mBuilding CXX object CMakeFiles/vissus_projekt__rosidl_typesupport_introspection_cpp.dir/rosidl_typesupport_introspection_cpp/vissus_projekt/msg/detail/formation__type_support.cpp.o\x1b[0m\n'}
+[5.214716] (-) TimerEvent: {}
+[5.227696] (vissus_projekt) StdoutLine: {'line': b'[ 26%] \x1b[32mBuilding CXX object CMakeFiles/vissus_projekt__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/vissus_projekt/msg/detail/dds_fastrtps/formation__type_support.cpp.o\x1b[0m\n'}
+[5.227999] (vissus_projekt) StdoutLine: {'line': b'[ 28%] \x1b[32mBuilding CXX object CMakeFiles/vissus_projekt__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/vissus_projekt/msg/detail/dds_fastrtps/odometry_array__type_support.cpp.o\x1b[0m\n'}
+[5.233711] (vissus_projekt) StdoutLine: {'line': b'[ 30%] \x1b[32mBuilding CXX object CMakeFiles/vissus_projekt__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/vissus_projekt/msg/detail/dds_fastrtps/tuning_params__type_support.cpp.o\x1b[0m\n'}
+[5.260668] (vissus_projekt) StderrLine: {'line': b'In file included from \x1b[01m\x1b[K/root/ros2_ws/src/vissus_projekt/build/vissus_projekt/rosidl_typesupport_cpp/vissus_projekt/msg/formation__type_support.cpp:7\x1b[m\x1b[K:\n'}
+[5.260932] (vissus_projekt) StderrLine: {'line': b'\x1b[01m\x1b[K/root/ros2_ws/src/vissus_projekt/build/vissus_projekt/rosidl_generator_cpp/vissus_projekt/msg/detail/formation__struct.hpp:20:10:\x1b[m\x1b[K \x1b[01;31m\x1b[Kfatal error: \x1b[m\x1b[Kvissus_projekt/msg/detail/point__struct.hpp: No such file or directory\n'}
+[5.261083] (vissus_projekt) StderrLine: {'line': b'   20 | #include \x1b[01;31m\x1b[K"vissus_projekt/msg/detail/point__struct.hpp"\x1b[m\x1b[K\n'}
+[5.261203] (vissus_projekt) StderrLine: {'line': b'      |          \x1b[01;31m\x1b[K^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\x1b[m\x1b[K\n'}
+[5.261326] (vissus_projekt) StderrLine: {'line': b'compilation terminated.\n'}
+[5.263976] (vissus_projekt) StderrLine: {'line': b'gmake[2]: *** [CMakeFiles/vissus_projekt__rosidl_typesupport_cpp.dir/build.make:196: CMakeFiles/vissus_projekt__rosidl_typesupport_cpp.dir/rosidl_typesupport_cpp/vissus_projekt/msg/formation__type_support.cpp.o] Error 1\n'}
+[5.264173] (vissus_projekt) StderrLine: {'line': b'gmake[2]: *** Waiting for unfinished jobs....\n'}
+[5.314852] (-) TimerEvent: {}
+[5.333615] (vissus_projekt) StderrLine: {'line': b'In file included from \x1b[01m\x1b[K/root/ros2_ws/src/vissus_projekt/build/vissus_projekt/rosidl_typesupport_introspection_cpp/vissus_projekt/msg/detail/formation__type_support.cpp:12\x1b[m\x1b[K:\n'}
+[5.333898] (vissus_projekt) StderrLine: {'line': b'\x1b[01m\x1b[K/root/ros2_ws/src/vissus_projekt/build/vissus_projekt/rosidl_generator_cpp/vissus_projekt/msg/detail/formation__struct.hpp:20:10:\x1b[m\x1b[K \x1b[01;31m\x1b[Kfatal error: \x1b[m\x1b[Kvissus_projekt/msg/detail/point__struct.hpp: No such file or directory\n'}
+[5.334064] (vissus_projekt) StderrLine: {'line': b'   20 | #include \x1b[01;31m\x1b[K"vissus_projekt/msg/detail/point__struct.hpp"\x1b[m\x1b[K\n'}
+[5.334196] (vissus_projekt) StderrLine: {'line': b'      |          \x1b[01;31m\x1b[K^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\x1b[m\x1b[K\n'}
+[5.334308] (vissus_projekt) StderrLine: {'line': b'compilation terminated.\n'}
+[5.339830] (vissus_projekt) StderrLine: {'line': b'gmake[2]: *** [CMakeFiles/vissus_projekt__rosidl_typesupport_introspection_cpp.dir/build.make:207: CMakeFiles/vissus_projekt__rosidl_typesupport_introspection_cpp.dir/rosidl_typesupport_introspection_cpp/vissus_projekt/msg/detail/formation__type_support.cpp.o] Error 1\n'}
+[5.340079] (vissus_projekt) StderrLine: {'line': b'gmake[2]: *** Waiting for unfinished jobs....\n'}
+[5.386549] (vissus_projekt) StderrLine: {'line': b'In file included from \x1b[01m\x1b[K/root/ros2_ws/src/vissus_projekt/build/vissus_projekt/rosidl_typesupport_fastrtps_cpp/vissus_projekt/msg/detail/formation__rosidl_typesupport_fastrtps_cpp.hpp:11\x1b[m\x1b[K,\n'}
+[5.386826] (vissus_projekt) StderrLine: {'line': b'                 from \x1b[01m\x1b[K/root/ros2_ws/src/vissus_projekt/build/vissus_projekt/rosidl_typesupport_fastrtps_cpp/vissus_projekt/msg/detail/dds_fastrtps/formation__type_support.cpp:4\x1b[m\x1b[K:\n'}
+[5.387006] (vissus_projekt) StderrLine: {'line': b'\x1b[01m\x1b[K/root/ros2_ws/src/vissus_projekt/build/vissus_projekt/rosidl_generator_cpp/vissus_projekt/msg/detail/formation__struct.hpp:20:10:\x1b[m\x1b[K \x1b[01;31m\x1b[Kfatal error: \x1b[m\x1b[Kvissus_projekt/msg/detail/point__struct.hpp: No such file or directory\n'}
+[5.387347] (vissus_projekt) StderrLine: {'line': b'   20 | #include \x1b[01;31m\x1b[K"vissus_projekt/msg/detail/point__struct.hpp"\x1b[m\x1b[K\n'}
+[5.387704] (vissus_projekt) StderrLine: {'line': b'      |          \x1b[01;31m\x1b[K^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\x1b[m\x1b[K\n'}
+[5.387817] (vissus_projekt) StderrLine: {'line': b'compilation terminated.\n'}
+[5.390404] (vissus_projekt) StderrLine: {'line': b'gmake[2]: *** [CMakeFiles/vissus_projekt__rosidl_typesupport_fastrtps_cpp.dir/build.make:207: CMakeFiles/vissus_projekt__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/vissus_projekt/msg/detail/dds_fastrtps/formation__type_support.cpp.o] Error 1\n'}
+[5.390641] (vissus_projekt) StderrLine: {'line': b'gmake[2]: *** Waiting for unfinished jobs....\n'}
+[5.414982] (-) TimerEvent: {}
+[5.515348] (-) TimerEvent: {}
+[5.583104] (vissus_projekt) StderrLine: {'line': b'gmake[1]: *** [CMakeFiles/Makefile2:401: CMakeFiles/vissus_projekt__rosidl_typesupport_cpp.dir/all] Error 2\n'}
+[5.615472] (-) TimerEvent: {}
+[5.715896] (-) TimerEvent: {}
+[5.816287] (-) TimerEvent: {}
+[5.840985] (vissus_projekt) StderrLine: {'line': b'gmake[1]: *** [CMakeFiles/Makefile2:375: CMakeFiles/vissus_projekt__rosidl_typesupport_introspection_cpp.dir/all] Error 2\n'}
+[5.916407] (-) TimerEvent: {}
+[5.916911] (vissus_projekt) StderrLine: {'line': b'gmake[1]: *** [CMakeFiles/Makefile2:297: CMakeFiles/vissus_projekt__rosidl_typesupport_fastrtps_cpp.dir/all] Error 2\n'}
+[5.917252] (vissus_projekt) StderrLine: {'line': b'gmake: *** [Makefile:146: all] Error 2\n'}
+[5.920811] (vissus_projekt) CommandEnded: {'returncode': 2}
+[5.933191] (vissus_projekt) JobEnded: {'identifier': 'vissus_projekt', 'rc': 2}
+[5.943694] (-) EventReactorShutdown: {}

@@ -1,0 +1,1 @@
+/root/ros2_ws/src/vissus_projekt/build/vissus_projekt/ament_cmake_core/vissus_projektConfig-version.cmake
