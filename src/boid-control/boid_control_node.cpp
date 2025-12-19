@@ -1,4 +1,4 @@
-#include <algorithm>
+    #include <algorithm>
 #include <cassert>
 #include <cmath>
 #include <csignal>
@@ -590,7 +590,8 @@ Vector2 Boid_Controller_Node::Calculate_Vel_Centroid_Consensus(const std::vector
         } 
      }
 	
-    return directed_total * (float)((double)(clock() - boid.last_time) / CLOCKS_PER_SEC);
+    //  return directed_total * (float)((double)(clock() - boid.last_time) / CLOCKS_PER_SEC);
+    return directed_total;
 }
 
 /// @brief Computes velocities for current agent to move towards the centroid of the agents it has the information of
@@ -627,13 +628,11 @@ Bool_mat Boid_Controller_Node::Get_Adjancency_Matrix(std::string filepath, int n
             return mat;
         }
 
-        mat.reserve(num_boids);
+        mat.resize(num_boids);
         for (auto& cell : mat)
-            cell.reserve(num_boids);
+            cell.resize(num_boids, false);
 
-        for (size_t y = 0; y < num_boids; y++)
-            for (size_t x = 0; x < num_boids; x++)
-                mat[y][x] = 0;
+    
 
         if (in.is_open())
         {
