@@ -153,13 +153,16 @@ private:
 
         robot_odoms_[cfID].pose.pose = msg->pose;
 
-        Msg_Boid_Info odom_array_id;
-        odom_array_id.odometries =
-            get_graph_neighbours(robot_odoms_, cfID);
+        Msg_Boid_Info odom_array_id[num_boids_];
+        for (int i = 0; i < num_boids_; i++){
+          odom_array_id.odometries[i] = robot_odoms_[i];
+          }
+             
+        //    get_graph_neighbours(robot_odoms_, cfID);
 
-        odom_array_id.odometries.insert(
-            odom_array_id.odometries.begin(),
-            robot_odoms_[cfID]);
+        //odom_array_id.odometries.insert(
+        //    odom_array_id.odometries.begin(),
+        //    robot_odoms_[cfID]);
 
         pubs_boid_info_[cfID]->publish(odom_array_id);
     }
