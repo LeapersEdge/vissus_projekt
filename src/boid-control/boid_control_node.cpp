@@ -609,7 +609,7 @@ Vector2 Boid_Controller_Node::Calculate_Vel_Centroid_Consensus(const std::vector
     };
 
     for (int i = 0; i < odoms.size(); i++) {
-        if (adjacency_mat_[robot_id_][i]) {
+        if (adjacency_mat_[robot_id_-1][i]) {
             directed_total.x += (float)odoms[i].pose.pose.position.x - (float)odoms[robot_id_-1].pose.pose.position.x;
             directed_total.y += (float)odoms[i].pose.pose.position.y - (float)odoms[robot_id_-1].pose.pose.position.y;
         } 

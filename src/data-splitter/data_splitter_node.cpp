@@ -28,15 +28,15 @@ public:
         boid_vision_range_ = this->declare_parameter<float>("boid_vision_range", 10.0f);
         num_boids_ = static_cast<unsigned int>(this->declare_parameter<int>("boid_number", 4));
 
-        for (unsigned int i = 0; i < num_boids_; ++i) {
-            robot_cfIDs_.push_back(i);
+        for (int i = 1; i < (num_boids_+1); ++i) {
+            robot_cfIDs_.push_back(i); // 1 indexing
         }
-
+        RCLCPP_INFO(this->get_logger(), "Data Splitter Node initialized with robot_cfIDs_ %d", robot_cfIDs_[0]);
         std::vector<std::string> cfID_pose_topics;
         std::vector<std::string> cfID_vel_topics;
 	    std::vector<std::string> cfID_odom_topics;
 
-        for (unsigned int id : robot_cfIDs_) {
+        for (int id : robot_cfIDs_) {
             cfID_odom_topics.push_back("/robot_" + std::to_string(id) + "/boid_info");
             cfID_pose_topics.push_back("/cf_" + std::to_string(id) + "/pose");
             cfID_vel_topics.push_back("/cf_" + std::to_string(id) + "/velocity");
@@ -51,7 +51,7 @@ public:
                     cfID_pose_topics[i],
                     10,
                     [this, i](const Msg_PoseStamped::SharedPtr msg) {
-                        this->Subscription_cfID_PoseStamped_Callback(msg, i);
+                        this->Subscription_cfID_PoseStamped_Callback(msg, robot_cfIDs_[i]);
                     });
 
             subs_posestamped_.push_back(sub_posestamped);
@@ -61,7 +61,7 @@ public:
                     cfID_vel_topics[i],
                     10,
                     [this, i](const Msg_LogDataGeneric::SharedPtr msg) {
-                        this->Subscription_cfID_LogDataGeneric_Callback(msg, i);
+                        this->Subscription_cfID_LogDataGeneric_Callback(msg, robot_cfIDs_[i]);
                     });
 
             subs_log_data_generic_.push_back(sub_log_data);
