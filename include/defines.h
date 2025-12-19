@@ -23,7 +23,7 @@ typedef geometry_msgs::msg::Point Msg_Point;
 typedef vissus_projekt::msg::TuningParams Msg_Tuning_Params; 
 typedef geometry_msgs::msg::PoseStamped Msg_PoseStamped;
 typedef crazyflie_interfaces::msg::LogDataGeneric Msg_LogDataGeneric;
-typedef vissus_projekt::msg::FormationMsg Formation_Msg;ž
+typedef vissus_projekt::msg::FormationMsg Formation_Msg;
 
 // pubs typedef
 typedef rclcpp::Publisher<Msg_Twist>::SharedPtr Publisher_Twist;
