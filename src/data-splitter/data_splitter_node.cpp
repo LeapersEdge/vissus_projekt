@@ -145,27 +145,24 @@ private:
         return neighbours;
     }
 
-    void Subscription_cfID_PoseStamped_Callback(
-        const Msg_PoseStamped::SharedPtr msg,
-        unsigned int cfID)
-    {
-        if (cfID >= robot_odoms_.size()) return;
+  void Subscription_cfID_PoseStamped_Callback(
+                                              const Msg_PoseStamped::SharedPtr msg,
+                                              unsigned int cfID)
+  {
+    if (cfID >= robot_odoms_.size()) return;
 
-        robot_odoms_[cfID].pose.pose = msg->pose;
+    robot_odoms_[cfID].pose.pose = msg->pose;
 
-        Msg_Boid_Info odom_array_id[num_boids_];
-        for (int i = 0; i < num_boids_; i++){
-          odom_array_id.odometries[i] = robot_odoms_[i];
-          }
-             
-        //    get_graph_neighbours(robot_odoms_, cfID);
+    Msg_Boid_Info boid_msg;
+    boid_msg.odometries.clear();
+    boid_msg.odometries.reserve(robot_odoms_.size());
 
-        //odom_array_id.odometries.insert(
-        //    odom_array_id.odometries.begin(),
-        //    robot_odoms_[cfID]);
-
-        pubs_boid_info_[cfID]->publish(odom_array_id);
+    for (unsigned int i = 0; i < robot_odoms_.size(); ++i) {
+      boid_msg.odometries.push_back(robot_odoms_[i]);
     }
+
+    pubs_boid_info_[cfID]->publish(boid_msg);
+  }
 
     void Subscription_cfID_LogDataGeneric_Callback(
         const Msg_LogDataGeneric::SharedPtr msg,
