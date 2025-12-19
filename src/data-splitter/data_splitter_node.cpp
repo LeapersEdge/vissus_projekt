@@ -31,6 +31,8 @@ public:
         for (int i = 1; i < (num_boids_+1); ++i) {
             robot_cfIDs_.push_back(i); // 1 indexing
         }
+
+       
         RCLCPP_INFO(this->get_logger(), "Data Splitter Node initialized with robot_cfIDs_ %d", robot_cfIDs_[0]);
         std::vector<std::string> cfID_pose_topics;
         std::vector<std::string> cfID_vel_topics;
@@ -51,7 +53,7 @@ public:
                     cfID_pose_topics[i],
                     10,
                     [this, i](const Msg_PoseStamped::SharedPtr msg) {
-                        this->Subscription_cfID_PoseStamped_Callback(msg, robot_cfIDs_[i]);
+                        this->Subscription_cfID_PoseStamped_Callback(msg, i);
                     });
 
             subs_posestamped_.push_back(sub_posestamped);
@@ -61,7 +63,7 @@ public:
                     cfID_vel_topics[i],
                     10,
                     [this, i](const Msg_LogDataGeneric::SharedPtr msg) {
-                        this->Subscription_cfID_LogDataGeneric_Callback(msg, robot_cfIDs_[i]);
+                      this->Subscription_cfID_LogDataGeneric_Callback(msg, i);
                     });
 
             subs_log_data_generic_.push_back(sub_log_data);
@@ -69,7 +71,7 @@ public:
             Publisher_Boid_Info pub_boidinfo =
                 this->create_publisher<Msg_Boid_Info>(
                     cfID_odom_topics[i],
-                    10);
+                    10); 
 
             pubs_boid_info_.push_back(pub_boidinfo);
         }

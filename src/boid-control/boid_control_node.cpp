@@ -159,7 +159,7 @@ private:
     Bool_mat adjacency_mat_;
 
     // parameter declarations 
-    float robot_id_;
+    int robot_id_;
     // modifiable params
     bool params_init = false;
     float rotation_kp_;
@@ -273,8 +273,8 @@ void Boid_Controller_Node::Subscription_Boid_Info_Callback(const Msg_Boid_Info::
         Msg_Twist twist_msg;
       
         {
-            twist_msg.linear.x = self_odom.twist.twist.linear.x + accel_total.x * delta_time + vel_consensus.x;
-            twist_msg.linear.y = self_odom.twist.twist.linear.y + accel_total.y * delta_time + vel_consensus.y;
+            twist_msg.linear.x = self_odom.twist.twist.linear.x + accel_total.x * delta_time;
+            twist_msg.linear.y = self_odom.twist.twist.linear.y + accel_total.y * delta_time;
             twist_msg.angular.z = 0.0f;
             float norm = sqrt(twist_msg.linear.x*twist_msg.linear.x + twist_msg.linear.y*twist_msg.linear.y);
             if (norm > max_speed_)
@@ -292,8 +292,8 @@ void Boid_Controller_Node::Subscription_Boid_Info_Callback(const Msg_Boid_Info::
 
         // Project 2
         //Vector2 vels = Calculate_Vel_Centroid_Consensus(odoms)
-        //twist_msg.linear.x += vels.x;
-        //twist_msg.linear.y += vels.y;
+        twist_msg.linear.x += vel_consensus.x;
+        twist_msg.linear.y += vel_consensus.y;
 
         pub_twist->publish(twist_msg);
     }
@@ -616,7 +616,7 @@ Vector2 Boid_Controller_Node::Calculate_Vel_Centroid_Consensus(const std::vector
      }
 	
     //  return directed_total * (float)((double)(clock() - boid.last_time) / CLOCKS_PER_SEC);
-    return directed_total * (float)((double)(clock() - boid.last_time) / CLOCKS_PER_SEC);
+    return directed_total * 0.001f;
 }
 
 /// @brief Computes velocities for current agent to move towards the centroid of the agents it has the information of
