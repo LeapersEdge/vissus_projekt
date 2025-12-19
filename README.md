@@ -1,4 +1,7 @@
-# vissus_projekt
+# vissus_projekt (branch: zadatak-2)
+## Project: 2nd phase
+### Controlling a Swarm of Crazyflies using Consensus Protocol and Auction-Based Task Allocation
+### (scroll to bottom)
 
   Grupa: Gabrijel Biočić, Dino Dubinović, Quinn Lee Fletcher, Ita Poklepović, Antonio Škara.
 
@@ -24,7 +27,7 @@ cd startup
 ros2 launch vissus_projekt simulation.launch.py
 ```
 
-### Što ne radi 
+### Što ne radi
 Ne radi nam rendevous, topici rade
 
 ### Concept
@@ -91,9 +94,11 @@ It is advised to modify the parameters via rqt; change the parameters in `/tunin
 5. `goal_factor` should be greater than `cohesion_factor` and `alignment_factor`, but considerably lower than `avoidance_factor` and `obstacle_avoidance_factor`
 
 
-#### To-do
-  1. Testirati simulaciju i isprobati razne parametre, parametri su definirani u msg/TuningParams.msg
-  2. Provjeriti sve nazive
-  3. Potencijalno pretvoriti sve floatove u double da ne moramo raditi konverziju
-  
+## Project: 2nd phase
 
+### How to use
+- When running the simulation, disable all boid rules except Separation, and perhaps the Goal rule as well.
+- Setup the drone's directed communication graph in `launch/topology`. An explanation on how to customize the topology is present at the bottom of the file.
+
+#### To-Do:
+- Topics are working but rendezvous isn't
