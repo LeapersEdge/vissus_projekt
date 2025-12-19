@@ -1,4 +1,4 @@
-    #include <algorithm>
+#include <algorithm>
 #include <cassert>
 #include <cmath>
 #include <csignal>
@@ -36,6 +36,25 @@
 // --------------------------------------------------------------
 // ROS2 NODE 
 
+void printBoolMatrix(const std::vector<std::vector<bool>> &matrix)
+{
+    std::ostringstream oss;
+    oss << "[\n";
+    for (const auto &row : matrix)
+    {
+        oss << "  [ ";
+        for (bool val : row)
+        {
+            oss << (val ? "true" : "false") << " ";
+        }
+        oss << "]\n";
+    }
+    oss << "]";
+    
+    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "\n%s", oss.str().c_str());
+}
+
+
 using std::placeholders::_1;
 double getYawFromQuaternion(const geometry_msgs::msg::Quaternion& q);
 float normalize_angle(float angle);
@@ -55,10 +74,16 @@ public:
         // get all available topics and extract highest <number> from topics with "robot_<number>/odom" 
         robot_id_ = this->declare_parameter<int>("robot_id", 0);
 
-	    std::string filepath = "/ros2_ws/src/vissus_projekt/launch/topology";
+	    std::string filepath = "/root/ros2_ws/src/vissus_projekt/launch/topology";
 	    int num_boids_ = 4;
-        adjacency_mat_ = Boid_Controller_Node::Get_Adjancency_Matrix(filepath, 4);
-
+        //adjacency_mat_ = Boid_Controller_Node::Get_Adjancency_Matrix(filepath, 4);
+        //printBoolMatrix(adjacency_mat_);
+        adjacency_mat_ = {
+            {false, true,  true,  true},  // Node 1 connected to 2, 3, 4
+            {true,  false, true,  true},  // Node 2 connected to 1, 3, 4
+            {true,  true,  false, true},  // Node 3 connected to 1, 2, 4
+            {true,  true,  true,  false}  // Node 4 connected to 1, 2, 3
+        };
         // initialize all publishers, subscriptions and boids
         std::string robot_twist_topic = "/cf_" + std::to_string(int(robot_id_)) + "/cmd_vel";
         std::string robot_boid_info_topic = "/robot_" + std::to_string(int(robot_id_)) + "/boid_info";
@@ -102,7 +127,7 @@ public:
         boid.initialized = false;
     }
 private:
-    // Project 1:
+    // Project 1
     void Subscription_Boid_Info_Callback(const Msg_Boid_Info::SharedPtr info);   // ALL BOID LOGIC HAPPENS HERE
     void Subscription_Tuning_Params_Callback(const Msg_Tuning_Params::SharedPtr params);
     void Subscription_Goal_Odom_Callback(const Msg_Point::SharedPtr points);
@@ -591,7 +616,7 @@ Vector2 Boid_Controller_Node::Calculate_Vel_Centroid_Consensus(const std::vector
      }
 	
     //  return directed_total * (float)((double)(clock() - boid.last_time) / CLOCKS_PER_SEC);
-    return directed_total;
+    return directed_total * (float)((double)(clock() - boid.last_time) / CLOCKS_PER_SEC);
 }
 
 /// @brief Computes velocities for current agent to move towards the centroid of the agents it has the information of
@@ -630,7 +655,7 @@ Bool_mat Boid_Controller_Node::Get_Adjancency_Matrix(std::string filepath, int n
 
         mat.resize(num_boids);
         for (auto& cell : mat)
-            cell.resize(num_boids, false);
+            cell.resize(num_boids, 0);
 
     
 
@@ -661,9 +686,11 @@ Bool_mat Boid_Controller_Node::Get_Adjancency_Matrix(std::string filepath, int n
                         {
                             char c = line[i++];
                             if (c == ':')
-                                left = std::stoi(temp);
+                                //RCLCPP_INFO_ONCE(this->get_logger(), "My log message %d", 687);
+                                left = std::stoi(temp); // adjusting for 0 index
                             else
                                 temp += c;
+                            //RCLCPP_INFO_ONCE(this->get_logger(), "My log message %d", 687);
                         }
                     }
 
@@ -680,6 +707,8 @@ Bool_mat Boid_Controller_Node::Get_Adjancency_Matrix(std::string filepath, int n
                             }
                             else
                                 temp += c;
+                            RCLCPP_INFO_ONCE(this->get_logger(), "My log message %d", 704);
+    
                         }
 
                         if (temp != "")
