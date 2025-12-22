@@ -277,7 +277,7 @@ void Boid_Controller_Node::Subscription_Boid_Info_Callback(const Msg_Boid_Info::
             twist_msg.linear.y = self_odom.twist.twist.linear.y + accel_total.y * delta_time;
             twist_msg.angular.z = 0.0f;
             float norm = sqrt(twist_msg.linear.x*twist_msg.linear.x + twist_msg.linear.y*twist_msg.linear.y);
-            if (norm > max_speed_)
+            if (norm > max_speed_ && norm > 1e-5) // norm is 0 check
             {
                 twist_msg.linear.x /= norm;
                 twist_msg.linear.y /= norm;
