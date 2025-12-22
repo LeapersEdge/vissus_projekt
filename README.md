@@ -98,7 +98,9 @@ It is advised to modify the parameters via rqt; change the parameters in `/tunin
 
 ### How to use
 - When running the simulation, disable all boid rules except Separation, and perhaps the Goal rule as well.
-- Setup the drone's directed communication graph in `launch/topology`. An explanation on how to customize the topology is present at the bottom of the file.
+- Setup the drone's directed communication graph in `launch/topology`. An explanation on how to customize the topology is present at the bottom of the file. !!! Not working for now; hard-code a bool matrix in `Boid Controller Node` to achieve the desired topology, instead. Moreover, the function for generating the graph matrix shouldn't generate an undirected matrix. @Dino should fix this, if possible. !!!
+- Consensus & formation work. Currently, the desired formation coordinates must be set using `Vector2` values as `(x, y)` offest coordinates within `Boid Controller Node`.
+- Separation isn't working; a divide by zero error is the most likely cause. Temporary fixes are: [1. Ignore acceleration calculations for boid rules], or [2. Hotfix: if acceleration ~ 0, velocity = 0]. (Option 2 added now, remains to be tested. Option 1. works like a charm but disables Reynolds' rules, but that may not even be a bad thing, anyway).
 
 #### To-Do:
-- Topics are working but rendezvous isn't
+- Rendezvous consensus & formation are working but separation isn't; maybe implement separation within consensus instead of using Reynolds' separation? @Dino said he'd fix separation in the meantime, though (if he can find the time).
