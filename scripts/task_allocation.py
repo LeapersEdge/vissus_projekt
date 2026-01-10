@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-
 import rclpy
 import networkx as nx       #onaj library za rad s grafovima
 import numpy as np
@@ -48,7 +47,7 @@ class TaskAllocator(Node):
 
 def main(args=None):
     rclpy.init(args=args)
-    node = MatrixPublisher()
+    node = TaskAllocator()
     rclpy.spin(node)
     node.destroy_node()
     rclpy.shutdown()

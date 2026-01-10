@@ -39,6 +39,8 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/OdometryArray.msg"
   "msg/TuningParams.msg"
   "msg/Formation.msg"
+  "msg/Task.msg"
+  "msg/TaskList.msg"
   DEPENDENCIES std_msgs nav_msgs geometry_msgs
 )
 
