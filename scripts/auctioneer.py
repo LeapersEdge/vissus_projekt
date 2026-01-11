@@ -29,6 +29,7 @@ class Auctioneer(Node):
         self.task_graph = self.build_tasks_graph(tasks)
         self.free_tasks = list()
         self.free_tasks_bids = dict()
+        self.num_robots = self.get_num_robots()
         self.expected_bids = self.get_num_robots()
         self.allocated_tasks = list()
         self.auction_round = 0
@@ -44,7 +45,7 @@ class Auctioneer(Node):
 
     def wait_for_bidders(self):
         count = self.task_publisher.get_subscription_count()
-        self.get_logger().info(f"Waiting for bidders... ({count}/{self.num_robots} connected)")
+        self.get_logger().info(f"Waiting for bidders... ({count}/{self.get_num_robots()} connected)")
 
         if count >= self.num_robots:
             self.get_logger().info("All bidders ready. Starting first auction round.")

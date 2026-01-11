@@ -16,8 +16,17 @@ class Bidder(Node):
     def __init__(self):
         super().__init__('Bidder')
 
-        self.robot_id = 1  # TODO: forward from laucnh
-        self.start_possition = [0.0, 0.0]  # TODO: get starting pos
+        self.declare_parameter('robot_id', 0)
+        self.declare_parameter('start_x', 0.0)
+        self.declare_parameter('start_y', 0.0)
+
+        # Get the values
+        self.robot_id = self.get_parameter('robot_id').value
+        self.start_position = [
+            self.get_parameter('start_x').value,
+            self.get_parameter('start_y').value
+        ]
+
         self.speed = 1 # cost of task will be calculated using speed and distance to point and durtion of task
         self.my_schedule = []
         self.last_processed_round = -1
