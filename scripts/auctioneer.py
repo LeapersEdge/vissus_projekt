@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""The auctioneer should load all the tasks T and their descriptions at initialization. Then, it should organize them
+
+"""TASK DESCRIPTION: The auctioneer should load all the tasks T and their descriptions at initialization. Then, it should organize them
 in sets of tasks without predecessors TF = free(T), second layer of tasks whose predecessors are in TF ,
 TL = free(T \ TF ), and the set of remaining, hidden tasks TH = T \ {TF ∪ TL}, according to tasks’ precedence
 constraints.
