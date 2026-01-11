@@ -39,7 +39,16 @@ class Auctioneer(Node):
 
         self.bid_listener = self.create_subscription(Bid, 'bids', self.bid_evaluator_callback, 10)
 
-        self.publish_free_tasks()
+        self.startup_timer = self.create_timer(1.0, self.wait_for_bidders)
+
+    def wait_for_bidders(self):
+        count = self.task_publisher.get_subscription_count()
+        self.get_logger().info(f"Waiting for bidders... ({count}/{self.num_robots} connected)")
+
+        if count >= self.num_robots:
+            self.get_logger().info("All bidders ready. Starting first auction round.")
+            self.startup_timer.cancel()  # Stop checking
+            self.start_next_auction()  # Trigger the first round
 
     def get_num_robots(self):
         return 4  # TODO: forward from launch
@@ -112,8 +121,8 @@ class Auctioneer(Node):
         best_bid.task_start = self.free_tasks_bids[best_task_id][3]
 
         # smanjujem broj robota koji su potrebni
-        # ako je multirobot task onda ce se
         node_data = self.task_graph.nodes[best_task_id]
+
         node_data['robots_needed'] -= 1
 
         # ako je startno vrijeme zadatka nakon onog od bida bit ce odgodeno
@@ -123,7 +132,7 @@ class Auctioneer(Node):
             self.pending_assignments[best_task_id] = []
 
         self.pending_assignments[best_task_id].append(best_bid)
-        if node_data['robots_needed'] == 0:
+        if node_data['robots_needed'] == 0:  # dovoljno robota je dobilo zadatak
             final_start_time = node_data['earliest_start']
             for i in self.pending_assignments[best_task_id]:
                 final_bid = Bid()
@@ -135,23 +144,27 @@ class Auctioneer(Node):
 
                 self.winner_publisher.publish(final_bid)
 
+            # ispunjena je kvota robota pa mičem zadatak iz liste
             self.allocated_tasks.append((best_task_id, self.task_graph.nodes[best_task_id]))
             for succ in self.task_graph.successors(best_task_id):
                 current_earliest_start = self.task_graph.nodes[succ].get('earliest_start')
-                self.task_graph.nodes[succ]['earliest_start'] = max(current_earliest_start, final_start_time + node_data['duration'])
+                self.task_graph.nodes[succ]['earliest_start'] = max(current_earliest_start,
+                                                                    final_start_time + node_data['duration'])
             del self.pending_assignments[best_task_id]
             self.task_graph.remove_node(best_task_id)
+        else:  # ako je potrebno čekati da se pronade jos robota šaljem privremeni bid koji ce se poslje updateat
+            self.winner_publisher.publish(best_bid)
 
     def bid_evaluator_callback(self, msg):
         """evaluates incoming bids by saving the best ones in free_tasks_bids"""
         bidder_id = msg.bidder_id
         task_id = msg.task_id
         bid = msg.bid
-        msg_round = msg.auction_round
+        auction_round = msg.auction_round
         task_start = msg.task_start
 
-        if msg_round == self.auction_round:
-            # only accepts current round bids
+        if auction_round == self.auction_round:
+            # only accepts current auction round bids
             self.expected_bids -= 1
 
             if self.free_tasks_bids[task_id] is None or self.free_tasks_bids[task_id][0] > bid:
@@ -162,9 +175,9 @@ class Auctioneer(Node):
                 self.start_next_auction()
 
     def start_next_auction(self):
-        # odmah se računaju svi slobodni taskovi
+        # free tasks are all tasks with no predecessor
         self.free_tasks = [(node, data) for node, data in self.task_graph.nodes(data=True) if
-                               self.task_graph.in_degree(node) == 0]
+                           self.task_graph.in_degree(node) == 0]
         self.expected_bids = self.get_num_robots()
         self.auction_round += 1
         self.free_tasks_bids.clear()
