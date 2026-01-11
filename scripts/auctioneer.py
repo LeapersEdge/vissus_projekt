@@ -31,6 +31,7 @@ class Auctioneer(Node):
         self.expected_bids = self.get_num_robots()
         self.allocated_tasks = list()
         self.auction_round = 0
+        self.pending_assignments = dict()
 
         self.task_publisher = self.create_publisher(TaskList, 'auction_task_list', 10)
 
@@ -47,7 +48,7 @@ class Auctioneer(Node):
         task_graph = nx.DiGraph()
         for t in tasks_data:
             # add task nodes with attributes as node data
-            task_graph.add_node(t['id'], pos=t['pos'], duration=t['duration'], robots=t['robots_needed'],
+            task_graph.add_node(t['id'], pos=t['pos'], duration=t['duration'], robots_needed=t['robots_needed'],
                                 earliest_start=0)
 
             # Add edges from predecessors
@@ -89,7 +90,7 @@ class Auctioneer(Node):
             t.id = t_id
             t.pos = [float(t_data['pos'][0]), float(t_data['pos'][1])]
             t.duration = t_data['duration']
-            t.robots_needed = t_data['robots']
+            t.robots_needed = t_data['robots_needed']
             t.earliest_start = t_data['earliest_start']
 
             # Append the individual task to the list
@@ -108,29 +109,53 @@ class Auctioneer(Node):
         best_bid.bid = self.free_tasks_bids[best_task_id][0]
         best_bid.bidder_id = self.free_tasks_bids[best_task_id][1]
         best_bid.auction_round = self.free_tasks_bids[best_task_id][2]
-        best_bid.task_end = self.free_tasks_bids[best_task_id][3]
+        best_bid.task_start = self.free_tasks_bids[best_task_id][3]
 
-        self.winner_publisher.publish(best_bid)
-        self.allocated_tasks.append((best_task_id, self.task_graph.nodes[best_task_id]))
-        for succ in self.task_graph.successors(best_task_id):
-            current_earliest_start = self.task_graph.nodes[succ].get('earliest_start')
-            self.task_graph.nodes[succ]['earliest_start'] = max(current_earliest_start, best_bid.task_end)
-        self.task_graph.remove_node(best_task_id)
+        # smanjujem broj robota koji su potrebni
+        # ako je multirobot task onda ce se
+        node_data = self.task_graph.nodes[best_task_id]
+        node_data['robots_needed'] -= 1
+
+        # ako je startno vrijeme zadatka nakon onog od bida bit ce odgodeno
+        node_data['earliest_start'] = max(node_data['earliest_start'], best_bid.task_start)
+
+        if best_task_id not in self.pending_assignments:
+            self.pending_assignments[best_task_id] = []
+
+        self.pending_assignments[best_task_id].append(best_bid)
+        if node_data['robots_needed'] == 0:
+            final_start_time = node_data['earliest_start']
+            for i in self.pending_assignments[best_task_id]:
+                final_bid = Bid()
+                final_bid.auction_round = i.auction_round
+                final_bid.bidder_id = i.bidder_id
+                final_bid.task_id = i.task_id
+                final_bid.bid = i.bid
+                final_bid.task_start = final_start_time
+
+                self.winner_publisher.publish(final_bid)
+
+            self.allocated_tasks.append((best_task_id, self.task_graph.nodes[best_task_id]))
+            for succ in self.task_graph.successors(best_task_id):
+                current_earliest_start = self.task_graph.nodes[succ].get('earliest_start')
+                self.task_graph.nodes[succ]['earliest_start'] = max(current_earliest_start, final_start_time + node_data['duration'])
+            del self.pending_assignments[best_task_id]
+            self.task_graph.remove_node(best_task_id)
 
     def bid_evaluator_callback(self, msg):
         """evaluates incoming bids by saving the best ones in free_tasks_bids"""
         bidder_id = msg.bidder_id
         task_id = msg.task_id
-        bid_val = msg.bid
+        bid = msg.bid
         msg_round = msg.auction_round
-        task_end = msg.task_end
+        task_start = msg.task_start
 
         if msg_round == self.auction_round:
             # only accepts current round bids
             self.expected_bids -= 1
 
             if self.free_tasks_bids[task_id] is None or self.free_tasks_bids[task_id][0] > bid:
-                self.free_tasks_bids[task_id] = (bid, bidder_id, auction_round, task_end)
+                self.free_tasks_bids[task_id] = (bid, bidder_id, auction_round, task_start)
 
             if self.expected_bids == 0:
                 self.assign_best_bid()

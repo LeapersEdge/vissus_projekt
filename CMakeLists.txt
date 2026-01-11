@@ -41,6 +41,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/Formation.msg"
   "msg/Task.msg"
   "msg/TaskList.msg"
+  "msg/Bid.msg"
   DEPENDENCIES std_msgs nav_msgs geometry_msgs
 )
 
