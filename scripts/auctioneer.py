@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """The auctioneer should load all the tasks T and their descriptions at initialization. Then, it should organize them
 in sets of tasks without predecessors TF = free(T), second layer of tasks whose predecessors are in TF ,
 TL = free(T \ TF ), and the set of remaining, hidden tasks TH = T \ {TF ∪ TL}, according to tasks’ precedence
@@ -17,7 +18,7 @@ from std_msgs.msg import Float64MultiArray
 import os
 import json
 import matplotlib.pyplot as plt
-
+from vissus_projekt.msg import TaskList, Task
 
 class Auctioneer(Node):
     def __init__(self):
@@ -27,7 +28,7 @@ class Auctioneer(Node):
         self.visualize_task_graph(self.task_graph)
 
         self.task_publisher = self.create_publisher(
-            "TaskList",
+            TaskList,
             'task_list',
             10
         )
@@ -74,18 +75,21 @@ class Auctioneer(Node):
         plt.show()
 
     def publish_free_tasks(self):
+        self.free_tasks = [(node, data) for node, data in self.task_graph.nodes(data=True) if self.task_graph.in_degree(node) == 0]
+    
         """publishes all tasks which have no predecessor (ready to allocate)"""
-        self.free_tasks = [node for node, degree in self.task_graph.in_degree() if degree == 0]
+        
+        
+        print(type(self.free_tasks[0]))
         msg = TaskList()
 
-        for t_data in self.free_tasks:
+        for t_id, t_data in self.free_tasks:
             t = Task()
-            t.id = t_data['id']
+            t.id = t_id
             t.pos = [float(t_data['pos'][0]), float(t_data['pos'][1])]
             t.duration = t_data['duration']
-            t.robots_needed = t_data['robots_needed']
-            t.predecessors = t_data['predecessors']
-
+            t.robots_needed = t_data['robots']
+            
             # Append the individual task to the list
             msg.tasks.append(t)
 
@@ -94,12 +98,11 @@ class Auctioneer(Node):
 
 
 def main(args=None):
-    auctioneer = Auctioneer()
-    # ros.init(args=args)
-    # node = Auctioneer()
-    # ros.spin(node)
-    # node.destroy_node()
-    # ros.shutdown()
+    ros.init(args=args)
+    node = Auctioneer()
+    ros.spin(node)
+    node.destroy_node()
+    ros.shutdown()
 
 if __name__ == '__main__':
     main()

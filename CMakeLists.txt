@@ -137,7 +137,7 @@ install(TARGETS
 
 # install py scripts
 install(PROGRAMS
-  "${MY_SCRIPTS}" 
+  ${MY_SCRIPTS} 
   DESTINATION lib/${PROJECT_NAME}
 )
 

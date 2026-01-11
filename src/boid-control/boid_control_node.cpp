@@ -75,7 +75,7 @@ public:
         robot_id_ = this->declare_parameter<int>("robot_id", 0);
 
 	    std::string filepath = "/root/ros2_ws/src/vissus_projekt/launch/topology";
-	    int num_boids_ = 4;
+	    int num_boids = 4;
         //adjacency_mat_ = Boid_Controller_Node::Get_Adjancency_Matrix(filepath, 4);
         //printBoolMatrix(adjacency_mat_);
         adjacency_mat_ = {
@@ -183,8 +183,7 @@ private:
 
 int main(int argc, char *argv[])
 {
-    rclcpp::init(argc, argv);
-    rclcpp::spin(std::make_shared<Boid_Controller_Node>());
+    rclcpp::init(argc, argv);    rclcpp::spin(std::make_shared<Boid_Controller_Node>());
     rclcpp::shutdown();
     return 0;
 }
@@ -665,16 +664,16 @@ Bool_mat Boid_Controller_Node::Get_Adjancency_Matrix(std::string filepath, int n
         return mat;
     }
 
-    mat.reserve(num_boids_);
-    mat.resize(num_boids_);
+    mat.reserve(num_boids);
+    mat.resize(num_boids);
     for (auto& cell : mat)
     {
-        cell.reserve(num_boids_);
-        cell.resize(num_boids_);
+        cell.reserve(num_boids);
+        cell.resize(num_boids);
     }
 
-    for (size_t y = 0; y < num_boids_; y++)
-        for (size_t x = 0; x < num_boids_; x++)
+    for (size_t y = 0; y < num_boids; y++)
+        for (size_t x = 0; x < num_boids; x++)
             mat[y][x] = 0;
 
     if (in.is_open())

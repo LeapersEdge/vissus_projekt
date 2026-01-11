@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import rclpy as ros
 import networkx as nx       #onaj library za rad s grafovima
 import numpy as np

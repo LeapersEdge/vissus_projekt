@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """Each bidder should know its initial position and set of capabilities (we assume that all robots are the same, have
 the same speed, and can perform all tasks).
 
