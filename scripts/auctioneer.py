@@ -60,7 +60,7 @@ class Auctioneer(Node):
         for t in tasks_data:
             # add task nodes with attributes as node data
             task_graph.add_node(t['id'], pos=t['pos'], duration=t['duration'], robots_needed=t['robots_needed'],
-                                earliest_start=0)
+                                earliest_start=0.0)
 
             # Add edges from predecessors
             for p_id in t['predecessors']:
@@ -183,7 +183,7 @@ class Auctioneer(Node):
         self.expected_bids = self.get_num_robots()
         self.auction_round += 1
         self.free_tasks_bids.clear()
-
+        self.publish_free_tasks()
 
 def main(args=None):
     ros.init(args=args)

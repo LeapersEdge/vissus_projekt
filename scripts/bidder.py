@@ -61,7 +61,7 @@ class Bidder(Node):
         best_bid.bidder_id = self.robot_id
         best_bid.auction_round = msg.auction_round
 
-        self.bid_publisher.publish(best_bid)
+        # self.bid_publisher.publish(best_bid)
 
     def winner_callback(self, msg):
         """Triggered when the Auctioneer announces a winner."""
