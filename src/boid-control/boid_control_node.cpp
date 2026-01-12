@@ -90,6 +90,10 @@ public:
         std::string robot_tuning_params_topic = "/tuning_params";
         std::string goal_odom_topic = "/goal_point";
     	std::string formation_topic = "/formation";
+
+        
+        //offsets_ = {Vector2(-1.0, 1.0), Vector2(0.3, -0.3), Vector2(0.6, -0.6), Vector2(1.9, -1.9)};
+        offsets_ = {Vector2(-0.0, 0.0), Vector2(0., -0.), Vector2(0., -0.), Vector2(0.0, -0.0)}; 
 	
         // init subs
         sub_boid_info = this->create_subscription<Msg_Boid_Info>(
@@ -229,7 +233,7 @@ void Boid_Controller_Node::Subscription_Boid_Info_Callback(const Msg_Boid_Info::
     Vector2 accel_goal  = Calculate_Accel_Goal(self_odom, goal_point);
     Vector2 accel_total = {};
 
-    Vector2 vel_consensus  = Calculate_Vel_Centroid_Consensus(info->odometries);
+    Vector2 vel_consensus  = Calculate_Vel_Centroid_Consensus(info->odometries, offsets_);
 
     // combine forces forces
     {
@@ -616,7 +620,7 @@ Vector2 Boid_Controller_Node::Calculate_Vel_Centroid_Consensus(const std::vector
      }
 	
     //  return directed_total * (float)((double)(clock() - boid.last_time) / CLOCKS_PER_SEC);
-    return directed_total * 0.001f;
+    return directed_total * 0.01f;
 }
 
 /// @brief Computes velocities for current agent to move towards the centroid of the agents it has the information of
@@ -631,13 +635,13 @@ Vector2 Boid_Controller_Node::Calculate_Vel_Centroid_Consensus(const std::vector
     };
 
     for (int i = 0; i < odoms.size(); i++) {
-        directed_total.x += (float)odoms[i].pose.pose.position.x - (float)odoms[robot_id_-1].pose.pose.position.x;
-        directed_total.y += (float)odoms[i].pose.pose.position.y - (float)odoms[robot_id_-1].pose.pose.position.y;
+      directed_total.x += (float)odoms[i].pose.pose.position.x - (float)odoms[robot_id_-1].pose.pose.position.x;
+      directed_total.y += (float)odoms[i].pose.pose.position.y - (float)odoms[robot_id_-1].pose.pose.position.y;
 
-        directed_total -= offsets[i] - offsets[robot_id_-1];
+      directed_total -= offsets[i] - offsets[robot_id_-1];
     }
 
-    return directed_total * (float)((double)(clock() - boid.last_time) / CLOCKS_PER_SEC);
+    return directed_total * 0.05f;
 }
 
 Bool_mat Boid_Controller_Node::Get_Adjancency_Matrix(std::string filepath, int num_boids)
