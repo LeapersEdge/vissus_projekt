@@ -281,7 +281,7 @@ void Boid_Controller_Node::Subscription_Boid_Info_Callback(const Msg_Boid_Info::
             twist_msg.linear.y = self_odom.twist.twist.linear.y + accel_total.y * delta_time;
             twist_msg.angular.z = 0.0f;
             float norm = sqrt(twist_msg.linear.x*twist_msg.linear.x + twist_msg.linear.y*twist_msg.linear.y);
-            if (norm > max_speed_)
+            if (norm > max_speed_ && norm > 1e-5) // norm is 0 check
             {
                 twist_msg.linear.x /= norm;
                 twist_msg.linear.y /= norm;
@@ -424,8 +424,14 @@ Vector2 Boid_Controller_Node::Calculate_Accel_Avoidence(std::vector<Msg_Odom> od
         // is the boid[i] close enough to boid[id] take effect on it?
         if (squared_euclidan_norm(distance) <= (this->avoidance_range_ * this->avoidance_range_))
         {
-            force_avoidence.x += distance.x / (squared_euclidan_norm(distance));
-            force_avoidence.y += distance.y / (squared_euclidan_norm(distance));
+            float zero_one_distance_x;  // zero when distance is 0, 1 when distance is visual range
+            float zero_one_distance_y;  // zero when distance is 0, 1 when distance is visual range
+
+            zero_one_distance_x = distance.x / this->avoidance_range_;
+            zero_one_distance_y = distance.y / this->avoidance_range_;
+
+            force_avoidence.x += 1.0f / (zero_one_distance_x * zero_one_distance_x);
+            force_avoidence.y += 1.0f / (zero_one_distance_y * zero_one_distance_y);
         }
     }
 
@@ -510,8 +516,14 @@ Vector2 Boid_Controller_Node::Calculate_Accel_Obstacle_Avoid(const Msg_Odom& sel
     // is within range?
     if (squared_euclidan_norm(distance) <= (this->obstacle_avoid_range_ * this->obstacle_avoid_range_))
     {
-        force_obstacle.x += distance.x / (squared_euclidan_norm(distance));
-        force_obstacle.y += distance.y / (squared_euclidan_norm(distance));
+        float zero_one_distance_x;  // zero when distance is 0, 1 when distance is visual range
+        float zero_one_distance_y;  // zero when distance is 0, 1 when distance is visual range
+
+        zero_one_distance_x = distance.x / this->obstacle_avoid_range_;
+        zero_one_distance_y = distance.y / this->obstacle_avoid_range_;
+
+        force_obstacle.x += 1.0f / (zero_one_distance_x * zero_one_distance_x);
+        force_obstacle.y += 1.0f / (zero_one_distance_y * zero_one_distance_y);
     }
 
     force_obstacle.x *= obstacle_avoid_factor_;
@@ -645,93 +657,101 @@ Vector2 Boid_Controller_Node::Calculate_Vel_Centroid_Consensus(const std::vector
 }
 
 Bool_mat Boid_Controller_Node::Get_Adjancency_Matrix(std::string filepath, int num_boids)
+{
+    typedef std::vector<std::vector<bool>> bool_matrix;
+    bool_matrix mat;
+
+    std::ifstream in(filepath);
+
+    if (in.bad())
     {
-        typedef std::vector<std::vector<bool>> bool_matrix;
-        bool_matrix mat;
-        
-        std::ifstream in(filepath);
-
-        if (in.bad())
-        {
-            RCUTILS_LOG_FATAL("INPUT CONFIG FILE %s IS BAD", filepath.c_str());
-            return mat;
-        }
-
-        mat.resize(num_boids);
-        for (auto& cell : mat)
-            cell.resize(num_boids, 0);
-
-    
-
-        if (in.is_open())
-        {
-            std::string line = "";
-            while (!in.eof()) 
-            {
-                std::getline(in, line);
-                if (line.size() && !(line[0] >= '0' && line[0] <= '9'/* || line[0] == 'T' */)) // T: <num> compatibility for total number of bots to include in consensus (consensus protocol needs to be calculated in boid_control_node, so the building of the adjacency matrix needs to use boid_num but since that's not present in boid_control we have to get it manually)
-                    continue;
-                
-                std::string temp;
-
-                int left = -1;
-                std::vector<int> right; 
-                // parsing stages
-                // line "left:right"
-                // stage 1, find "left:"
-                // stage 2, find ":right"
-                {
-                    size_t i = 0;
-
-                    // stage 1
-                    {
-                        temp = "";
-                        while (left == -1 && i < line.size())
-                        {
-                            char c = line[i++];
-                            if (c == ':')
-                                //RCLCPP_INFO_ONCE(this->get_logger(), "My log message %d", 687);
-                                left = std::stoi(temp); // adjusting for 0 index
-                            else
-                                temp += c;
-                            //RCLCPP_INFO_ONCE(this->get_logger(), "My log message %d", 687);
-                        }
-                    }
-
-                    // stage 2
-                    {
-                        temp = "";
-                        while (i < line.size()) 
-                        {
-                            char c = line[i++];
-                            if (c == ' ')
-                            {
-                                right.push_back(std::stoi(temp));
-                                temp = "";
-                            }
-                            else
-                                temp += c;
-                            RCLCPP_INFO_ONCE(this->get_logger(), "My log message %d", 704);
-    
-                        }
-
-                        if (temp != "")
-                        {
-                            right.push_back(std::stoi(temp));
-                            temp = "";
-                        }
-                    }
-                } 
-            
-                for (const int r : right)
-                {
-                    mat[left][r] = '1';
-                    mat[r][left] = '1';
-                }
-            }
-        }
-
-        in.close();
-
+        RCUTILS_LOG_FATAL("INPUT CONFIG FILE %s IS BAD", filepath.c_str());
         return mat;
     }
+
+    mat.reserve(num_boids_);
+    mat.resize(num_boids_);
+    for (auto& cell : mat)
+    {
+        cell.reserve(num_boids_);
+        cell.resize(num_boids_);
+    }
+
+    for (size_t y = 0; y < num_boids_; y++)
+        for (size_t x = 0; x < num_boids_; x++)
+            mat[y][x] = 0;
+
+    if (in.is_open())
+    {
+        std::string line = "";
+        while (!in.eof()) 
+        {
+            std::getline(in, line);
+            if (line.size() && !(line[0] >= '0' && line[0] <= '9'))
+                continue;
+
+            std::string temp;
+
+            int left = -1;
+            std::vector<int> right; 
+            // parsing stages
+            // line "left:right"
+            // stage 1, find "left:"
+            // stage 2, find ":right"
+            {
+                size_t i = 0;
+
+                // stage 1
+                {
+                    temp = "";
+                    bool leftIsAssigned = left != -1;
+                    while (!leftIsAssigned && i < line.size())
+                    {
+                        char c = line[i];
+                        if (c == ':')
+                            left = std::stoi(temp) - 1;
+                        else if (c != ' ')
+                            temp += c;
+                        
+                        leftIsAssigned = left != -1;
+                        i++;
+                    }
+                }
+
+                // stage 2
+                {
+                    temp = "";
+                    while (i < line.size()) 
+                    {
+                        char c = line[i];
+                        if (c == ' ' && temp != "")
+                        {
+                            right.push_back(std::stoi(temp) - 1);
+                            temp = "";
+                        }
+                        else if (c != ' ')
+                            temp += c;
+
+                        i++;
+                    }
+
+                    if (temp != "")
+                    {
+                        right.push_back(std::stoi(temp) - 1);
+                        temp = "";
+                    }
+                }
+            } 
+
+            for (const int r : right)
+            {
+                mat[left][r] = '1';
+                mat[r][left] = '1';
+            }
+        }
+    }
+
+    in.close();
+
+    return mat;
+}
