@@ -102,5 +102,35 @@ It is advised to modify the parameters via rqt; change the parameters in `/tunin
 - Consensus & formation work. Currently, the desired formation coordinates must be set using `Vector2` values as `(x, y)` offest coordinates within `Boid Controller Node`.
 - Separation isn't working; a divide by zero error is the most likely cause. Temporary fixes are: [1. Ignore acceleration calculations for boid rules], or [2. Hotfix: if acceleration ~ 0, velocity = 0]. (Option 2 added now, remains to be tested. Option 1. works like a charm but disables Reynolds' rules, but that may not even be a bad thing, anyway).
 
+#### Simulation
+0. Build everything with `colcon build --symlink-install` and source.
+1. Run simulation
+```bash
+cd ~/ros2_ws/src/mrs_crazyfiles/startup
+./start.sh
+```
+2. Modify launch_params.yaml by need especcialy `num_of_robots` part.
+3. Launch with
+```bash
+ros2 launch simulation.launch.py
+```
+
+### Experimental setup (real drones)
+0.1. Build everything with `colcon build --symlink-install` and source.
+0.2. Use ```cfclient``` to check if you can connect with drone
+1. Modify by need ```mrs_crazyfile_exp/config/crazyflies_mrs.yaml```  
+2. Run nodes that interact with antenna and real drones
+```bash
+cd ~/ros2_ws/src/mrs_crazyfiles_exp/startup
+./start.sh
+```
+3. Modify launch_params.yaml by need especcialy `num_of_robots` part.
+4. Launch with
+```bash
+ros2 launch simulation.launch.py
+```
+
+
 #### To-Do:
 - Rendezvous consensus & formation are working but separation isn't; maybe implement separation within consensus instead of using Reynolds' separation? @Dino said he'd fix separation in the meantime, though (if he can find the time).
+

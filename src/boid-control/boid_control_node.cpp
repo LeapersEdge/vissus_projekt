@@ -36,11 +36,28 @@
 // --------------------------------------------------------------
 // ROS2 NODE 
 
+void printBoolMatrix(const std::vector<std::vector<bool>> &matrix)
+{
+    std::ostringstream oss;
+    oss << "[\n";
+    for (const auto &row : matrix)
+    {
+        oss << "  [ ";
+        for (bool val : row)
+        {
+            oss << (val ? "true" : "false") << " ";
+        }
+        oss << "]\n";
+    }
+    oss << "]";
+    
+    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "\n%s", oss.str().c_str());
+}
+
 
 using std::placeholders::_1;
 double getYawFromQuaternion(const geometry_msgs::msg::Quaternion& q);
 float normalize_angle(float angle);
-Bool_mat loadAdjacency(const rclcpp::Parameter& param, size_t n);
 
 struct Boid
 {
@@ -55,40 +72,24 @@ public:
     Boid_Controller_Node() : Node("boid_controller_node")
     {
         // get all available topics and extract highest <number> from topics with "robot_<number>/odom" 
-        this->declare_parameter<int>("robot_id", 0);
-	this->declare_parameter<int>("num_boids", 4);
-	this->declare_parameter<Bool_array>("adjacency",
-						   {false, true, true, true,
-						    true, false, true, true,
-						    true, true, false, true,
-						    true, true, true, false}
-						   );
+        robot_id_ = this->declare_parameter<int>("robot_id", 0);
 
-	robot_id_ = this->get_parameter("robot_id").as_int();
-	int num_boids = this->get_parameter("num_boids").as_int();
-	Parameter adj_param = this->get_parameter("adjacency");
-	adjacency_mat_ = loadAdjacency(adj_param, num_boids);
-	      
-	//std::string filepath = "/root/ros2_ws/src/vissus_projekt/launch/topology";       
-	
+	    std::string filepath = "/root/ros2_ws/src/vissus_projekt/launch/topology";
+	    int num_boids_ = 4;
         //adjacency_mat_ = Boid_Controller_Node::Get_Adjancency_Matrix(filepath, 4);
         //printBoolMatrix(adjacency_mat_);
-        // adjacency_mat_ = {
-        //     {false, true,  true,  true},  // Node 1 connected to 2, 3, 4
-        //     {true,  false, true,  true},  // Node 2 connected to 1, 3, 4
-        //     {true,  true,  false, true},  // Node 3 connected to 1, 2, 4
-        //     {true,  true,  true,  false}  // Node 4 connected to 1, 2, 3
-        // };
+        adjacency_mat_ = {
+            {false, true,  true,  true},  // Node 1 connected to 2, 3, 4
+            {true,  false, true,  true},  // Node 2 connected to 1, 3, 4
+            {true,  true,  false, true},  // Node 3 connected to 1, 2, 4
+            {true,  true,  true,  false}  // Node 4 connected to 1, 2, 3
+        };
         // initialize all publishers, subscriptions and boids
         std::string robot_twist_topic = "/cf_" + std::to_string(int(robot_id_)) + "/cmd_vel";
         std::string robot_boid_info_topic = "/robot_" + std::to_string(int(robot_id_)) + "/boid_info";
         std::string robot_tuning_params_topic = "/tuning_params";
         std::string goal_odom_topic = "/goal_point";
     	std::string formation_topic = "/formation";
-
-        
-        //offsets_ = {Vector2(-1.0, 1.0), Vector2(0.3, -0.3), Vector2(0.6, -0.6), Vector2(1.9, -1.9)};
-        offsets_ = {Vector2(-0.0, 0.0), Vector2(0., -0.), Vector2(0., -0.), Vector2(0.0, -0.0)}; 
 	
         // init subs
         sub_boid_info = this->create_subscription<Msg_Boid_Info>(
@@ -227,7 +228,8 @@ void Boid_Controller_Node::Subscription_Boid_Info_Callback(const Msg_Boid_Info::
     Vector2 accel_obsta = Calculate_Accel_Obstacle_Avoid(self_odom, obstacle_point);
     Vector2 accel_goal  = Calculate_Accel_Goal(self_odom, goal_point);
     Vector2 accel_total = {};
-
+    
+    std::vector<Vector2> offsets_= {Vector2{0, 0}, Vector2{0.5, 0.5}, Vector2{1.0, 1.0}, Vector2{1.5, 1.5}};
     Vector2 vel_consensus  = Calculate_Vel_Centroid_Consensus(info->odometries, offsets_);
 
     // combine forces forces
@@ -271,28 +273,30 @@ void Boid_Controller_Node::Subscription_Boid_Info_Callback(const Msg_Boid_Info::
         // construct message
         Msg_Twist twist_msg;
       
-        {
-            twist_msg.linear.x = self_odom.twist.twist.linear.x + accel_total.x * delta_time;
-            twist_msg.linear.y = self_odom.twist.twist.linear.y + accel_total.y * delta_time;
-            twist_msg.angular.z = 0.0f;
-            float norm = sqrt(twist_msg.linear.x*twist_msg.linear.x + twist_msg.linear.y*twist_msg.linear.y);
-            if (norm > max_speed_ && norm > 1e-5) // norm is 0 check
-            {
-                twist_msg.linear.x /= norm;
-                twist_msg.linear.y /= norm;
-                twist_msg.linear.x *= max_speed_;
-                twist_msg.linear.y *= max_speed_;
-            }
-        }
+        // {
+        //     twist_msg.linear.x = self_odom.twist.twist.linear.x + accel_total.x * delta_time;
+        //     twist_msg.linear.y = self_odom.twist.twist.linear.y + accel_total.y * delta_time;
+        //     twist_msg.angular.z = 0.0f;
+        //     float norm = sqrt(twist_msg.linear.x*twist_msg.linear.x + twist_msg.linear.y*twist_msg.linear.y);
+        //     if (norm > max_speed_)
+        //     {
+        //         twist_msg.linear.x /= norm;
+        //         twist_msg.linear.y /= norm;
+        //         twist_msg.linear.x *= max_speed_;
+        //         twist_msg.linear.y *= max_speed_;
+        //     }
+        // }
      
-        twist_msg.linear.z = 0.0f;
+        twist_msg.linear.z = 0.1f;
         twist_msg.angular.x = 0.0f;
         twist_msg.angular.y = 0.0f;
 
         // Project 2
         //Vector2 vels = Calculate_Vel_Centroid_Consensus(odoms)
-        twist_msg.linear.x += vel_consensus.x;
-        twist_msg.linear.y += vel_consensus.y;
+	RCUTILS_LOG_INFO("Vel consensus x:%f", vel_consensus.x);
+	RCUTILS_LOG_INFO("Vel consensus y:%f", vel_consensus.y);
+        twist_msg.linear.x = 100*vel_consensus.x;
+        twist_msg.linear.y = 100*vel_consensus.y;
 
         pub_twist->publish(twist_msg);
     }
@@ -419,14 +423,8 @@ Vector2 Boid_Controller_Node::Calculate_Accel_Avoidence(std::vector<Msg_Odom> od
         // is the boid[i] close enough to boid[id] take effect on it?
         if (squared_euclidan_norm(distance) <= (this->avoidance_range_ * this->avoidance_range_))
         {
-            float zero_one_distance_x;  // zero when distance is 0, 1 when distance is visual range
-            float zero_one_distance_y;  // zero when distance is 0, 1 when distance is visual range
-
-            zero_one_distance_x = distance.x / this->avoidance_range_;
-            zero_one_distance_y = distance.y / this->avoidance_range_;
-
-            force_avoidence.x += 1.0f / (zero_one_distance_x * zero_one_distance_x);
-            force_avoidence.y += 1.0f / (zero_one_distance_y * zero_one_distance_y);
+            force_avoidence.x += distance.x / (squared_euclidan_norm(distance));
+            force_avoidence.y += distance.y / (squared_euclidan_norm(distance));
         }
     }
 
@@ -511,14 +509,8 @@ Vector2 Boid_Controller_Node::Calculate_Accel_Obstacle_Avoid(const Msg_Odom& sel
     // is within range?
     if (squared_euclidan_norm(distance) <= (this->obstacle_avoid_range_ * this->obstacle_avoid_range_))
     {
-        float zero_one_distance_x;  // zero when distance is 0, 1 when distance is visual range
-        float zero_one_distance_y;  // zero when distance is 0, 1 when distance is visual range
-
-        zero_one_distance_x = distance.x / this->obstacle_avoid_range_;
-        zero_one_distance_y = distance.y / this->obstacle_avoid_range_;
-
-        force_obstacle.x += 1.0f / (zero_one_distance_x * zero_one_distance_x);
-        force_obstacle.y += 1.0f / (zero_one_distance_y * zero_one_distance_y);
+        force_obstacle.x += distance.x / (squared_euclidan_norm(distance));
+        force_obstacle.y += distance.y / (squared_euclidan_norm(distance));
     }
 
     force_obstacle.x *= obstacle_avoid_factor_;
@@ -627,7 +619,7 @@ Vector2 Boid_Controller_Node::Calculate_Vel_Centroid_Consensus(const std::vector
      }
 	
     //  return directed_total * (float)((double)(clock() - boid.last_time) / CLOCKS_PER_SEC);
-    return directed_total * 0.01f;
+    return directed_total * 0.001f;
 }
 
 /// @brief Computes velocities for current agent to move towards the centroid of the agents it has the information of
@@ -642,33 +634,103 @@ Vector2 Boid_Controller_Node::Calculate_Vel_Centroid_Consensus(const std::vector
     };
 
     for (int i = 0; i < odoms.size(); i++) {
-      directed_total.x += (float)odoms[i].pose.pose.position.x - (float)odoms[robot_id_-1].pose.pose.position.x;
-      directed_total.y += (float)odoms[i].pose.pose.position.y - (float)odoms[robot_id_-1].pose.pose.position.y;
+        directed_total.x += (float)odoms[i].pose.pose.position.x - (float)odoms[robot_id_-1].pose.pose.position.x;
+        directed_total.y += (float)odoms[i].pose.pose.position.y - (float)odoms[robot_id_-1].pose.pose.position.y;
 
-      directed_total -= offsets[i] - offsets[robot_id_-1];
+        directed_total -= offsets[i] - offsets[robot_id_-1];
     }
 
-    return directed_total * 0.05f;
+    return directed_total * (float)((double)(clock() - boid.last_time) / CLOCKS_PER_SEC);
 }
 
+Bool_mat Boid_Controller_Node::Get_Adjancency_Matrix(std::string filepath, int num_boids)
+    {
+        typedef std::vector<std::vector<bool>> bool_matrix;
+        bool_matrix mat;
+        
+        std::ifstream in(filepath);
 
-Bool_mat loadAdjacency(
-    const rclcpp::Parameter& param,
-    size_t n)
-{
-    auto flat = param.as_bool_array();
+        if (in.bad())
+        {
+            RCUTILS_LOG_FATAL("INPUT CONFIG FILE %s IS BAD", filepath.c_str());
+            return mat;
+        }
 
-    if (flat.size() != n * n) {
-        throw std::runtime_error("Adjacency matrix size mismatch");
+        mat.resize(num_boids);
+        for (auto& cell : mat)
+            cell.resize(num_boids, 0);
+
+    
+
+        if (in.is_open())
+        {
+            std::string line = "";
+            while (!in.eof()) 
+            {
+                std::getline(in, line);
+                if (line.size() && !(line[0] >= '0' && line[0] <= '9'/* || line[0] == 'T' */)) // T: <num> compatibility for total number of bots to include in consensus (consensus protocol needs to be calculated in boid_control_node, so the building of the adjacency matrix needs to use boid_num but since that's not present in boid_control we have to get it manually)
+                    continue;
+                
+                std::string temp;
+
+                int left = -1;
+                std::vector<int> right; 
+                // parsing stages
+                // line "left:right"
+                // stage 1, find "left:"
+                // stage 2, find ":right"
+                {
+                    size_t i = 0;
+
+                    // stage 1
+                    {
+                        temp = "";
+                        while (left == -1 && i < line.size())
+                        {
+                            char c = line[i++];
+                            if (c == ':')
+                                //RCLCPP_INFO_ONCE(this->get_logger(), "My log message %d", 687);
+                                left = std::stoi(temp); // adjusting for 0 index
+                            else
+                                temp += c;
+                            //RCLCPP_INFO_ONCE(this->get_logger(), "My log message %d", 687);
+                        }
+                    }
+
+                    // stage 2
+                    {
+                        temp = "";
+                        while (i < line.size()) 
+                        {
+                            char c = line[i++];
+                            if (c == ' ')
+                            {
+                                right.push_back(std::stoi(temp));
+                                temp = "";
+                            }
+                            else
+                                temp += c;
+                            RCLCPP_INFO_ONCE(this->get_logger(), "My log message %d", 704);
+    
+                        }
+
+                        if (temp != "")
+                        {
+                            right.push_back(std::stoi(temp));
+                            temp = "";
+                        }
+                    }
+                } 
+            
+                for (const int r : right)
+                {
+                    mat[left][r] = '1';
+                    mat[r][left] = '1';
+                }
+            }
+        }
+
+        in.close();
+
+        return mat;
     }
-
-    Bool_mat mat(n, std::vector<bool>(n));
-
-    for (size_t i = 0; i < n; ++i)
-        for (size_t j = 0; j < n; ++j)
-            mat[i][j] = flat[i * n + j];
-
-    return mat;
-}
-
-       
