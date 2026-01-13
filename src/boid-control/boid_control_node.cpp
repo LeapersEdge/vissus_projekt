@@ -228,8 +228,9 @@ void Boid_Controller_Node::Subscription_Boid_Info_Callback(const Msg_Boid_Info::
     Vector2 accel_obsta = Calculate_Accel_Obstacle_Avoid(self_odom, obstacle_point);
     Vector2 accel_goal  = Calculate_Accel_Goal(self_odom, goal_point);
     Vector2 accel_total = {};
-
-    Vector2 vel_consensus  = Calculate_Vel_Centroid_Consensus(info->odometries);
+    
+    std::vector<Vector2> offsets_= {Vector2{0, 0}, Vector2{0.5, 0.5}, Vector2{1.0, 1.0}, Vector2{1.5, 1.5}};
+    Vector2 vel_consensus  = Calculate_Vel_Centroid_Consensus(info->odometries, offsets_);
 
     // combine forces forces
     {
@@ -272,28 +273,30 @@ void Boid_Controller_Node::Subscription_Boid_Info_Callback(const Msg_Boid_Info::
         // construct message
         Msg_Twist twist_msg;
       
-        {
-            twist_msg.linear.x = self_odom.twist.twist.linear.x + accel_total.x * delta_time;
-            twist_msg.linear.y = self_odom.twist.twist.linear.y + accel_total.y * delta_time;
-            twist_msg.angular.z = 0.0f;
-            float norm = sqrt(twist_msg.linear.x*twist_msg.linear.x + twist_msg.linear.y*twist_msg.linear.y);
-            if (norm > max_speed_)
-            {
-                twist_msg.linear.x /= norm;
-                twist_msg.linear.y /= norm;
-                twist_msg.linear.x *= max_speed_;
-                twist_msg.linear.y *= max_speed_;
-            }
-        }
+        // {
+        //     twist_msg.linear.x = self_odom.twist.twist.linear.x + accel_total.x * delta_time;
+        //     twist_msg.linear.y = self_odom.twist.twist.linear.y + accel_total.y * delta_time;
+        //     twist_msg.angular.z = 0.0f;
+        //     float norm = sqrt(twist_msg.linear.x*twist_msg.linear.x + twist_msg.linear.y*twist_msg.linear.y);
+        //     if (norm > max_speed_)
+        //     {
+        //         twist_msg.linear.x /= norm;
+        //         twist_msg.linear.y /= norm;
+        //         twist_msg.linear.x *= max_speed_;
+        //         twist_msg.linear.y *= max_speed_;
+        //     }
+        // }
      
-        twist_msg.linear.z = 0.0f;
+        twist_msg.linear.z = 0.1f;
         twist_msg.angular.x = 0.0f;
         twist_msg.angular.y = 0.0f;
 
         // Project 2
         //Vector2 vels = Calculate_Vel_Centroid_Consensus(odoms)
-        twist_msg.linear.x += vel_consensus.x;
-        twist_msg.linear.y += vel_consensus.y;
+	RCUTILS_LOG_INFO("Vel consensus x:%f", vel_consensus.x);
+	RCUTILS_LOG_INFO("Vel consensus y:%f", vel_consensus.y);
+        twist_msg.linear.x = 100*vel_consensus.x;
+        twist_msg.linear.y = 100*vel_consensus.y;
 
         pub_twist->publish(twist_msg);
     }
