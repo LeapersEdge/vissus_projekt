@@ -116,14 +116,16 @@ ros2 launch simulation.launch.py
 ```
 
 ### Experimental setup (real drones)
-0. Build everything with `colcon build --symlink-install` and source.
-1. Run nodes that interact with antenna and real drones
+0.1. Build everything with `colcon build --symlink-install` and source.
+0.2. Use ```cfclient``` to check if you can connect with drone
+1. Modify by need ```mrs_crazyfile_exp/config/crazyflies_mrs.yaml```  
+2. Run nodes that interact with antenna and real drones
 ```bash
 cd ~/ros2_ws/src/mrs_crazyfiles_exp/startup
 ./start.sh
 ```
-2. Modify launch_params.yaml by need especcialy `num_of_robots` part.
-3. Launch with
+3. Modify launch_params.yaml by need especcialy `num_of_robots` part.
+4. Launch with
 ```bash
 ros2 launch simulation.launch.py
 ```
