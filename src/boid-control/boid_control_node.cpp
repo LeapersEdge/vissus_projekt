@@ -36,28 +36,11 @@
 // --------------------------------------------------------------
 // ROS2 NODE 
 
-void printBoolMatrix(const std::vector<std::vector<bool>> &matrix)
-{
-    std::ostringstream oss;
-    oss << "[\n";
-    for (const auto &row : matrix)
-    {
-        oss << "  [ ";
-        for (bool val : row)
-        {
-            oss << (val ? "true" : "false") << " ";
-        }
-        oss << "]\n";
-    }
-    oss << "]";
-    
-    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "\n%s", oss.str().c_str());
-}
-
 
 using std::placeholders::_1;
 double getYawFromQuaternion(const geometry_msgs::msg::Quaternion& q);
 float normalize_angle(float angle);
+Bool_mat loadAdjacency(const rclcpp::Parameter& param, size_t n);
 
 struct Boid
 {
@@ -72,18 +55,30 @@ public:
     Boid_Controller_Node() : Node("boid_controller_node")
     {
         // get all available topics and extract highest <number> from topics with "robot_<number>/odom" 
-        robot_id_ = this->declare_parameter<int>("robot_id", 0);
+        this->declare_parameter<int>("robot_id", 0);
+	this->declare_parameter<int>("num_boids", 4);
+	this->declare_parameter<Bool_array>("adjacency",
+						   {false, true, true, true,
+						    true, false, true, true,
+						    true, true, false, true,
+						    true, true, true, false}
+						   );
 
-	    std::string filepath = "/root/ros2_ws/src/vissus_projekt/launch/topology";
-	    int num_boids_ = 4;
+	robot_id_ = this->get_parameter("robot_id").as_int();
+	int num_boids = this->get_parameter("num_boids").as_int();
+	Parameter adj_param = this->get_parameter("adjacency");
+	adjacency_mat_ = loadAdjacency(adj_param, num_boids);
+	      
+	//std::string filepath = "/root/ros2_ws/src/vissus_projekt/launch/topology";       
+	
         //adjacency_mat_ = Boid_Controller_Node::Get_Adjancency_Matrix(filepath, 4);
         //printBoolMatrix(adjacency_mat_);
-        adjacency_mat_ = {
-            {false, true,  true,  true},  // Node 1 connected to 2, 3, 4
-            {true,  false, true,  true},  // Node 2 connected to 1, 3, 4
-            {true,  true,  false, true},  // Node 3 connected to 1, 2, 4
-            {true,  true,  true,  false}  // Node 4 connected to 1, 2, 3
-        };
+        // adjacency_mat_ = {
+        //     {false, true,  true,  true},  // Node 1 connected to 2, 3, 4
+        //     {true,  false, true,  true},  // Node 2 connected to 1, 3, 4
+        //     {true,  true,  false, true},  // Node 3 connected to 1, 2, 4
+        //     {true,  true,  true,  false}  // Node 4 connected to 1, 2, 3
+        // };
         // initialize all publishers, subscriptions and boids
         std::string robot_twist_topic = "/cf_" + std::to_string(int(robot_id_)) + "/cmd_vel";
         std::string robot_boid_info_topic = "/robot_" + std::to_string(int(robot_id_)) + "/boid_info";
@@ -656,102 +651,24 @@ Vector2 Boid_Controller_Node::Calculate_Vel_Centroid_Consensus(const std::vector
     return directed_total * 0.05f;
 }
 
-Bool_mat Boid_Controller_Node::Get_Adjancency_Matrix(std::string filepath, int num_boids)
+
+Bool_mat loadAdjacency(
+    const rclcpp::Parameter& param,
+    size_t n)
 {
-    typedef std::vector<std::vector<bool>> bool_matrix;
-    bool_matrix mat;
+    auto flat = param.as_bool_array();
 
-    std::ifstream in(filepath);
-
-    if (in.bad())
-    {
-        RCUTILS_LOG_FATAL("INPUT CONFIG FILE %s IS BAD", filepath.c_str());
-        return mat;
+    if (flat.size() != n * n) {
+        throw std::runtime_error("Adjacency matrix size mismatch");
     }
 
-    mat.reserve(num_boids_);
-    mat.resize(num_boids_);
-    for (auto& cell : mat)
-    {
-        cell.reserve(num_boids_);
-        cell.resize(num_boids_);
-    }
+    Bool_mat mat(n, std::vector<bool>(n));
 
-    for (size_t y = 0; y < num_boids_; y++)
-        for (size_t x = 0; x < num_boids_; x++)
-            mat[y][x] = 0;
-
-    if (in.is_open())
-    {
-        std::string line = "";
-        while (!in.eof()) 
-        {
-            std::getline(in, line);
-            if (line.size() && !(line[0] >= '0' && line[0] <= '9'))
-                continue;
-
-            std::string temp;
-
-            int left = -1;
-            std::vector<int> right; 
-            // parsing stages
-            // line "left:right"
-            // stage 1, find "left:"
-            // stage 2, find ":right"
-            {
-                size_t i = 0;
-
-                // stage 1
-                {
-                    temp = "";
-                    bool leftIsAssigned = left != -1;
-                    while (!leftIsAssigned && i < line.size())
-                    {
-                        char c = line[i];
-                        if (c == ':')
-                            left = std::stoi(temp) - 1;
-                        else if (c != ' ')
-                            temp += c;
-                        
-                        leftIsAssigned = left != -1;
-                        i++;
-                    }
-                }
-
-                // stage 2
-                {
-                    temp = "";
-                    while (i < line.size()) 
-                    {
-                        char c = line[i];
-                        if (c == ' ' && temp != "")
-                        {
-                            right.push_back(std::stoi(temp) - 1);
-                            temp = "";
-                        }
-                        else if (c != ' ')
-                            temp += c;
-
-                        i++;
-                    }
-
-                    if (temp != "")
-                    {
-                        right.push_back(std::stoi(temp) - 1);
-                        temp = "";
-                    }
-                }
-            } 
-
-            for (const int r : right)
-            {
-                mat[left][r] = '1';
-                mat[r][left] = '1';
-            }
-        }
-    }
-
-    in.close();
+    for (size_t i = 0; i < n; ++i)
+        for (size_t j = 0; j < n; ++j)
+            mat[i][j] = flat[i * n + j];
 
     return mat;
 }
+
+       

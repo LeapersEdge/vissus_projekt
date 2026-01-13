@@ -1,1 +1,0 @@
-/root/ros2_ws/src/vissus_projekt/build/vissus_projekt/rosidl_typesupport_fastrtps_cpp/vissus_projekt/msg/detail/tuning_params__rosidl_typesupport_fastrtps_cpp.hpp

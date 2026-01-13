@@ -1,6 +1,0 @@
-/usr/bin/ld: CMakeFiles/boid_control.dir/src/boid-control/boid_control_node.cpp.o: in function `Boid_Controller_Node::Boid_Controller_Node()':
-boid_control_node.cpp:(.text._ZN20Boid_Controller_NodeC2Ev[_ZN20Boid_Controller_NodeC5Ev]+0x305): undefined reference to `Boid_Controller_Node::Get_Adjancency_Matrix(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, int)'
-collect2: error: ld returned 1 exit status
-gmake[2]: *** [CMakeFiles/boid_control.dir/build.make:201: boid_control] Error 1
-gmake[1]: *** [CMakeFiles/Makefile2:598: CMakeFiles/boid_control.dir/all] Error 2
-gmake: *** [Makefile:146: all] Error 2

@@ -1,1 +1,0 @@
-/root/ros2_ws/src/vissus_projekt/build/vissus_projekt/rosidl_typesupport_introspection_c/vissus_projekt/msg/rosidl_typesupport_introspection_c__visibility_control.h

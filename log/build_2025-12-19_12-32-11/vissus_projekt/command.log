@@ -1,2 +1,0 @@
-Invoking command in '/root/ros2_ws/src/vissus_projekt/build/vissus_projekt': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/root/ros2_ws/install/crazyflie_py:/opt/ros/humble /usr/bin/cmake --build /root/ros2_ws/src/vissus_projekt/build/vissus_projekt -- -j16 -l16
-Invoked command in '/root/ros2_ws/src/vissus_projekt/build/vissus_projekt' returned '2': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/root/ros2_ws/install/crazyflie_py:/opt/ros/humble /usr/bin/cmake --build /root/ros2_ws/src/vissus_projekt/build/vissus_projekt -- -j16 -l16

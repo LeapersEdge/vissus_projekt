@@ -42,6 +42,7 @@ typedef rclcpp::Subscription<Msg_Twist>::SharedPtr Subscription_Twist;
 typedef rclcpp::Subscription<Msg_LogDataGeneric>::SharedPtr Subscription_LogDataGeneric;
 typedef rclcpp::Subscription<Msg_Formation>::SharedPtr Subscription_Formation;
 
+// message filters  not used
 typedef message_filters::Subscriber<Msg_Twist> Sub_Filter_Twist;
 typedef message_filters::Subscriber<Msg_PoseStamped> Sub_Filter_PoseStamped;
 typedef message_filters::Subscriber<Msg_LogDataGeneric> Sub_Filter_LogDataGeneric;
@@ -49,5 +50,9 @@ typedef message_filters::Subscriber<Msg_LogDataGeneric> Sub_Filter_LogDataGeneri
 typedef message_filters::sync_policies::ApproximateTime<Msg_PoseStamped, Msg_LogDataGeneric> SyncPolicy;
 
 typedef message_filters::Synchronizer<SyncPolicy> Synchronizer;
-typedef std::vector<std::vector<bool>> Bool_mat;
 
+
+// variable
+typedef std::vector<std::vector<bool>> Bool_mat;
+typedef rclcpp::Parameter Parameter;
+typedef std::vector<bool> Bool_array;

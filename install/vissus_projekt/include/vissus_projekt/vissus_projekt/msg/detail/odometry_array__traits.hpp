@@ -1,1 +1,0 @@
-/root/ros2_ws/src/vissus_projekt/build/vissus_projekt/rosidl_generator_cpp/vissus_projekt/msg/detail/odometry_array__traits.hpp

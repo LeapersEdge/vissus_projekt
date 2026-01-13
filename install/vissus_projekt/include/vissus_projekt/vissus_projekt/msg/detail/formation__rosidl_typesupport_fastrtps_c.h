@@ -1,1 +1,0 @@
-/root/ros2_ws/src/vissus_projekt/build/vissus_projekt/rosidl_typesupport_fastrtps_c/vissus_projekt/msg/detail/formation__rosidl_typesupport_fastrtps_c.h

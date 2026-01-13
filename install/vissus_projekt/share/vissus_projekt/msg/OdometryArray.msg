@@ -1,1 +1,0 @@
-/root/ros2_ws/src/vissus_projekt/msg/OdometryArray.msg

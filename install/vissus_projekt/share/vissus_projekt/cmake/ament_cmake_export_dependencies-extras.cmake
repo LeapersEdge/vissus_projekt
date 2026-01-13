@@ -1,1 +1,0 @@
-/root/ros2_ws/src/vissus_projekt/build/vissus_projekt/ament_cmake_export_dependencies/ament_cmake_export_dependencies-extras.cmake
