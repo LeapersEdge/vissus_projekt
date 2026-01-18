@@ -56,6 +56,7 @@ class Bidder(Node):
         # TODO: calculate bid value for every placement in schedule and return the best one (I will do this)
         best_makespan = float('inf')
         best_schedule = None
+        new_node = task_to_bid.id
 
         for index in range(len(self.tasks) + 1):
             temp_graph = copy.deepcopy(self.my_schedule)
@@ -83,7 +84,7 @@ class Bidder(Node):
                 temp_graph.add_edge(pred, task_to_bid.id, distance=dist_pred)
                 temp_first = self.first_task
 
-            makespan = self.calculate_makespan(temp_graph, temp_first)
+            makespan, start = self.calculate_makespan(temp_graph, temp_first, new_node)
 
             if makespan < best_makespan:
                 best_makespan = makespan
@@ -91,7 +92,7 @@ class Bidder(Node):
 
         return best_makespan, best_schedule
 
-    def calculate_makespan(self, graph, start_node):
+    def calculate_makespan(self, graph, start_node, new_node):
         curr = start_node
 
         # First Task: Travel from robot current position
@@ -100,10 +101,13 @@ class Bidder(Node):
         arrival = dist_from_robot / self.speed
         graph.nodes[curr]['start_time'] = max(arrival, t_obj.earliest_start)
 
+
         while True:
+            if curr == new_node:
+                start_time = graph.nodes[curr]['start_time']
             successors = list(graph.successors(curr))
             if not successors:
-                return graph.nodes[curr]['start_time'] + graph.nodes[curr]['task'].duration
+                return graph.nodes[curr]['start_time'] + graph.nodes[curr]['task'].duration, start_time
 
             nxt = successors[0]
             dist = graph.edges[curr, nxt]['distance']
@@ -125,10 +129,10 @@ class Bidder(Node):
         # evaluate all tasks and pick the best one
         for task in msg.tasks:
             # get the task with best bid
-            makespan, schedule = self.calculate_bid_value(task)
+            makespan, schedule, start = self.calculate_bid_value(task)
             if makespan < lowest_cost:
                 lowest_cost = makespan
-                best_bid = makespan, schedule, task
+                best_bid = makespan, schedule, task, start
 
         bid = Bid()
         bid.auction_round = msg.auction_round

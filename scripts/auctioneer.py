@@ -155,6 +155,7 @@ class Auctioneer(Node):
                                                                     final_start_time + node_data['duration'])
             del self.pending_assignments[best_task_id]
             self.task_graph.remove_node(best_task_id)
+            self.free_tasks = [t for t in self.free_tasks if t[0] != best_task_id]
         else:  # ako je potrebno čekati da se pronade jos robota šaljem privremeni bid koji ce se poslje updateat
             self.winner_publisher.publish(best_bid)
 
