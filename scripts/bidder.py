@@ -90,7 +90,7 @@ class Bidder(Node):
                 best_makespan = makespan
                 best_schedule = temp_graph
 
-        return best_makespan, best_schedule
+        return best_makespan, best_schedule, start
 
     def calculate_makespan(self, graph, start_node, new_node):
         curr = start_node
@@ -139,7 +139,7 @@ class Bidder(Node):
         bid.bidder_id = self.robot_id
         bid.task_id = best_bid[2].id
         bid.bid = best_bid[0]
-        bid.task_start = -1
+        bid.task_start = start
 
         self.active_bid = best_bid
         self.bid_publisher.publish(bid)
