@@ -161,7 +161,7 @@ class Bidder(Node):
         # check if you're the winner
         if winning_bid.bidder_id == self.robot_id:
             if self.active_bid is not None:
-                makespan, schedule, task = self.active_bid
+                makespan, schedule, task, start = self.active_bid
                 self.my_schedule = schedule
                 self.first_task = next(n for n, d in self.my_schedule.in_degree() if d == 0)
                 self.tasks[task.id] = task
