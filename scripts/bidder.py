@@ -15,6 +15,7 @@ from rclpy.node import Node
 from vissus_projekt.msg import TaskList, Task, Bid
 import matplotlib.pyplot as plt
 from std_msgs.msg import Bool
+import json
 
 class Bidder(Node):
     def __init__(self):
@@ -53,34 +54,25 @@ class Bidder(Node):
 
     def closing_callback(self, msg):
         self.get_logger().info("market closing_ drawing schedule...")
-        self.visualize_schedule(self.my_schedule, self.robot_id)
+        self.save_schedule()
         self.get_logger().info("Mission complete. Shutting down...")
         raise SystemExit
 
-
-    def visualize_schedule(self, graph, robot_id):
-        plt.figure(figsize=(10, 4))
-
-        pos = {node: (data['start_time'], 0) for node, data in graph.nodes(data=True)}
-
-        # Draw the components
-        nx.draw_networkx_nodes(graph, pos, node_size=800, node_color='lightgreen')
-        nx.draw_networkx_edges(graph, pos, arrowstyle='->', arrowsize=15)
-
-        # Add labels showing Task ID and Start Time
-        labels = {n: f"T{n}\n@{data['start_time']:.1f}" for n, data in graph.nodes(data=True)}
-        nx.draw_networkx_labels(graph, pos, labels=labels, font_size=10)
-
-        plt.title(f"Final Schedule Timeline: Robot {robot_id}")
-        plt.xlabel("Time (seconds)")
-        plt.yticks([])  # Hide Y axis as it has no meaning here
-        plt.grid(axis='x', linestyle='--', alpha=0.7)
-
-        plt.savefig(f"robot_{robot_id}_timeline.png")
-       
     def save_schedule(self):
-        # TODO:
-        pass
+        # 1. Convert graph to a dictionary format
+        data = nx.node_link_data(self.my_schedule)
+
+        # 2. Strip out non-serializable ROS 'task' objects from nodes
+        for node in data['nodes']:
+            if 'task' in node:
+                del node['task']
+
+         # 3. Write to a JSON file
+        filename = f"robot_{self.robot_id}_schedule.json"
+        with open(filename, 'w') as f:
+            json.dump(data, f, indent=4)
+
+        self.get_logger().info(f"Schedule saved to {filename}")
 
     def distance(self, A, B):
         return np.sqrt((A[0] - B[0]) ** 2 + (A[1] - B[1]) ** 2)
