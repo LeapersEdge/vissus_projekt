@@ -35,6 +35,7 @@ class Auctioneer(Node):
         self.allocated_tasks = list()
         self.auction_round = 0
         self.pending_assignments = dict()
+        self.best_bid = [0]
 
         self.task_publisher = self.create_publisher(TaskList, 'auction_task_list', 10)
 
@@ -114,16 +115,14 @@ class Auctioneer(Node):
 
     def assign_best_bid(self):
         """publishes a winner"""
-        best_task_id = min(self.free_tasks_bids,
-                           key=lambda k: self.free_tasks_bids[k][0] if self.free_tasks_bids[k] is not None else float(
-                               'inf'))
+        best_bid, best_bidder_id, best_task_id, best_auction_round, best_task_start = self.best_bid
 
         best_bid = Bid()
         best_bid.task_id = best_task_id
-        best_bid.bid = self.free_tasks_bids[best_task_id][0]
-        best_bid.bidder_id = self.free_tasks_bids[best_task_id][1]
-        best_bid.auction_round = self.free_tasks_bids[best_task_id][2]
-        best_bid.task_start = self.free_tasks_bids[best_task_id][3]
+        best_bid.bid = best_bid
+        best_bid.bidder_id = best_bidder_id
+        best_bid.auction_round = best_auction_round
+        best_bid.task_start = best_task_start
 
         node_data = self.task_graph.nodes[best_task_id]
 
@@ -142,7 +141,7 @@ class Auctioneer(Node):
             # svim robotima za ovaj zadatak šalejm update kako bi uskladili vrijeme starta
             for i in self.pending_assignments[best_task_id]:
                 final_bid = Bid()
-                final_bid.auction_round = i.auction_round
+                final_bid.auction_round = best_auction_round
                 final_bid.bidder_id = i.bidder_id
                 final_bid.task_id = i.task_id
                 final_bid.bid = i.bid
@@ -174,8 +173,8 @@ class Auctioneer(Node):
             # only accepts current auction round bids
             self.expected_bids -= 1
 
-            if self.free_tasks_bids[task_id] is None or self.free_tasks_bids[task_id][0] > bid:
-                self.free_tasks_bids[task_id] = (bid, bidder_id, auction_round, task_start)
+            if bid > self.best_bid[0]:
+                self.best_bid = [bid, bidder_id, task_id, auction_round, task_start]
 
             if self.expected_bids == 0:
                 self.assign_best_bid()
