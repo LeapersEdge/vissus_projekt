@@ -1,0 +1,22 @@
+{
+    "directed": true,
+    "multigraph": false,
+    "graph": {},
+    "nodes": [
+        {
+            "start_time": 2.23606797749979,
+            "id": 2
+        },
+        {
+            "start_time": 27.23606797749979,
+            "id": 4
+        }
+    ],
+    "links": [
+        {
+            "distance": 9.219544457292887,
+            "source": 2,
+            "target": 4
+        }
+    ]
+}
