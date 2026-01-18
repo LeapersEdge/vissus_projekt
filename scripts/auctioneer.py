@@ -16,6 +16,7 @@ import networkx as nx  # onaj library za rad s grafovima
 import numpy as np
 from rclpy.node import Node
 from std_msgs.msg import Float64MultiArray
+from std_msgs.msg import Bool
 import os
 import json
 import matplotlib.pyplot as plt
@@ -36,6 +37,8 @@ class Auctioneer(Node):
         self.pending_assignments = dict()
 
         self.task_publisher = self.create_publisher(TaskList, 'auction_task_list', 10)
+
+        self.end_publisher = self.create_publisher(Bool, 'auction_end', 10)
 
         self.winner_publisher = self.create_publisher(Bid, 'auction_winner', 10)
 
@@ -89,7 +92,7 @@ class Auctioneer(Node):
 
         plt.title("Task Precedence Graph (DAG)")
         plt.axis('off')
-        plt.show()
+        plt.save()
 
     def publish_free_tasks(self):
         """publishes"""
@@ -183,10 +186,19 @@ class Auctioneer(Node):
         if not self.free_tasks:
             self.free_tasks = [(node, data) for node, data in self.task_graph.nodes(data=True) if
                                self.task_graph.in_degree(node) == 0]
+            if self.free_tasks == []:
+                self.end()
         self.expected_bids = self.get_num_robots()
         self.auction_round += 1
         self.free_tasks_bids.clear()
         self.publish_free_tasks()
+
+    def end(self):
+        closing = Bool()
+        closing.data = True
+        self.end_publisher.publish(closing)
+        ros.shutdown()
+
 
 def main(args=None):
     ros.init(args=args)

@@ -13,6 +13,7 @@ import numpy as np
 import networkx as nx
 from rclpy.node import Node
 from vissus_projekt.msg import TaskList, Task, Bid
+import matplotlib as plt
 
 
 class Bidder(Node):
@@ -48,12 +49,45 @@ class Bidder(Node):
         self.winner_sub = self.create_subscription(
             Bid, 'auction_winner', self.winner_callback, 10)
 
+        self.closing_sub = self.create_subscription(Bid, 'auction_closing', self.closing_callback, 10)
+
+    def closing_callback(self, msg):
+        if msg.data:
+            self.visualize_schedule(self.my_schedule, self.robot_id)
+            ros.shutdown()
+
+    def visualize_schedule(self, graph, robot_id):
+        plt.figure(figsize=(10, 4))
+
+        # Position nodes by their actual start_time on the X-axis
+        # We set Y to 0 since it's a single robot's timeline
+        pos = {node: (data['start_time'], 0) for node, data in graph.nodes(data=True)}
+
+        # Draw the components
+        nx.draw_networkx_nodes(graph, pos, node_size=800, node_color='lightgreen')
+        nx.draw_networkx_edges(graph, pos, arrowstyle='->', arrowsize=15)
+
+        # Add labels showing Task ID and Start Time
+        labels = {n: f"T{n}\n@{data['start_time']:.1f}" for n, data in graph.nodes(data=True)}
+        nx.draw_networkx_labels(graph, pos, labels=labels, font_size=10)
+
+        plt.title(f"Final Schedule Timeline: Robot {robot_id}")
+        plt.xlabel("Time (seconds)")
+        plt.yticks([])  # Hide Y axis as it has no meaning here
+        plt.grid(axis='x', linestyle='--', alpha=0.7)
+
+        plt.savefig(f"robot_{robot_id}_timeline.png")
+        plt.close()  # Close to free up memory
+
+    def save_schedule(self):
+        # TODO:
+        pass
+
     def distance(self, A, B):
         return np.sqrt((A[0] - B[0]) ** 2 + (A[1] - B[1]) ** 2)
 
     def calculate_bid_value(self, task_to_bid):
         """Logic to determine the cost for a task"""
-        # TODO: calculate bid value for every placement in schedule and return the best one (I will do this)
         best_makespan = float('inf')
         best_schedule = None
         new_node = task_to_bid.id
