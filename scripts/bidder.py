@@ -123,23 +123,33 @@ class Bidder(Node):
             return
 
         self.last_processed_round = msg.auction_round
-        lowest_cost = float("inf")
+        lowest_cost = 1e10
         best_bid = None
 
         # evaluate all tasks and pick the best one
         for task in msg.tasks:
+            if task in self.tasks:
+                continue
             # get the task with best bid
             makespan, schedule, start = self.calculate_bid_value(task)
             if makespan < lowest_cost:
                 lowest_cost = makespan
                 best_bid = makespan, schedule, task, start
 
-        bid = Bid()
-        bid.auction_round = msg.auction_round
-        bid.bidder_id = self.robot_id
-        bid.task_id = best_bid[2].id
-        bid.bid = best_bid[0]
-        bid.task_start = start
+        if best_bid is None:
+            bid = Bid()
+            bid.auction_round = msg.auction_round
+            bid.bidder_id = self.robot_id
+            bid.task_id = 0
+            bid.bid = lowest_cost
+            bid.task_start = -1
+        else:
+            bid = Bid()
+            bid.auction_round = msg.auction_round
+            bid.bidder_id = self.robot_id
+            bid.task_id = best_bid[2].id
+            bid.bid = best_bid[0]
+            bid.task_start = start
 
         self.active_bid = best_bid
         self.bid_publisher.publish(bid)
