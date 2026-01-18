@@ -38,7 +38,7 @@ class Auctioneer(Node):
 
         self.task_publisher = self.create_publisher(TaskList, 'auction_task_list', 10)
 
-        self.end_publisher = self.create_publisher(Bool, 'auction_end', 10)
+        self.end_publisher = self.create_publisher(Bool, 'auction_closing', 10)
 
         self.winner_publisher = self.create_publisher(Bid, 'auction_winner', 10)
 
@@ -186,18 +186,22 @@ class Auctioneer(Node):
         if not self.free_tasks:
             self.free_tasks = [(node, data) for node, data in self.task_graph.nodes(data=True) if
                                self.task_graph.in_degree(node) == 0]
-            if self.free_tasks == []:
-                self.end()
-        self.expected_bids = self.get_num_robots()
-        self.auction_round += 1
-        self.free_tasks_bids.clear()
-        self.publish_free_tasks()
+        if self.free_tasks == []:
+            self.get_logger().info("!!! MISSION COMPLETE: No tasks left in graph !!!")
+            self.end()
+            return
+        else:
+            self.expected_bids = self.get_num_robots()
+            self.auction_round += 1
+            self.free_tasks_bids.clear()
+            self.publish_free_tasks()
 
     def end(self):
         closing = Bool()
-        closing.data = True
+        self.get_logger().info("!!! MISSION COMPLETE: No tasks left in graph !!!") 
         self.end_publisher.publish(closing)
-        ros.shutdown()
+        self.create_timer(10.0, lambda: None)
+        raise SystemExit
 
 
 def main(args=None):

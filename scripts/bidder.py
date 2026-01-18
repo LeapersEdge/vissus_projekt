@@ -13,8 +13,8 @@ import numpy as np
 import networkx as nx
 from rclpy.node import Node
 from vissus_projekt.msg import TaskList, Task, Bid
-import matplotlib as plt
-
+import matplotlib.pyplot as plt
+from std_msgs.msg import Bool
 
 class Bidder(Node):
     def __init__(self):
@@ -49,18 +49,18 @@ class Bidder(Node):
         self.winner_sub = self.create_subscription(
             Bid, 'auction_winner', self.winner_callback, 10)
 
-        self.closing_sub = self.create_subscription(Bid, 'auction_closing', self.closing_callback, 10)
+        self.closing_sub = self.create_subscription(Bool, 'auction_closing', self.closing_callback, 10)
 
     def closing_callback(self, msg):
-        if msg.data:
-            self.visualize_schedule(self.my_schedule, self.robot_id)
-            ros.shutdown()
+        self.get_logger().info("market closing_ drawing schedule...")
+        self.visualize_schedule(self.my_schedule, self.robot_id)
+        self.get_logger().info("Mission complete. Shutting down...")
+        raise SystemExit
+
 
     def visualize_schedule(self, graph, robot_id):
         plt.figure(figsize=(10, 4))
 
-        # Position nodes by their actual start_time on the X-axis
-        # We set Y to 0 since it's a single robot's timeline
         pos = {node: (data['start_time'], 0) for node, data in graph.nodes(data=True)}
 
         # Draw the components
@@ -77,8 +77,7 @@ class Bidder(Node):
         plt.grid(axis='x', linestyle='--', alpha=0.7)
 
         plt.savefig(f"robot_{robot_id}_timeline.png")
-        plt.close()  # Close to free up memory
-
+       
     def save_schedule(self):
         # TODO:
         pass
