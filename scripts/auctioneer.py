@@ -122,9 +122,9 @@ class Auctioneer(Node):
         best_bid.auction_round = self.free_tasks_bids[best_task_id][2]
         best_bid.task_start = self.free_tasks_bids[best_task_id][3]
 
-        # smanjujem broj robota koji su potrebni
         node_data = self.task_graph.nodes[best_task_id]
 
+        # smanjujem broj robota koji su potrebni
         node_data['robots_needed'] -= 1
 
         # ako je startno vrijeme zadatka nakon onog od bida bit ce odgodeno
@@ -136,6 +136,7 @@ class Auctioneer(Node):
         self.pending_assignments[best_task_id].append(best_bid)
         if node_data['robots_needed'] == 0:  # dovoljno robota je dobilo zadatak
             final_start_time = node_data['earliest_start']
+            # svim robotima za ovaj zadatak šalejm update kako bi uskladili vrijeme starta
             for i in self.pending_assignments[best_task_id]:
                 final_bid = Bid()
                 final_bid.auction_round = i.auction_round
@@ -178,8 +179,9 @@ class Auctioneer(Node):
 
     def start_next_auction(self):
         # free tasks are all tasks with no predecessor
-        self.free_tasks = [(node, data) for node, data in self.task_graph.nodes(data=True) if
-                           self.task_graph.in_degree(node) == 0]
+        if not self.free_tasks:
+            self.free_tasks = [(node, data) for node, data in self.task_graph.nodes(data=True) if
+                               self.task_graph.in_degree(node) == 0]
         self.expected_bids = self.get_num_robots()
         self.auction_round += 1
         self.free_tasks_bids.clear()

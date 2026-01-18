@@ -8,6 +8,9 @@ computes the corresponding total schedule duration (makespan). It then selects t
 minimum makespan and submits it as a bid (task-makespan pair)."""
 
 import rclpy as ros
+import copy
+import numpy as np
+import networkx as nx
 from rclpy.node import Node
 from vissus_projekt.msg import TaskList, Task, Bid
 
@@ -29,10 +32,11 @@ class Bidder(Node):
 
         self.speed = 1  # cost of task will be calculated using speed and distance to point and durtion of task
         # mozda moze ovako ostat stin da su svi iste brzine? nije bitno
-        self.my_schedule = []
-        self.tasks = dict()
+        self.my_schedule =  nx.DiGraph() # task_ID as node and node data (start_time = start_time)
+        self.tasks = dict() # dict of al tasks in schedule (key == task ID)
         self.last_processed_round = -1
         self.active_bid = None
+        self.first_task = None
 
         # 2. Publishers
         self.bid_publisher = self.create_publisher(Bid, 'bids', 10)
@@ -44,10 +48,70 @@ class Bidder(Node):
         self.winner_sub = self.create_subscription(
             Bid, 'auction_winner', self.winner_callback, 10)
 
-    def calculate_bid_value(self, task):
+    def distance(self, A, B):
+        return np.sqrt((A[0] - B[0]) ** 2 + (A[1] - B[1]) ** 2)
+
+    def calculate_bid_value(self, task_to_bid):
         """Logic to determine the cost for a task"""
-        # TODO: Implement calculation
-        return (0, placement_in_schedule, start)
+        # TODO: calculate bid value for every placement in schedule and return the best one (I will do this)
+        best_makespan = float('inf')
+        best_schedule = None
+
+        for index in range(len(self.tasks) + 1):
+            temp_graph = copy.deepcopy(self.my_schedule)
+            temp_graph.add_node(task_to_bid.id, task=task_to_bid)
+
+            if index == 0:
+                if self.first_task is not None:
+                    dist = self.distance(task_to_bid.pos, temp_graph.nodes[self.first_task]['task'].pos)
+                    temp_graph.add_edge(task_to_bid.id, self.first_task, distance=dist)
+                temp_first = task_to_bid.id
+            else:
+                # Middle or End
+                pred = self.first_task
+                for _ in range(1, index):
+                    pred = next(temp_graph.successors(pred))
+
+                succ = next(temp_graph.successors(pred), None)
+
+                if succ is not None:
+                    temp_graph.remove_edge(pred, succ)
+                    dist_new = self.distance(task_to_bid.pos, temp_graph.nodes[succ]['task'].pos)
+                    temp_graph.add_edge(task_to_bid.id, succ, distance=dist_new)
+
+                dist_pred = self.distance(temp_graph.nodes[pred]['task'].pos, task_to_bid.pos)
+                temp_graph.add_edge(pred, task_to_bid.id, distance=dist_pred)
+                temp_first = self.first_task
+
+            makespan = self.calculate_makespan(temp_graph, temp_first)
+
+            if makespan < best_makespan:
+                best_makespan = makespan
+                best_schedule = temp_graph
+
+        return best_makespan, best_schedule
+
+    def calculate_makespan(self, graph, start_node):
+        curr = start_node
+
+        # First Task: Travel from robot current position
+        t_obj = graph.nodes[curr]['task']
+        dist_from_robot = self.distance(self.start_position, t_obj.pos)
+        arrival = dist_from_robot / self.speed
+        graph.nodes[curr]['start_time'] = max(arrival, t_obj.earliest_start)
+
+        while True:
+            successors = list(graph.successors(curr))
+            if not successors:
+                return graph.nodes[curr]['start_time'] + graph.nodes[curr]['task'].duration
+
+            nxt = successors[0]
+            dist = graph.edges[curr, nxt]['distance']
+
+            arrival_next = graph.nodes[curr]['start_time'] + graph.nodes[curr]['task'].duration + (dist / self.speed)
+            graph.nodes[nxt]['start_time'] = max(arrival_next, graph.nodes[nxt]['task'].earliest_start)
+
+            curr = nxt
 
     def task_callback(self, msg):
         """Triggered when the Auctioneer publishes tasks"""
@@ -56,27 +120,25 @@ class Bidder(Node):
 
         self.last_processed_round = msg.auction_round
         lowest_cost = float("inf")
-        bid = None
+        best_bid = None
 
         # evaluate all tasks and pick the best one
         for task in msg.tasks:
-            cost, placement_in_schedule, start = self.calculate_bid_value(task)
-            if cost < lowest_cost:
-                lowest_cost = cost
-                bid = (task, placement_in_schedule, start)
+            # get the task with best bid
+            makespan, schedule = self.calculate_bid_value(task)
+            if makespan < lowest_cost:
+                lowest_cost = makespan
+                best_bid = makespan, schedule, task
 
-        # make a bid
-        task, placement_in_schedule, start = bid
+        bid = Bid()
+        bid.auction_round = msg.auction_round
+        bid.bidder_id = self.robot_id
+        bid.task_id = best_bid[2].id
+        bid.bid = best_bid[0]
+        bid.task_start = -1
 
-        best_bid = Bid()
-        best_bid.auction_round = msg.auction_round
-        best_bid.bidder_id = self.robot_id
-        best_bid.task_id = task.id
-        best_bid.bid = lowest_cost
-        best_bid.task_start = start
-
-        self.active_bid = (task, placement_in_schedule, best_bid)
-        self.bid_publisher.publish(best_bid)
+        self.active_bid = best_bid
+        self.bid_publisher.publish(bid)
 
     def winner_callback(self, winning_bid):
         """Triggered when the Auctioneer announces a winner."""
@@ -84,23 +146,25 @@ class Bidder(Node):
             return
         # check if you're the winner
         if winning_bid.bidder_id == self.robot_id:
-            task, placement_in_schedule, bid = self.active_bid
-            # if winner place task in schedule
-            if task.id not in self.tasks:
+            if self.active_bid is not None:
+                makespan, schedule, task = self.active_bid
+                self.my_schedule = schedule
+                self.first_task = next(n for n, d in self.my_schedule.in_degree() if d == 0)
                 self.tasks[task.id] = task
-                self.my_schedule.insert(placement_in_schedule, task.id)
+                self.active_bid = None
             else:
-                self.tasks[task.id].earliest_start = task.earliest_start
-                index = self.my_schedule.index(task.id)
-                # ako updatean task nije zadnji u rasporedu trebaju se pushat ostali ako ih ne stigne obavit na vrijeme
-                if index != len(self.my_schedule) - 1:
-                    next_task_id = self.my_schedule[index + 1]
-                    diff = self.tasks[task.id].earliest_start + self.tasks[task.id].duration - self.tasks[next_task_id].earliest_start
-                    if diff > 0:
-                        for task_id_to_pushback in self.my_schedule[index + 1:]:
-                            self.tasks[task_id_to_pushback].earliest_start += diff
+                # mora se updateat vrijeme i potencijalno pushat successore
+                node = winning_bid.task_id
+                node_data = self.my_schedule.nodes[node]
+                node_data['start_time'] = winning_bid.task_start
+                next_node = next(self.my_schedule.successors(node), None)
+                while next_node is not None:
+                    distance = self.my_schedule.edges[node, next_node]['distance']
+                    next_node_data = self.my_schedule.nodes[next_node]
+                    next_node_data['start_time'] = np.max(next_node_data['start_time'], node_data['start_time'] + node_data['task'].duration + distance/self.speed)
+                    node = next_node
+                    next_node = next(self.my_schedule.successors(node), None)
 
-        self.active_bid = None
 
 
 def main(args=None):
