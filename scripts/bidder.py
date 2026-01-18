@@ -149,7 +149,7 @@ class Bidder(Node):
             bid.bidder_id = self.robot_id
             bid.task_id = best_bid[2].id
             bid.bid = best_bid[0]
-            bid.task_start = start
+            bid.task_start = best_bid[3]
 
         self.active_bid = best_bid
         self.bid_publisher.publish(bid)
