@@ -57,7 +57,6 @@ class Bidder(Node):
 
     def closing_callback(self, msg):
         self.get_logger().info("market closing_ drawing schedule...")
-        self.save_schedule()
         self.get_logger().info("Mission complete. Shutting down...")
         raise SystemExit
 
@@ -128,7 +127,7 @@ class Bidder(Node):
         dist_from_robot = self.distance(self.start_position, t_obj.pos)
         arrival = dist_from_robot / self.speed
         earliest = max(arrival, t_obj.earliest_start)
-        graph.nodes[curr]['start_time'] = earliest if graph.nodes[curr]['start_time'] is None else max(graph.nodes[curr]['start_time'], earliest)
+        graph.nodes[curr]['start_time'] = earliest if graph.nodes[curr].get('start_time') is None else max(graph.nodes[curr]['start_time'], earliest)
 
         while True:
             if curr == new_node:
@@ -141,7 +140,9 @@ class Bidder(Node):
             dist = graph.edges[curr, nxt]['distance']
 
             arrival_next = graph.nodes[curr]['start_time'] + graph.nodes[curr]['task'].duration + (dist / self.speed)
-            graph.nodes[nxt]['start_time'] = max(arrival_next, graph.nodes[nxt]['task'].earliest_start)
+            earliest = max(arrival_next, graph.nodes[nxt]['task'].earliest_start)
+            graph.nodes[nxt]['start_time'] = earliest if graph.nodes[nxt].get('start_time') is None else max(earliest, graph.nodes[nxt]['start_time'])
+            
 
             curr = nxt
 
