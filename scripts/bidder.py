@@ -127,8 +127,8 @@ class Bidder(Node):
         t_obj = graph.nodes[curr]['task']
         dist_from_robot = self.distance(self.start_position, t_obj.pos)
         arrival = dist_from_robot / self.speed
-        graph.nodes[curr]['start_time'] = max(arrival, t_obj.earliest_start)
-
+        earliest = max(arrival, t_obj.earliest_start)
+        graph.nodes[curr]['start_time'] = earliest if graph.nodes[curr]['start_time'] is None else max(graph.nodes[curr]['start_time'], earliest)
 
         while True:
             if curr == new_node:
@@ -223,7 +223,7 @@ class Bidder(Node):
                 node_data = next_node_data
                 next_node = next(self.my_schedule.successors(node), None)
 
-        self.save_schedule()
+            self.save_schedule()
         ready = Bool()
         self.ready_publisher.publish(ready)
 
