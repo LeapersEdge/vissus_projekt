@@ -69,10 +69,10 @@ class Bidder(Node):
                 t = node['task']
                 node['task_details'] = {
                     'id': t.id,
-                    'pos': t.pos,
+                    'pos': list(t.pos),
                     'duration': t.duration,
                     'robots_needed': t.robots_needed,
-                    'predecessors': t.predecessors,
+                    'predecessors': list(t.predecessors),
                     'earliest_start': t.earliest_start,
                 }
                 del node['task']
