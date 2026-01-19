@@ -35,18 +35,18 @@ class Bidder(Node):
         qos_profile = QoSProfile(depth=10, durability=DurabilityPolicy.TRANSIENT_LOCAL)
         
         self.speed = 1  # cost of task will be calculated using speed and distance to point and durtion of task
-        # mozda moze ovako ostat stin da su svi iste brzine? nije bitno
-        self.my_schedule =  nx.DiGraph() # task_ID as node and node data (start_time = start_time)
+        # all robots of same speed? maybe it could just stay speed=1
+        self.my_schedule =  nx.DiGraph() # task_ID as node and node data (start_time, task)
         self.tasks = dict() # dict of al tasks in schedule (key == task ID)
         self.last_processed_round = -1
         self.active_bid = None
         self.first_task = None
 
-        # 2. Publishers
+        # Init Publishers
         self.bid_publisher = self.create_publisher(Bid, 'bids', qos_profile)
         self.ready_publisher = self.create_publisher(Bool, 'bidder_ready', qos_profile)
 
-        # 3. Subscribers
+        # Init Subscribers
         self.task_sub = self.create_subscription(
             TaskList, 'auction_task_list', self.task_callback, qos_profile)
 
@@ -56,21 +56,29 @@ class Bidder(Node):
         self.closing_sub = self.create_subscription(Bool, 'auction_closing', self.closing_callback, qos_profile)
 
     def closing_callback(self, msg):
-        self.get_logger().info("market closing_ drawing schedule...")
+        self.get_logger().info("Market closed... shutting down")
         self.save_schedule()
-        self.get_logger().info("Mission complete. Shutting down...")
         raise SystemExit
 
     def save_schedule(self):
-        # 1. Convert graph to a dictionary format
+        # Convert graph to a dictionary format
         data = nx.node_link_data(self.my_schedule, edges='edges')
 
-        # 2. Strip out non-serializable ROS 'task' objects from nodes
+        # Replacing task with dictionary of its values
         for node in data['nodes']:
             if 'task' in node:
+                t = node['task']
+                node['task_details'] = {
+                    'id': t.id,
+                    'pos': t.pos,
+                    'duration': t.duration,
+                    'robots_needed': t.robots_needed,
+                    'predecessors': t.predecessors,
+                    'earliest_start': t.earliest_start,
+                }
                 del node['task']
 
-         # 3. Write to a JSON file
+        # Write to JSON file
         filename = f"robot_{self.robot_id}_schedule.json"
         with open(filename, 'w') as f:
             json.dump(data, f, indent=4)
@@ -86,6 +94,7 @@ class Bidder(Node):
         best_schedule = None
         new_node = task_to_bid.id
 
+        # going through all possible positions in schedule and choosing the one with lowest makespan
         for index in range(len(self.tasks) + 1):
             temp_graph = copy.deepcopy(self.my_schedule)
             temp_graph.add_node(task_to_bid.id, task=task_to_bid)
@@ -103,7 +112,7 @@ class Bidder(Node):
 
                 succ = next(temp_graph.successors(pred), None)
 
-                if succ is not None:
+                if succ is not None: # if not the last
                     temp_graph.remove_edge(pred, succ)
                     dist_new = self.distance(task_to_bid.pos, temp_graph.nodes[succ]['task'].pos)
                     temp_graph.add_edge(task_to_bid.id, succ, distance=dist_new)
@@ -121,9 +130,9 @@ class Bidder(Node):
         return best_makespan, best_schedule, start
 
     def calculate_makespan(self, graph, start_node, new_node):
+        """Calculates the total duration of given schedule and assigns start_times along the way."""
         curr = start_node
 
-        # First Task: Travel from robot current position
         t_obj = graph.nodes[curr]['task']
         dist_from_robot = self.distance(self.start_position, t_obj.pos)
         arrival = dist_from_robot / self.speed
@@ -135,7 +144,7 @@ class Bidder(Node):
                 start_time = graph.nodes[curr]['start_time']
             successors = list(graph.successors(curr))
             if not successors:
-                return graph.nodes[curr]['start_time'] + graph.nodes[curr]['task'].duration, start_time
+                return graph.nodes[curr]['start_time'] + graph.nodes[curr]['task'].duration, start_time # if last node return makespan
 
             nxt = successors[0]
             dist = graph.edges[curr, nxt]['distance']
@@ -154,18 +163,18 @@ class Bidder(Node):
         lowest_cost =float(1e10)
         best_bid = None
 
-        # evaluate all tasks and pick the best one
+        # Evaluate all tasks and pick the best one
         for task in msg.tasks:
             if task.id in self.tasks:
                  none_id = task.id
                  continue
-            # get the task with best bid
+            # Get the task with best bid
             makespan, schedule, start = self.calculate_bid_value(task)
             if makespan < lowest_cost:
                 lowest_cost = makespan
                 best_bid = makespan, schedule, task, start
 
-        if best_bid is None:
+        if best_bid is None: # Send a huge bid that will not win
             bid = Bid()
             bid.auction_round = msg.auction_round
             bid.bidder_id = self.robot_id
@@ -184,12 +193,10 @@ class Bidder(Node):
         self.bid_publisher.publish(bid)
 
     def winner_callback(self, winning_bid):
-
-        self.get_logger().info(f"winner callback {winning_bid.task_id} id, round {winning_bid.auction_round}")
         """Triggered when the Auctioneer announces a winner."""
-        
+        self.get_logger().info(f"Winner callback {winning_bid.task_id} id, round {winning_bid.auction_round}")
 
-        if winning_bid.auction_round != self.last_processed_round:
+        if winning_bid.auction_round != self.last_processed_round: # processes only current round
             return
         # check if you're the winner
         if winning_bid.bidder_id == self.robot_id:
@@ -201,27 +208,21 @@ class Bidder(Node):
                 self.tasks[task.id] = task
                 self.active_bid = None
 
-            self.get_logger().info(f"got {winning_bid.task_id}, active_bid is {self.active_bid[2].id if self.active_bid is not None else 'none for active'} in already seen task")
-            # mora se updateat vrijeme i potencijalno pushat successore
-            node = winning_bid.task_id
-            node_data = self.my_schedule.nodes[node]
-            old_time = self.my_schedule.nodes[node].get('start_time', 'N/A')
-            self.get_logger().info(f"Robot {self.robot_id}: Node {node} OLD time: {old_time}")
-                
-            self.get_logger().info(f"updating {winning_bid.task_id} to {winning_bid.task_start}..... active bid is {self.active_bid}")
-            node_data['start_time'] = winning_bid.task_start
-                
-            new_time = self.my_schedule.nodes[node]['start_time']
-            self.get_logger().info(f"Robot {self.robot_id}: Node {node} NEW time: {new_time}")
+            else: # update start_time and push successors if necessary
+                node = winning_bid.task_id
+                node_data = self.my_schedule.nodes[node]
 
-            next_node = next(self.my_schedule.successors(node), None)
-            while next_node is not None:
-                distance = self.my_schedule.edges[node, next_node]['distance']
-                next_node_data = self.my_schedule.nodes[next_node]
-                next_node_data['start_time'] = np.max(next_node_data['start_time'], node_data['start_time'] + node_data['task'].duration + distance/self.speed)
-                node = next_node
-                node_data = next_node_data
+                self.get_logger().info(f"Updating task {winning_bid.task_id} start_time from {self.my_schedule.nodes[node].get('start_time')} to {winning_bid.task_start}...")
+                node_data['start_time'] = winning_bid.task_start
+
                 next_node = next(self.my_schedule.successors(node), None)
+                while next_node is not None:
+                    distance = self.my_schedule.edges[node, next_node]['distance']
+                    next_node_data = self.my_schedule.nodes[next_node]
+                    next_node_data['start_time'] = np.max(next_node_data['start_time'], node_data['start_time'] + node_data['task'].duration + distance/self.speed)
+                    node = next_node
+                    node_data = next_node_data
+                    next_node = next(self.my_schedule.successors(node), None)
 
             self.save_schedule()
         ready = Bool()
