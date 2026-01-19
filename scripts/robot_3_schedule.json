@@ -8,15 +8,24 @@
             "id": 2
         },
         {
-            "start_time": 27.23606797749979,
-            "id": 4
+            "start_time": 12.23606797749979,
+            "id": 3
+        },
+        {
+            "start_time": 40.071067811865476,
+            "id": 5
         }
     ],
-    "links": [
+    "edges": [
         {
-            "distance": 9.219544457292887,
+            "distance": 5.0,
             "source": 2,
-            "target": 4
+            "target": 3
+        },
+        {
+            "distance": 7.0710678118654755,
+            "source": 3,
+            "target": 5
         }
     ]
 }

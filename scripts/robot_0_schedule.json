@@ -6,7 +6,17 @@
         {
             "start_time": 8.0,
             "id": 3
+        },
+        {
+            "start_time": 30.071067811865476,
+            "id": 4
         }
     ],
-    "links": []
+    "edges": [
+        {
+            "distance": 7.0710678118654755,
+            "source": 3,
+            "target": 4
+        }
+    ]
 }

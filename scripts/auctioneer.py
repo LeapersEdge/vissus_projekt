@@ -10,7 +10,7 @@ After that, the auctioneer starts the task allocation by auctioning the set of f
 The auctioneer collects all the bids and selects the best one. It communicates its selection to the bid winner, who
 then permanently adds the tasks to its list of assigned tasks. The auctioneer starts the process again with the
 remaining tasks until all tasks from TF are assigned. """
-
+from rclpy.qos import QoSProfile, DurabilityPolicy
 import rclpy as ros
 import networkx as nx  # onaj library za rad s grafovima
 import numpy as np
@@ -35,17 +35,27 @@ class Auctioneer(Node):
         self.allocated_tasks = list()
         self.auction_round = 0
         self.pending_assignments = dict()
-        self.best_bid = [0]
+        self.best_bid = [float('inf')]
+        self.ready = 0
+        qos_profile = QoSProfile(depth=10, durability=DurabilityPolicy.TRANSIENT_LOCAL)
 
-        self.task_publisher = self.create_publisher(TaskList, 'auction_task_list', 10)
+        self.task_publisher = self.create_publisher(TaskList, 'auction_task_list', qos_profile)
 
-        self.end_publisher = self.create_publisher(Bool, 'auction_closing', 10)
+        self.end_publisher = self.create_publisher(Bool, 'auction_closing', qos_profile)
 
-        self.winner_publisher = self.create_publisher(Bid, 'auction_winner', 10)
+        self.winner_publisher = self.create_publisher(Bid, 'auction_winner', qos_profile)
 
-        self.bid_listener = self.create_subscription(Bid, 'bids', self.bid_evaluator_callback, 10)
+        self.bid_listener = self.create_subscription(Bid, 'bids', self.bid_evaluator_callback, qos_profile)
 
         self.startup_timer = self.create_timer(1.0, self.wait_for_bidders)
+
+        self.ready_sub = self.create_subscription(Bool, 'bidder_ready', self.ready_callback, 10)
+
+    def ready_callback(self, msg):
+        self.ready += 1
+        if self.ready == self.num_robots:
+            self.ready = 0
+            self.start_next_auction()
 
     def wait_for_bidders(self):
         count = self.task_publisher.get_subscription_count()
@@ -115,15 +125,15 @@ class Auctioneer(Node):
 
     def assign_best_bid(self):
         """publishes a winner"""
-        best_bid, best_bidder_id, best_task_id, best_auction_round, best_task_start = self.best_bid
+        best_bid_val, best_bidder_id, best_task_id, best_auction_round, best_task_start = self.best_bid
 
         best_bid = Bid()
         best_bid.task_id = best_task_id
-        best_bid.bid = best_bid
+        best_bid.bid = best_bid_val
         best_bid.bidder_id = best_bidder_id
         best_bid.auction_round = best_auction_round
         best_bid.task_start = best_task_start
-
+        self.get_logger().info(f"trying to get {best_task_id}...")
         node_data = self.task_graph.nodes[best_task_id]
 
         # smanjujem broj robota koji su potrebni
@@ -146,8 +156,12 @@ class Auctioneer(Node):
                 final_bid.task_id = i.task_id
                 final_bid.bid = i.bid
                 final_bid.task_start = final_start_time
+                
+                self.ready -= self.num_robots if i is not best_bid else 0
 
                 self.winner_publisher.publish(final_bid)
+
+                
 
             # ispunjena je kvota robota pa mičem zadatak iz liste
             self.allocated_tasks.append((best_task_id, self.task_graph.nodes[best_task_id]))
@@ -173,12 +187,11 @@ class Auctioneer(Node):
             # only accepts current auction round bids
             self.expected_bids -= 1
 
-            if bid > self.best_bid[0]:
-                self.best_bid = [bid, bidder_id, task_id, auction_round, task_start]
+            if bid < self.best_bid[0]:
+                self.best_bid = (bid, bidder_id, task_id, auction_round, task_start)
 
             if self.expected_bids == 0:
                 self.assign_best_bid()
-                self.start_next_auction()
 
     def start_next_auction(self):
         # free tasks are all tasks with no predecessor
@@ -193,6 +206,7 @@ class Auctioneer(Node):
             self.expected_bids = self.get_num_robots()
             self.auction_round += 1
             self.free_tasks_bids.clear()
+            self.best_bid = [float('inf')]
             self.publish_free_tasks()
 
     def end(self):

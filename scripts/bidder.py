@@ -6,7 +6,7 @@ the same speed, and can perform all tasks).
 Upon receiving the list of tasks in the auction, the bidder tries to insert each task into its current schedule and
 computes the corresponding total schedule duration (makespan). It then selects the task that would result in the
 minimum makespan and submits it as a bid (task-makespan pair)."""
-
+from rclpy.qos import QoSProfile, DurabilityPolicy
 import rclpy as ros
 import copy
 import numpy as np
@@ -32,6 +32,8 @@ class Bidder(Node):
             self.get_parameter('start_y').value
         ]
 
+        qos_profile = QoSProfile(depth=10, durability=DurabilityPolicy.TRANSIENT_LOCAL)
+        
         self.speed = 1  # cost of task will be calculated using speed and distance to point and durtion of task
         # mozda moze ovako ostat stin da su svi iste brzine? nije bitno
         self.my_schedule =  nx.DiGraph() # task_ID as node and node data (start_time = start_time)
@@ -41,16 +43,17 @@ class Bidder(Node):
         self.first_task = None
 
         # 2. Publishers
-        self.bid_publisher = self.create_publisher(Bid, 'bids', 10)
+        self.bid_publisher = self.create_publisher(Bid, 'bids', qos_profile)
+        self.ready_publisher = self.create_publisher(Bool, 'bidder_ready', qos_profile)
 
         # 3. Subscribers
         self.task_sub = self.create_subscription(
-            TaskList, 'auction_task_list', self.task_callback, 10)
+            TaskList, 'auction_task_list', self.task_callback, qos_profile)
 
         self.winner_sub = self.create_subscription(
-            Bid, 'auction_winner', self.winner_callback, 10)
+            Bid, 'auction_winner', self.winner_callback, qos_profile)
 
-        self.closing_sub = self.create_subscription(Bool, 'auction_closing', self.closing_callback, 10)
+        self.closing_sub = self.create_subscription(Bool, 'auction_closing', self.closing_callback, qos_profile)
 
     def closing_callback(self, msg):
         self.get_logger().info("market closing_ drawing schedule...")
@@ -60,7 +63,7 @@ class Bidder(Node):
 
     def save_schedule(self):
         # 1. Convert graph to a dictionary format
-        data = nx.node_link_data(self.my_schedule)
+        data = nx.node_link_data(self.my_schedule, edges='edges')
 
         # 2. Strip out non-serializable ROS 'task' objects from nodes
         for node in data['nodes']:
@@ -181,30 +184,48 @@ class Bidder(Node):
         self.bid_publisher.publish(bid)
 
     def winner_callback(self, winning_bid):
+
+        self.get_logger().info(f"winner callback {winning_bid.task_id} id, round {winning_bid.auction_round}")
         """Triggered when the Auctioneer announces a winner."""
+        
+
         if winning_bid.auction_round != self.last_processed_round:
             return
         # check if you're the winner
         if winning_bid.bidder_id == self.robot_id:
-            if self.active_bid is not None:
+            if winning_bid.task_id not in self.tasks:
+                self.get_logger().info(f"got {winning_bid.task_id}, active_bid is {self.active_bid[2].id}")
                 makespan, schedule, task, start = self.active_bid
                 self.my_schedule = schedule
                 self.first_task = next(n for n, d in self.my_schedule.in_degree() if d == 0)
                 self.tasks[task.id] = task
                 self.active_bid = None
-            else:
-                # mora se updateat vrijeme i potencijalno pushat successore
-                node = winning_bid.task_id
-                node_data = self.my_schedule.nodes[node]
-                node_data['start_time'] = winning_bid.task_start
-                next_node = next(self.my_schedule.successors(node), None)
-                while next_node is not None:
-                    distance = self.my_schedule.edges[node, next_node]['distance']
-                    next_node_data = self.my_schedule.nodes[next_node]
-                    next_node_data['start_time'] = np.max(next_node_data['start_time'], node_data['start_time'] + node_data['task'].duration + distance/self.speed)
-                    node = next_node
-                    next_node = next(self.my_schedule.successors(node), None)
 
+            self.get_logger().info(f"got {winning_bid.task_id}, active_bid is {self.active_bid[2].id if self.active_bid is not None else 'none for active'} in already seen task")
+            # mora se updateat vrijeme i potencijalno pushat successore
+            node = winning_bid.task_id
+            node_data = self.my_schedule.nodes[node]
+            old_time = self.my_schedule.nodes[node].get('start_time', 'N/A')
+            self.get_logger().info(f"Robot {self.robot_id}: Node {node} OLD time: {old_time}")
+                
+            self.get_logger().info(f"updating {winning_bid.task_id} to {winning_bid.task_start}..... active bid is {self.active_bid}")
+            node_data['start_time'] = winning_bid.task_start
+                
+            new_time = self.my_schedule.nodes[node]['start_time']
+            self.get_logger().info(f"Robot {self.robot_id}: Node {node} NEW time: {new_time}")
+
+            next_node = next(self.my_schedule.successors(node), None)
+            while next_node is not None:
+                distance = self.my_schedule.edges[node, next_node]['distance']
+                next_node_data = self.my_schedule.nodes[next_node]
+                next_node_data['start_time'] = np.max(next_node_data['start_time'], node_data['start_time'] + node_data['task'].duration + distance/self.speed)
+                node = next_node
+                node_data = next_node_data
+                next_node = next(self.my_schedule.successors(node), None)
+
+        self.save_schedule()
+        ready = Bool()
+        self.ready_publisher.publish(ready)
 
 
 def main(args=None):
