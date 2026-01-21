@@ -73,6 +73,8 @@ public:
     {
         // get all available topics and extract highest <number> from topics with "robot_<number>/odom" 
         robot_id_ = this->declare_parameter<int>("robot_id", 0);
+	//sep_range_ = this->declare_parameter<float>("separation_range", 0);
+	//sep_factor_ = this->declare_parameter<float>("separantion_factor", 0);
 
 	    std::string filepath = "/root/ros2_ws/src/vissus_projekt/launch/topology";
 	    int num_boids_ = 4;
@@ -147,6 +149,8 @@ private:
     Bool_mat Get_Adjancency_Matrix(std::string filepath, int num_boids);
     Vector2 Calculate_Vel_Centroid_Consensus(const std::vector<Msg_Odom> odoms);
     Vector2 Calculate_Vel_Centroid_Consensus(const std::vector<Msg_Odom> odoms, const std::vector<Vector2> offsets);
+    Vector2 Calculate_Vel_Centroid_Consensus_Separation(const std::vector<Msg_Odom> odoms, const std::vector<Vector2> offsets);
+    int sign(float x);
 
 private:
     Boid boid;
@@ -229,8 +233,10 @@ void Boid_Controller_Node::Subscription_Boid_Info_Callback(const Msg_Boid_Info::
     Vector2 accel_goal  = Calculate_Accel_Goal(self_odom, goal_point);
     Vector2 accel_total = {};
     
-    std::vector<Vector2> offsets_= {Vector2{0, 0}, Vector2{0.5, 0.5}, Vector2{1.0, 1.0}, Vector2{1.5, 1.5}};
-    Vector2 vel_consensus  = Calculate_Vel_Centroid_Consensus(info->odometries, offsets_);
+    //std::vector<Vector2> offsets_= {Vector2{0, 0}, Vector2{0.5, 0.5}, Vector2{1.0, 1.0}, Vector2{1.5, 1.5}};
+    //Vector2 vel_consensus  = Calculate_Vel_Centroid_Consensus(info->odometries, offsets_);
+    std::vector<Vector2> offsets_= {Vector2{0, 0}, Vector2{0.0, 0.0}, Vector2{0.0, 1.0}, Vector2{0.0, 0.0}};
+    Vector2 vel_consensus = Calculate_Vel_Centroid_Consensus_Separation(info->odometries, offsets_);
 
     // combine forces forces
     {
@@ -655,6 +661,53 @@ Vector2 Boid_Controller_Node::Calculate_Vel_Centroid_Consensus(const std::vector
 
     return directed_total * (float)((double)(clock() - boid.last_time) / CLOCKS_PER_SEC);
 }
+Vector2 Boid_Controller_Node::Calculate_Vel_Centroid_Consensus_Separation(const std::vector<Msg_Odom> odoms, const std::vector<Vector2> offsets)
+{
+  //float sep_range = 1.0.f; // replace with actual separation rule range? this->avoidance_range_?
+  //float sep_factor = 0.001f; // replace with actual separation rule factor?
+
+    Vector2 directed_total = {
+        (float)0,
+        (float)0,
+    };
+
+
+    for (int i = 0; i < odoms.size(); i++) {
+        if (i == robot_id_-1) continue;
+
+        Vector2 delta_pos = { // robot_i.pos - robot_cur.pos
+            (float)odoms[i].pose.pose.position.x - (float)odoms[robot_id_-1].pose.pose.position.x,
+            (float)odoms[i].pose.pose.position.y - (float)odoms[robot_id_-1].pose.pose.position.y,
+        };
+
+        //directed_total.x += (float)odoms[i].pose.pose.position.x - (float)odoms[robot_id_-1].pose.pose.position.x;
+        //directed_total.y += (float)odoms[i].pose.pose.position.y - (float)odoms[robot_id_-1].pose.pose.position.y;
+
+        directed_total += delta_pos - (offsets[i] - offsets[robot_id_-1]);
+
+        float delta_dist = delta_pos.length();
+
+        if (delta_dist < avoidance_range_) {
+            //Vector2 separation = delta_pos / delta_pos.length_squared()
+            Vector2 separation;
+            separation.x = sign(delta_pos.x) / delta_pos.length_squared() * (avoidance_range_ - std::sqrt(squared_euclidan_norm(delta_pos)));
+            separation.y = sign(delta_pos.y) / delta_pos.length_squared() * (avoidance_range_ - std::sqrt(squared_euclidan_norm(delta_pos)));
+
+            separation *= avoidance_factor_; // maybe slow it down more smoothly? this is using squared distance...
+            separation /= delta_dist / avoidance_range_; // affect it by where it is proportional to the range at which separation starts
+        
+            directed_total += separation;
+
+        }
+
+    }
+
+    return directed_total * (float)((double)(clock() - boid.last_time) / CLOCKS_PER_SEC);
+}
+
+int Boid_Controller_Node::sign(float x) {
+    return (x < 0.0f) ? -1 : 1;
+}
 
 Bool_mat Boid_Controller_Node::Get_Adjancency_Matrix(std::string filepath, int num_boids)
 {
@@ -668,16 +721,16 @@ Bool_mat Boid_Controller_Node::Get_Adjancency_Matrix(std::string filepath, int n
         return mat;
     }
     
-    mat.reserve(num_boids_);
-    mat.resize(num_boids_);
+    mat.reserve(num_boids);
+    mat.resize(num_boids);
     for (auto& cell : mat)
     {
-        cell.reserve(num_boids_);
-        cell.resize(num_boids_);
+        cell.reserve(num_boids);
+        cell.resize(num_boids);
     }
 
-    for (size_t y = 0; y < num_boids_; y++)
-        for (size_t x = 0; x < num_boids_; x++)
+    for (size_t y = 0; y < num_boids; y++)
+        for (size_t x = 0; x < num_boids; x++)
             mat[y][x] = 0;
 
     if (in.is_open())

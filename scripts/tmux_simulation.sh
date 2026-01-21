@@ -12,7 +12,7 @@ if ! tmux has-session -t mrs_simulation 2>/dev/null; then
 fi
 
 # Run the commands to setup the simulation
-tmux send-keys -t mrs_simulation:bg "cd ~/ros2_ws/src/mrs_crazyfiles/startup" Enter
+tmux send-keys -t mrs_simulation:bg "cd ~/ros2_ws/src/mrs_crazyflies/startup" Enter
 tmux send-keys -t mrs_simulation:bg "./start.sh" Enter
 tmux send-keys -t mrs_simulation:bg "pgrep -f rqt || rqt &" Enter
 tmux send-keys -t mrs_simulation:main.1 "ros2 launch simulation.launch.py" Enter
