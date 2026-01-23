@@ -73,6 +73,8 @@ public:
     {
         // get all available topics and extract highest <number> from topics with "robot_<number>/odom" 
         robot_id_ = this->declare_parameter<int>("robot_id", 0);
+	//sep_range_ = this->declare_parameter<float>("separation_range", 0);
+	//sep_factor_ = this->declare_parameter<float>("separantion_factor", 0);
 
 	    std::string filepath = "/root/ros2_ws/src/vissus_projekt/launch/topology";
 	    int num_boids_ = 4;
@@ -84,6 +86,9 @@ public:
             {true,  true,  false, true},  // Node 3 connected to 1, 2, 4
             {true,  true,  true,  false}  // Node 4 connected to 1, 2, 3
         };
+
+	
+	
         // initialize all publishers, subscriptions and boids
         std::string robot_twist_topic = "/cf_" + std::to_string(int(robot_id_)) + "/cmd_vel";
         std::string robot_boid_info_topic = "/robot_" + std::to_string(int(robot_id_)) + "/boid_info";
@@ -132,10 +137,7 @@ private:
     void Subscription_Tuning_Params_Callback(const Msg_Tuning_Params::SharedPtr params);
     void Subscription_Goal_Odom_Callback(const Msg_Point::SharedPtr points);
     void Subscription_Formation_Callback(const Msg_Formation::SharedPtr points) ;
-    Vector2 Calculate_Accel_Alignment(std::vector<Msg_Odom> odoms);
-    Vector2 Calculate_Accel_Avoidence(std::vector<Msg_Odom> odoms);
-    Vector2 Calculate_Accel_Cohesion(std::vector<Msg_Odom> odoms);
-    Vector2 Calculate_Accel_Obstacle_Avoid(const Msg_Odom& self_odom, const Msg_Point& closest_obstacle);
+
     Vector2 Calculate_Accel_Goal(const Msg_Odom& self_odom, const Msg_Point& goal);
     // Project 2:
     // TODO: - Get_Adjacency_Matrix should read a line of the form "T: X" where X is the total number of boids to include in the consensus protocol (usually the same as the total number of boids presumably, but since only data_splitter gets to see the total number of boids and we could potentially say that some boids aren't part of the consensus protocol, these should be kept separate)
@@ -147,6 +149,8 @@ private:
     Bool_mat Get_Adjancency_Matrix(std::string filepath, int num_boids);
     Vector2 Calculate_Vel_Centroid_Consensus(const std::vector<Msg_Odom> odoms);
     Vector2 Calculate_Vel_Centroid_Consensus(const std::vector<Msg_Odom> odoms, const std::vector<Vector2> offsets);
+    Vector2 Calculate_Vel_Centroid_Consensus_Separation(const std::vector<Msg_Odom> odoms, const std::vector<Vector2> offsets);
+    int sign(float x);
 
 private:
     Boid boid;
@@ -162,19 +166,15 @@ private:
     int robot_id_;
     // modifiable params
     bool params_init = false;
+    bool formation_init = false;
     float rotation_kp_;
-    float cohesion_range_;
-    float cohesion_factor_;
-    float alignment_range_;
-    float alignment_factor_;
+    float census_factor_; 
     float avoidance_range_;
-    float avoidance_factor_;
-    float obstacle_avoid_range_;
-    float obstacle_avoid_factor_;
+    float avoidance_factor_;       
     float goal_factor_;
     float max_speed_;
-
     Msg_Point goal_point;
+  
     std::vector<Vector2> offsets_;   
 };
 
@@ -206,7 +206,6 @@ void Boid_Controller_Node::Subscription_Boid_Info_Callback(const Msg_Boid_Info::
 
     // update information we have and which is required for later operations
     Msg_Odom self_odom = info->odometries[0];
-    Msg_Point obstacle_point = info->closest_obstacle; 
     float z = self_odom.pose.pose.orientation.z;
     float w = self_odom.pose.pose.orientation.w;
     boid.last_rotation = atan2(2.0f * (w * z), w * w - z * z);
@@ -219,73 +218,28 @@ void Boid_Controller_Node::Subscription_Boid_Info_Callback(const Msg_Boid_Info::
         return;
     }
 
+    if (!boid.initialized)
+    {
+        boid.last_time = clock();
+        boid.initialized = true;
+        return;
+    }
+
     // ---------------------------------------------------------
     // boids logic
     
-    Vector2 accel_align = Calculate_Accel_Alignment(info->odometries); 
-    Vector2 accel_avoid = Calculate_Accel_Avoidence(info->odometries);
-    Vector2 accel_cohes = Calculate_Accel_Cohesion(info->odometries);
-    Vector2 accel_obsta = Calculate_Accel_Obstacle_Avoid(self_odom, obstacle_point);
-    Vector2 accel_goal  = Calculate_Accel_Goal(self_odom, goal_point);
-    Vector2 accel_total = {};
-    
-    std::vector<Vector2> offsets_= {Vector2{0, 0}, Vector2{0.5, 0.5}, Vector2{1.0, 1.0}, Vector2{1.5, 1.5}};
-    Vector2 vel_consensus  = Calculate_Vel_Centroid_Consensus(info->odometries, offsets_);
-
-    // combine forces forces
-    {
-        accel_total.x = 
-            accel_align.x + 
-            accel_avoid.x + 
-            accel_cohes.x + 
-            accel_obsta.x +
-            accel_goal.x;
-
-        accel_total.y = 
-            accel_align.y + 
-            accel_avoid.y +
-            accel_cohes.y + 
-            accel_obsta.y +
-            accel_goal.y;
-    }
+    //std::vector<Vector2> offsets_= {Vector2{0, 0}, Vector2{0.5, 0.5}, Vector2{1.0, 1.0}, Vector2{1.5, 1.5}};
+    //Vector2 vel_consensus  = Calculate_Vel_Centroid_Consensus(info->odometries, offsets_);
+    //std::vector<Vector2> offsets_= {Vector2{0, 0}, Vector2{1.0, 1.0}, Vector2{2.0, 2.0}, Vector2{3.0, 3.0}};
+    Vector2 vel_consensus = Calculate_Vel_Centroid_Consensus_Separation(info->odometries, offsets_);
 
     // create twist message based on total accel and current state well give to boid
     // and publish it
     {
-        // delta time in seconds
-        float delta_time = (double)(clock() - boid.last_time) / CLOCKS_PER_SEC;
-
-        // calculate delta_velocities
-        float delta_linear_x = sqrt(accel_total.x*accel_total.x + accel_total.y*accel_total.y); 
-        // UPITNO za delta_linear_x jeli ok izracunati accel u namjenjenom za vremenski interval (t+1)-(t) 
-        // a koristiti dt=(t)-(t-1)
-        //
-        // Dinov komentar: mislim da je ok jer je simulation refresh rate nadam se capped na necemu
-        float yaw = getYawFromQuaternion(self_odom.pose.pose.orientation);
-        
-        float relative_angle = normalize_angle(atan2(accel_total.y, accel_total.x) - yaw);
-        float delta_angular_z = p_controller_update(
-                    atan2(accel_total.y, accel_total.x), 
-                    boid.last_rotation,
-                    this->rotation_kp_
-                );
-
+        // delta time in seconds        
+       
         // construct message
         Msg_Twist twist_msg;
-      
-        // {
-        //     twist_msg.linear.x = self_odom.twist.twist.linear.x + accel_total.x * delta_time;
-        //     twist_msg.linear.y = self_odom.twist.twist.linear.y + accel_total.y * delta_time;
-        //     twist_msg.angular.z = 0.0f;
-        //     float norm = sqrt(twist_msg.linear.x*twist_msg.linear.x + twist_msg.linear.y*twist_msg.linear.y);
-        //     if (norm > max_speed_)
-        //     {
-        //         twist_msg.linear.x /= norm;
-        //         twist_msg.linear.y /= norm;
-        //         twist_msg.linear.x *= max_speed_;
-        //         twist_msg.linear.y *= max_speed_;
-        //     }
-        // }
      
         twist_msg.linear.z = 0.1f;
         twist_msg.angular.x = 0.0f;
@@ -295,8 +249,8 @@ void Boid_Controller_Node::Subscription_Boid_Info_Callback(const Msg_Boid_Info::
         //Vector2 vels = Calculate_Vel_Centroid_Consensus(odoms)
 	RCUTILS_LOG_INFO("Vel consensus x:%f", vel_consensus.x);
 	RCUTILS_LOG_INFO("Vel consensus y:%f", vel_consensus.y);
-        twist_msg.linear.x = 100*vel_consensus.x;
-        twist_msg.linear.y = 100*vel_consensus.y;
+        twist_msg.linear.x = vel_consensus.x;
+        twist_msg.linear.y = vel_consensus.y;
 
         pub_twist->publish(twist_msg);
     }
@@ -307,230 +261,6 @@ void Boid_Controller_Node::Subscription_Boid_Info_Callback(const Msg_Boid_Info::
     boid.last_time = clock();  // this is for delta_time to work
 }
 
-// TLDR: calculates alignment rule influence 
-// not TLDR: Calculates acceleration based from alignment rule influence, with respect to odometries of self and other boids
-// return: vector2 of acceleration 
-Vector2 Boid_Controller_Node::Calculate_Accel_Alignment(std::vector<Msg_Odom> odoms)
-{
-    Vector2 force_alignment = {};
-    uint alignment_neighbours_count = 0;
-
-    Msg_Odom self_odom = odoms[0];
-
-    Vector2 boid_self_pose = {
-        (float)self_odom.pose.pose.position.x,
-        (float)self_odom.pose.pose.position.y,
-    };
-
-    // start from 1 because 0 is boid self
-    for (uint i = 1; i < odoms.size(); ++i)
-    {
-        Vector2 boid_i_pose = {
-            (float)odoms[i].pose.pose.position.x,
-            (float)odoms[i].pose.pose.position.y,
-        };
-        // distance between boid[id] and boid[i]
-        Vector2 distance = {
-            boid_i_pose.x - boid_self_pose.x,
-            boid_i_pose.y - boid_self_pose.y
-        };
-    
-        // is the boid[i] close enough to boid[id] take effect on it?
-        if (squared_euclidan_norm(distance) <= (this->alignment_range_ * this->alignment_range_))
-        {
-            // linear component of linear+angular pair
-            float boid_i_lin = odoms[i].twist.twist.linear.x;
-            float boid_self_lin = self_odom.twist.twist.linear.x;
-
-            // -calculating jaw based on quaternion data
-            // -x and y are unneccessary because were only rotating around jaw so they are always 0
-            // -full function if ever needed:
-            // // float boid_i_rot = atan2(2.0f * (w * z + x * y), w * w + x * x - y * y - z * z);
-            float z = (float)odoms[i].pose.pose.orientation.z;
-            float w = (float)odoms[i].pose.pose.orientation.w;
-            float boid_i_rot = atan2(2.0f * (w * z), w * w - z * z);
-            z = (float)self_odom.pose.pose.orientation.z;
-            w = (float)self_odom.pose.pose.orientation.w;
-            float boid_self_rot = atan2(2.0f * (w * z), w * w - z * z);
-
-            // -jaw = 0° is to the right of the screen
-            // -positive rotation axis is right handed if Z goes outside the screen
-            // -positive X is right, positive Y is up
-
-            // -we only calculate linear_xy vectors based on magnitude and rotation
-            // because angular velocity doesnt have affect on current_velocity_xy vector
-            // -angular velocity is only needed for rotating the vessel which we will
-            // calculate for actuation purposes, and not guidence, as it can be looked at as
-            // acceleration thats affecting the magnitude vector in global frame 
-            // (changes its value overtime in global frame, yes, twist.linear is in
-            // local coordinate frame)
-            Vector2 boid_i_vel_lin = {
-                (float)cos(boid_i_rot)*boid_i_lin,
-                (float)sin(boid_i_rot)*boid_i_lin,
-            };
-            Vector2 boid_id_vel_lin = {
-                (float)cos(boid_self_rot)*boid_self_lin,
-                (float)sin(boid_self_rot)*boid_self_lin,
-            };
-
-            force_alignment.x += boid_i_vel_lin.x - boid_id_vel_lin.x;
-            force_alignment.y += boid_i_vel_lin.y - boid_id_vel_lin.y;
-
-            ++alignment_neighbours_count;
-        }
-    }
-    
-    // scale force
-    if (alignment_neighbours_count != 0)
-    {
-        force_alignment.x /= alignment_neighbours_count;
-        force_alignment.y /= alignment_neighbours_count;
-    }
-    
-    force_alignment.x *= alignment_factor_;
-    force_alignment.y *= alignment_factor_;
-
-    return force_alignment;
-}
-
-// TLDR: calculates aboidence rule influence 
-// not TLDR: Calculates acceleration based from avoidence rule influence, with respect to odometries of self and other boids
-// return: vector2 of acceleration 
-Vector2 Boid_Controller_Node::Calculate_Accel_Avoidence(std::vector<Msg_Odom> odoms)
-{
-    Vector2 force_avoidence = {};
-
-    Msg_Odom self_odom = odoms[0];
-
-    Vector2 boid_self_pose = {
-        (float)self_odom.pose.pose.position.x,
-        (float)self_odom.pose.pose.position.y,
-    };
-
-    // start from 1 because 0 is boid self
-    for (uint i = 1; i < odoms.size(); ++i)
-    {
-        Vector2 boid_i_pose = {
-            (float)odoms[i].pose.pose.position.x,
-            (float)odoms[i].pose.pose.position.y,
-        };
-        // distance between boid[id] and boid[i]
-        Vector2 distance = {
-            boid_self_pose.x - boid_i_pose.x,
-            boid_self_pose.y - boid_i_pose.y
-        };
-    
-        // is the boid[i] close enough to boid[id] take effect on it?
-        bool isInRange = squared_euclidan_norm(distance) <= (this->avoidance_range_ * this->avoidance_range_);
-        if (isInRange)
-        {
-            float zero_one_distance_x;  // zero when distance is 0, 1 when distance is visual range
-            float zero_one_distance_y;  // zero when distance is 0, 1 when distance is visual range
-
-            zero_one_distance_x = distance.x / this->avoidance_range_;
-            zero_one_distance_y = distance.y / this->avoidance_range_;
-
-            force_avoidence.x += 1.0f / (zero_one_distance_x * zero_one_distance_x);
-            force_avoidence.y += 1.0f / (zero_one_distance_y * zero_one_distance_y);
-}
-    }
-
-    force_avoidence.x *= avoidance_factor_;
-    force_avoidence.y *= avoidance_factor_;
-
-    return force_avoidence;
-}
-
-// TLDR: calculates cohesion rule influence 
-// not TLDR: Calculates acceleration based from cohesion rule influence, with respect to odometries of self and other boids
-// return: vector2 of acceleration 
-Vector2 Boid_Controller_Node::Calculate_Accel_Cohesion(std::vector<Msg_Odom> odoms)
-{
-    Vector2 force_cohesion = {};
-    uint cohesion_neighbours_count = 0;
-    
-    Msg_Odom self_odom = odoms[0];
-
-    Vector2 boid_self_pose = {
-        (float)self_odom.pose.pose.position.x,
-        (float)self_odom.pose.pose.position.y,
-    };
-
-    // start from 1 because 0 is boid self
-    for (uint i = 1; i < odoms.size(); ++i)
-    {
-        Vector2 boid_i_pose = {
-            0.0f,
-            0.0f
-        };
-        // distance between boid[id] and boid[i]
-        Vector2 distance = {
-            boid_i_pose.x - boid_self_pose.x,
-            boid_i_pose.y - boid_self_pose.y
-        };
-    
-        // is within range?
-        if (squared_euclidan_norm(distance) <= (this->cohesion_range_ * this->cohesion_range_))
-        {
-            force_cohesion.x += distance.x;
-            force_cohesion.y += distance.y;
-            ++cohesion_neighbours_count;
-        }
-    }
-
-    // scale force
-    if (cohesion_neighbours_count != 0)
-    {
-        force_cohesion.x /= cohesion_neighbours_count;
-        force_cohesion.y /= cohesion_neighbours_count;
-    }
-
-    force_cohesion.x *= cohesion_factor_;
-    force_cohesion.y *= cohesion_factor_;
-
-    return force_cohesion;
-}
-
-// TLDR: calculates obstacle avoidence rule influence 
-// not TLDR: Calculates acceleration based on closest obstacle point coordinates, with respect to odometry of self
-// return: vector2 of acceleration 
-Vector2 Boid_Controller_Node::Calculate_Accel_Obstacle_Avoid(const Msg_Odom& self_odom, const Msg_Point& closest_obstacle)
-{
-    Vector2 force_obstacle = {};
-
-    Vector2 boid_self_pose = {
-        (float)self_odom.pose.pose.position.x,
-        (float)self_odom.pose.pose.position.y,
-    };
-
-    Vector2 closest_obstacle_pose = {
-        (float)closest_obstacle.x,
-        (float)closest_obstacle.y,
-    };
-   
-    Vector2 distance = {
-        boid_self_pose.x - closest_obstacle_pose.x,
-        boid_self_pose.y - closest_obstacle_pose.y
-    };
-   
-    bool isInRange = squared_euclidan_norm(distance) <= (this->obstacle_avoid_range_ * this->obstacle_avoid_range_);
-    if (isInRange)
-    {
-        float zero_one_distance_x;  // zero when distance is 0, 1 when distance is visual range
-        float zero_one_distance_y;  // zero when distance is 0, 1 when distance is visual range
-
-        zero_one_distance_x = distance.x / this->obstacle_avoid_range_;
-        zero_one_distance_y = distance.y / this->obstacle_avoid_range_;
-
-        force_obstacle.x += 1.0f / (zero_one_distance_x * zero_one_distance_x);
-        force_obstacle.y += 1.0f / (zero_one_distance_y * zero_one_distance_y);
-    }
-
-    force_obstacle.x *= obstacle_avoid_factor_;
-    force_obstacle.y *= obstacle_avoid_factor_;
-    return force_obstacle;
-}
-
 // TLDR: updates tuning params 
 // not TLDR: Based on subscription of topic thats designed to update tuning params, updates tuning params 
 // return: nothing
@@ -538,15 +268,10 @@ void Boid_Controller_Node::Subscription_Tuning_Params_Callback(const Msg_Tuning_
 {
     params_init = true; 
     
-    rotation_kp_ = params->rotation_kp;
-    cohesion_range_ = params->cohesion_range;
-    cohesion_factor_ = params->cohesion_factor; 
-    alignment_range_ = params->alignment_range; 
-    alignment_factor_ = params->alignment_factor; 
+    rotation_kp_ = params->rotation_kp;     
     avoidance_range_ = params->avoidance_range; 
     avoidance_factor_ = params->avoidance_factor;
-    obstacle_avoid_range_ = params->obstacle_avoid_range; 
-    obstacle_avoid_factor_ = params->obstacle_avoid_factor; 
+    census_factor_ = params->census_factor;
     goal_factor_ = params->goal_factor; 
     max_speed_ = params->max_speed; 
 }
@@ -559,14 +284,24 @@ void Boid_Controller_Node::Subscription_Goal_Odom_Callback(const Msg_Point::Shar
     goal_point = *point;
 }
 
+// void Boid_Controller_Node::Subscription_Formation_Callback(const Msg_Formation::SharedPtr points)
+// {   
+//   for (auto point : points->formation_points){
+//     Vector2 vpoint;
+//     vpoint.x = point.x;
+//     vpoint.y = point.y;
+//     offsets_.push_back(vpoint);        
+//   }
+// }
+
 void Boid_Controller_Node::Subscription_Formation_Callback(const Msg_Formation::SharedPtr points)
 {   
-  for (auto point : points->formation_points){
-    Vector2 vpoint;
-    vpoint.x = point.x;
-    vpoint.y = point.y;
-    offsets_.push_back(vpoint);        
-  }
+    offsets_ = { 
+        Vector2{points->cf1.x, points->cf1.y},
+        Vector2{points->cf2.x, points->cf2.y},
+        Vector2{points->cf3.x, points->cf3.y},
+        Vector2{points->cf4.x, points->cf4.y}
+    };
 }
 
 
@@ -655,6 +390,57 @@ Vector2 Boid_Controller_Node::Calculate_Vel_Centroid_Consensus(const std::vector
 
     return directed_total * (float)((double)(clock() - boid.last_time) / CLOCKS_PER_SEC);
 }
+Vector2 Boid_Controller_Node::Calculate_Vel_Centroid_Consensus_Separation(const std::vector<Msg_Odom> odoms, const std::vector<Vector2> offsets)
+{
+  //float sep_range = 1.0.f; // replace with actual separation rule range? this->avoidance_range_?
+  //float sep_factor = 0.001f; // replace with actual separation rule factor?
+
+    Vector2 directed_total = {
+        (float)0,
+        (float)0,
+    };
+
+
+    for (int i = 0; i < odoms.size(); i++) {
+        if (i == robot_id_-1) continue;	        
+	
+        Vector2 delta_pos = { // robot_i.pos - robot_cur.pos
+	  (float)odoms[i].pose.pose.position.x - (float)odoms[robot_id_-1].pose.pose.position.x,
+	  (float)odoms[i].pose.pose.position.y - (float)odoms[robot_id_-1].pose.pose.position.y,
+        };
+
+	float delta_dist = delta_pos.length();
+
+        //directed_total.x += (float)odoms[i].pose.pose.position.x - (float)odoms[robot_id_-1].pose.pose.position.x;
+        //directed_total.y += (float)odoms[i].pose.pose.position.y - (float)odoms[robot_id_-1].pose.pose.position.y;
+
+        directed_total += delta_pos - (offsets[i] - offsets[robot_id_-1]);
+
+        if (delta_dist < avoidance_range_) {
+            //Vector2 separation = delta_pos / delta_pos.length_squared()
+            Vector2 separation;
+            //separation.x = sign(delta_pos.x) / delta_pos.length_squared(); // * (avoidance_range_ - std::sqrt(squared_euclidan_norm(delta_pos)));
+            //separation.y = sign(delta_pos.y) / delta_pos.length_squared(); // * (avoidance_range_ - std::sqrt(squared_euclidan_norm(delta_pos)));
+
+	    separation.x = (1. - delta_dist / avoidance_range_) * delta_pos.x / delta_pos.length_squared(); // linear repulsion 
+            separation.y = (1. - delta_dist / avoidance_range_) * delta_pos.y / delta_pos.length_squared(); //
+
+            separation *= avoidance_factor_; // maybe slow it down more smoothly? this is using squared distance...
+            separation /= delta_dist / avoidance_range_; // affect it by where it is proportional to the range at which separation starts
+        
+            directed_total += separation;
+
+        }
+
+    }
+
+    directed_total *= census_factor_ ;
+    return directed_total;
+}
+
+int Boid_Controller_Node::sign(float x) {
+    return (x < 0.0f) ? -1 : 1;
+}
 
 Bool_mat Boid_Controller_Node::Get_Adjancency_Matrix(std::string filepath, int num_boids)
 {
@@ -668,16 +454,16 @@ Bool_mat Boid_Controller_Node::Get_Adjancency_Matrix(std::string filepath, int n
         return mat;
     }
     
-    mat.reserve(num_boids_);
-    mat.resize(num_boids_);
+    mat.reserve(num_boids);
+    mat.resize(num_boids);
     for (auto& cell : mat)
     {
-        cell.reserve(num_boids_);
-        cell.resize(num_boids_);
+        cell.reserve(num_boids);
+        cell.resize(num_boids);
     }
 
-    for (size_t y = 0; y < num_boids_; y++)
-        for (size_t x = 0; x < num_boids_; x++)
+    for (size_t y = 0; y < num_boids; y++)
+        for (size_t x = 0; x < num_boids; x++)
             mat[y][x] = 0;
 
     if (in.is_open())
@@ -735,7 +521,7 @@ Bool_mat Boid_Controller_Node::Get_Adjancency_Matrix(std::string filepath, int n
                     }
 
                     if (temp != "")
-                    {
+v                    {
                         right.push_back(std::stoi(temp) - 1);
                         temp = "";
                     }

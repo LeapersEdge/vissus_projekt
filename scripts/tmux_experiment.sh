@@ -12,7 +12,7 @@ if ! tmux has-session -t mrs_experiment 2>/dev/null; then
 fi
 
 # Run the commands to setup the experiment
-tmux send-keys -t mrs_experiment:bg "cd ~/ros2_ws/src/mrs_crazyfiles_exp/startup" Enter
+tmux send-keys -t mrs_experiment:bg "cd ~/ros2_ws/src/mrs_crazyflies_exp/startup" Enter
 tmux send-keys -t mrs_experiment:bg "./start.sh" Enter
 tmux send-keys -t mrs_experiment:bg "pgrep -f rqt || rqt &" Enter
 tmux send-keys -t mrs_experiment:main.1 "ros2 launch simulation.launch.py" Enter

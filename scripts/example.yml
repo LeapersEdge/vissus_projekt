@@ -1,0 +1,36 @@
+name: mrs_simulation
+root: ./
+
+startup_window: bg
+
+pre_window: |
+  source <%= @settings["setup_name"] %>
+  source ~/ros2_ws/install/setup.bash
+  source /opt/ros/humble/setup.bash
+
+windows:
+  - bg:
+      layout: tiled
+      panes:
+        - cd ~/ros2_ws/src/mrs_crazyflies/startup && ./start.sh
+        - waitForCfsGazebo; sleep 2; ros2 launch mrs_crazyflies cf_velmux_launch.py
+
+  - main:
+      layout: main-vertical
+      panes:
+        - ros2 launch vissus_projekt simulation.launch.py
+        - bash
+
+  - rqt:
+      layout: even-horizontal
+      panes:
+        - rqt
+        - |
+            ros2 topic pub /tuning_params std_msgs/msg/Float32 "data: 0.5"
+        - |
+            ros2 topic pub /cp4/cmd_vel geometry_msgs/msg/Twist "{linear: {x: 0.0}, angular: {z: 0.0}}"
+
+  - cli:
+      panes:
+        - bash
+

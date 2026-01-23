@@ -1,11 +1,6 @@
 float32 rotation_kp
 float32 max_speed
-float32 cohesion_range
-float32 cohesion_factor
-float32 alignment_range
-float32 alignment_factor
 float32 avoidance_range
 float32 avoidance_factor
-float32 obstacle_avoid_range
-float32 obstacle_avoid_factor
+float32 census_factor
 float32 goal_factor 
