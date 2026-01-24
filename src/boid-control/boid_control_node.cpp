@@ -1,4 +1,4 @@
-#include <algorithm>
+boid#include <algorithm>
 #include <cassert>
 #include <cmath>
 #include <csignal>
@@ -363,6 +363,34 @@ Vector2 Boid_Controller_Node::Calculate_Vel_Centroid_Consensus(const std::vector
         if (adjacency_mat_[robot_id_-1][i]) {
             directed_total.x += (float)odoms[i].pose.pose.position.x - (float)odoms[robot_id_-1].pose.pose.position.x;
             directed_total.y += (float)odoms[i].pose.pose.position.y - (float)odoms[robot_id_-1].pose.pose.position.y;
+
+
+	    Vector2 delta_pos = { // robot_i.pos - robot_cur.pos
+	      (float)odoms[i].pose.pose.position.x - (float)odoms[robot_id_-1].pose.pose.position.x,
+	      (float)odoms[i].pose.pose.position.y - (float)odoms[robot_id_-1].pose.pose.position.y,
+	    };
+	    float delta_dist = delta_pos.length();
+	    
+	    //directed_total.x += (float)odoms[i].pose.pose.position.x - (float)odoms[robot_id_-1].pose.pose.position.x;
+	    //directed_total.y += (float)odoms[i].pose.pose.position.y - (float)odoms[robot_id_-1].pose.pose.position.y;
+	    
+	    directed_total += delta_pos - (offsets[i] - offsets[robot_id_-1]);
+	    
+	    if (delta_dist < avoidance_range_) {
+	      //Vector2 separation = delta_pos / delta_pos.length_squared()
+	      Vector2 separation;
+	      //separation.x = sign(delta_pos.x) / delta_pos.length_squared(); // * (avoidance_range_ - std::sqrt(squared_euclidan_norm(delta_pos)));
+	      //separation.y = sign(delta_pos.y) / delta_pos.length_squared(); // * (avoidance_range_ - std::sqrt(squared_euclidan_norm(delta_pos)));
+	      
+	      separation.x = (1. - delta_dist / avoidance_range_) * delta_pos.x / delta_pos.length_squared(); // linear repulsion 
+	      separation.y = (1. - delta_dist / avoidance_range_) * delta_pos.y / delta_pos.length_squared(); //
+	      
+	      separation *= avoidance_factor_; // maybe slow it down more smoothly? this is using squared distance...
+	      separation /= delta_dist / avoidance_range_; // affect it by where it is proportional to the range at which separation starts
+        
+	      directed_total += separation;
+	      
+	    }
         } 
      }
 	
@@ -385,6 +413,28 @@ Vector2 Boid_Controller_Node::Calculate_Vel_Centroid_Consensus(const std::vector
         directed_total.x += (float)odoms[i].pose.pose.position.x - (float)odoms[robot_id_-1].pose.pose.position.x;
         directed_total.y += (float)odoms[i].pose.pose.position.y - (float)odoms[robot_id_-1].pose.pose.position.y;
 
+	Vector2 delta_pos = { // robot_i.pos - robot_cur.pos
+	  (float)odoms[i].pose.pose.position.x - (float)odoms[robot_id_-1].pose.pose.position.x,
+	  (float)odoms[i].pose.pose.position.y - (float)odoms[robot_id_-1].pose.pose.position.y,
+        };
+	float delta_dist = delta_pos.length();
+
+	if (delta_dist < avoidance_range_) {
+            //Vector2 separation = delta_pos / delta_pos.length_squared()
+            Vector2 separation;
+            //separation.x = sign(delta_pos.x) / delta_pos.length_squared(); // * (avoidance_range_ - std::sqrt(squared_euclidan_norm(delta_pos)));
+            //separation.y = sign(delta_pos.y) / delta_pos.length_squared(); // * (avoidance_range_ - std::sqrt(squared_euclidan_norm(delta_pos)));
+
+	    separation.x = (1. - delta_dist / avoidance_range_) * delta_pos.x / delta_pos.length_squared(); // linear repulsion 
+            separation.y = (1. - delta_dist / avoidance_range_) * delta_pos.y / delta_pos.length_squared(); //
+
+            separation *= avoidance_factor_; // maybe slow it down more smoothly? this is using squared distance...
+            separation /= delta_dist / avoidance_range_; // affect it by where it is proportional to the range at which separation starts
+        
+            directed_total += separation;
+
+        }
+	
         directed_total -= offsets[i] - offsets[robot_id_-1];
     }
 
@@ -521,7 +571,7 @@ Bool_mat Boid_Controller_Node::Get_Adjancency_Matrix(std::string filepath, int n
                     }
 
                     if (temp != "")
-v                    {
+                    {
                         right.push_back(std::stoi(temp) - 1);
                         temp = "";
                     }
