@@ -4,21 +4,6 @@
     "graph": {},
     "nodes": [
         {
-            "start_time": 2.23606797749979,
-            "id": 2,
-            "task_details": {
-                "id": 2,
-                "pos": [
-                    8.0,
-                    1.0
-                ],
-                "duration": 5.0,
-                "robots_needed": 1,
-                "predecessors": [],
-                "earliest_start": 0.0
-            }
-        },
-        {
             "start_time": 12.23606797749979,
             "id": 3,
             "task_details": {
@@ -28,17 +13,32 @@
                     5.0
                 ],
                 "duration": 15.0,
-                "robots_needed": 1,
+                "robots_needed": 4,
                 "predecessors": [],
-                "earliest_start": 11.60555127546399
+                "earliest_start": 8.0
+            }
+        },
+        {
+            "start_time": 34.30713578936526,
+            "id": 4,
+            "task_details": {
+                "id": 4,
+                "pos": [
+                    10.0,
+                    10.0
+                ],
+                "duration": 10.0,
+                "robots_needed": 2,
+                "predecessors": [],
+                "earliest_start": 27.23606797749979
             }
         }
     ],
     "edges": [
         {
-            "distance": 5.0,
-            "source": 2,
-            "target": 3
+            "distance": 7.0710678118654755,
+            "source": 3,
+            "target": 4
         }
     ]
 }
