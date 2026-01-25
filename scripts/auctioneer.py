@@ -1,0 +1,218 @@
+#!/usr/bin/env python3
+
+"""TASK DESCRIPTION: The auctioneer should load all the tasks T and their descriptions at initialization. Then, it should organize them
+in sets of tasks without predecessors TF = free(T), second layer of tasks whose predecessors are in TF ,
+TL = free(T \ TF ), and the set of remaining, hidden tasks TH = T \ {TF ∪ TL}, according to tasks’ precedence
+constraints.
+
+After that, the auctioneer starts the task allocation by auctioning the set of free tasks TF .
+
+The auctioneer collects all the bids and selects the best one. It communicates its selection to the bid winner, who
+then permanently adds the tasks to its list of assigned tasks. The auctioneer starts the process again with the
+remaining tasks until all tasks from TF are assigned. """
+from rclpy.qos import QoSProfile, DurabilityPolicy
+import rclpy as ros
+import networkx as nx  # onaj library za rad s grafovima
+import numpy as np
+from rclpy.node import Node
+from std_msgs.msg import Float64MultiArray
+from std_msgs.msg import Bool
+import os
+import json
+import matplotlib.pyplot as plt
+from vissus_projekt.msg import TaskList, Task, Bid
+
+
+class Auctioneer(Node):
+    def __init__(self):
+        super().__init__('Auctioneer')
+        self.task_graph = self.build_tasks_graph(self.load_mission_config())
+        self.free_tasks = list()
+        self.num_robots = self.get_num_robots()
+        self.expected_bids = self.get_num_robots()
+        self.auction_round = 0
+        self.pending_assignments = dict()
+        self.best_bid = [float('inf')]
+        self.ready = 0
+        qos_profile = QoSProfile(depth=10, durability=DurabilityPolicy.TRANSIENT_LOCAL)
+
+        # init publishers
+        self.task_publisher = self.create_publisher(TaskList, 'auction_task_list', qos_profile)
+        self.end_publisher = self.create_publisher(Bool, 'auction_closing', qos_profile)
+        self.winner_publisher = self.create_publisher(Bid, 'auction_winner', qos_profile)
+
+        # init listeners
+        self.bid_listener = self.create_subscription(Bid, 'bids', self.bid_evaluator_callback, qos_profile)
+        self.ready_sub = self.create_subscription(Bool, 'bidder_ready', self.ready_callback, qos_profile)
+
+        self.startup_timer = self.create_timer(1.0, self.wait_for_bidders) # wait for bidder nodes to sub
+
+
+    def ready_callback(self, msg):
+        """counts ready signals from bidders and starts auction when all are received."""
+        self.ready += 1
+        if self.ready == self.num_robots:
+            self.ready = 0
+            self.start_next_auction()
+
+    def wait_for_bidders(self):
+        count = self.task_publisher.get_subscription_count()
+        self.get_logger().info(f"Waiting for bidders... ({count}/{self.get_num_robots()} connected)")
+
+        if count >= self.num_robots:
+            self.get_logger().info("All bidders ready. Starting first auction round.")
+            self.startup_timer.cancel()  # Stop checking
+            self.start_next_auction()  # Trigger the first round
+
+    def get_num_robots(self):
+        return 4  # TODO: forward from launch
+
+    def build_tasks_graph(self, tasks_data):
+        task_graph = nx.DiGraph()
+        for t in tasks_data:
+            # Adds task nodes with attributes as node data
+            task_graph.add_node(t['id'], pos=t['pos'], duration=t['duration'], robots_needed=t['robots_needed'],
+                                earliest_start=0.0)
+
+            # Adds edges from predecessors
+            for p_id in t['predecessors']:
+                task_graph.add_edge(p_id, t['id'])
+        return task_graph
+
+    def load_mission_config(self):
+        # TODO: ROS Path
+        json_path = "../config/tasks.json"
+
+        try:
+            with open(json_path, 'r') as f:
+                data = json.load(f)
+                return data['tasks']
+        except FileNotFoundError:
+            print(f"Could not find tasks.json at {json_path}")
+
+    def visualize_task_graph(self, graph):
+        plt.figure(figsize=(8, 6))
+
+        pos = nx.spring_layout(graph)
+        nx.draw_networkx_nodes(graph, pos, node_size=700, node_color='skyblue')
+        nx.draw_networkx_edges(graph, pos, arrowstyle='->', arrowsize=20, edge_color='gray')
+        nx.draw_networkx_labels(graph, pos, font_size=12, font_family='sans-serif')
+
+        plt.title("Task Precedence Graph (DAG)")
+        plt.axis('off')
+        #plt.savefig() # TODO save graph
+
+    def publish_free_tasks(self):
+        """Auctions the new list of tasks."""
+        msg = TaskList()
+        msg.auction_round = self.auction_round
+
+        for t_id, t_data in self.free_tasks:
+            t = Task()
+            t.id = t_id
+            t.pos = [float(t_data['pos'][0]), float(t_data['pos'][1])]
+            t.duration = t_data['duration']
+            t.robots_needed = t_data['robots_needed']
+            t.earliest_start = t_data['earliest_start']
+
+            # Append the individual task to the list
+            msg.tasks.append(t)
+        self.task_publisher.publish(msg)
+
+    def assign_best_bid(self):
+        """Publishes the winner and sends updates for multirobot tasks."""
+        best_bid_val, best_bidder_id, best_task_id, best_auction_round, best_task_start = self.best_bid
+
+        best_bid = Bid()
+        best_bid.task_id = best_task_id
+        best_bid.bid = best_bid_val
+        best_bid.bidder_id = best_bidder_id
+        best_bid.auction_round = best_auction_round
+        best_bid.task_start = best_task_start
+        self.get_logger().info(f"trying to get {best_task_id}...")
+        node_data = self.task_graph.nodes[best_task_id]
+
+        node_data['robots_needed'] -= 1
+        node_data['earliest_start'] = max(node_data['earliest_start'], best_bid.task_start)
+
+        if best_task_id not in self.pending_assignments:
+            self.pending_assignments[best_task_id] = []
+
+        self.pending_assignments[best_task_id].append(best_bid)
+        if node_data['robots_needed'] == 0:  # Quota is fulfilled
+            final_start_time = node_data['earliest_start']
+
+            # sending this bid to all who won this multirobot task in previous iterations so they can update start time
+            for i in self.pending_assignments[best_task_id]:
+                final_bid = Bid()
+                final_bid.auction_round = best_auction_round
+                final_bid.bidder_id = i.bidder_id
+                final_bid.task_id = i.task_id
+                final_bid.bid = i.bid
+                final_bid.task_start = final_start_time
+                
+                self.ready -= self.num_robots if i is not best_bid else 0
+
+                self.winner_publisher.publish(final_bid)
+
+            # update earliest starts for dependent tasks
+            for succ in self.task_graph.successors(best_task_id):
+                current_earliest_start = self.task_graph.nodes[succ].get('earliest_start')
+                self.task_graph.nodes[succ]['earliest_start'] = max(current_earliest_start,
+                                                                    final_start_time + node_data['duration'])
+            del self.pending_assignments[best_task_id]
+            self.task_graph.remove_node(best_task_id)
+            self.free_tasks = [t for t in self.free_tasks if t[0] != best_task_id] # removes task from list
+        else:  # sends temporary bid until all bidders have bid on multirobot task
+            self.winner_publisher.publish(best_bid)
+
+    def bid_evaluator_callback(self, msg):
+        """Evaluates incoming bids. Saves the best ones in best_bid."""
+        bidder_id = msg.bidder_id
+        task_id = msg.task_id
+        bid = msg.bid
+        auction_round = msg.auction_round
+        task_start = msg.task_start
+
+        # accepts current auction round bids
+        if auction_round == self.auction_round:
+
+            self.expected_bids -= 1
+            if bid < self.best_bid[0]:
+                self.best_bid = (bid, bidder_id, task_id, auction_round, task_start)
+
+            # only assignes the best bid when all the bids have been received
+            if self.expected_bids == 0:
+                self.assign_best_bid()
+
+    def start_next_auction(self):
+        """Starts nex round of auction. Free tasks are updated only when the current layer is completely distributed."""
+        if not self.free_tasks:
+            self.free_tasks = [(node, data) for node, data in self.task_graph.nodes(data=True) if
+                               self.task_graph.in_degree(node) == 0]
+        if self.free_tasks == []:
+            self.end()
+            return
+        else:
+            self.expected_bids = self.get_num_robots()
+            self.auction_round += 1
+            self.best_bid = [float('inf')]
+            self.publish_free_tasks()
+
+    def end(self):
+        """Shuts down auctioneer node."""
+        self.get_logger().info("!!! MISSION COMPLETE: No tasks left in graph !!!")
+        self.end_publisher.publish(Bool())
+        raise SystemExit
+
+
+def main(args=None):
+    ros.init(args=args)
+    node = Auctioneer()
+    ros.spin(node)
+    node.destroy_node()
+    ros.shutdown()
+
+
+if __name__ == '__main__':
+    main()

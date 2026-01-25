@@ -39,6 +39,9 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/OdometryArray.msg"
   "msg/TuningParams.msg"
   "msg/Formation.msg"
+  "msg/Task.msg"
+  "msg/TaskList.msg"
+  "msg/Bid.msg"
   DEPENDENCIES std_msgs nav_msgs geometry_msgs
 )
 
@@ -135,7 +138,7 @@ install(TARGETS
 
 # install py scripts
 install(PROGRAMS
-  "${MY_SCRIPTS}" 
+  ${MY_SCRIPTS} 
   DESTINATION lib/${PROJECT_NAME}
 )
 

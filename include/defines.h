@@ -14,6 +14,8 @@
 #include "crazyflie_interfaces/msg/log_data_generic.hpp"
 #include <vector>
 #include "geometry_msgs/msg/point.hpp"
+#include "geometry_msgs/msg/pose_array.hpp"
+#include "std_msgs/msg/int32_multi_array.hpp"
 
 // msg typedef
 typedef geometry_msgs::msg::Twist Msg_Twist;
@@ -21,6 +23,8 @@ typedef nav_msgs::msg::Odometry Msg_Odom;
 typedef vissus_projekt::msg::OdometryArray Msg_Boid_Info;
 typedef nav_msgs::msg::OccupancyGrid Msg_Map;
 typedef geometry_msgs::msg::Point Msg_Point;
+typedef geometry_msgs::msg::PoseArray Msg_PoseArray;
+typedef std_msgs::msg::Int32MultiArray Msg_Adjacency;
 typedef vissus_projekt::msg::TuningParams Msg_Tuning_Params; 
 typedef geometry_msgs::msg::PoseStamped Msg_PoseStamped;
 typedef crazyflie_interfaces::msg::LogDataGeneric Msg_LogDataGeneric;
@@ -32,6 +36,8 @@ typedef rclcpp::Publisher<Msg_Boid_Info>::SharedPtr Publisher_Boid_Info;
 typedef rclcpp::Publisher<Msg_PoseStamped>::SharedPtr Publisher_PoseStamped;
 
 // subs typedef
+typedef rclcpp::Subscription<Msg_Adjacency>::SharedPtr Subscription_Adjacency;
+typedef rclcpp::Subscription<Msg_PoseArray>::SharedPtr Subscription_PoseArray;
 typedef rclcpp::Subscription<Msg_Boid_Info>::SharedPtr Subscription_Boid_Info;
 typedef rclcpp::Subscription<Msg_Odom>::SharedPtr Subscription_Odom;
 typedef rclcpp::Subscription<Msg_Map>::SharedPtr Subscription_Map;
