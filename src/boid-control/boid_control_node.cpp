@@ -99,7 +99,7 @@ public:
         std::string robot_tuning_params_topic = "/tuning_params";
         std::string goal_odom_topic = "/robot_goals";
     	std::string formation_topic = "/formation";
-	std::string adjacency_topic = "/adjacency";
+	std::string adjacency_topic = "/adjacency_matrix";
 	
         // init subs
 	sub_adjacency = this->create_subscription<Msg_Adjacency>(
@@ -182,6 +182,9 @@ private:
     std::string mode_;
     bool params_init = false;
     bool formation_init = false;
+    bool adjacency_init = false;
+    bool robot_goals_init = false;
+    bool first_take_off = true;
     float rotation_kp_;
     float census_factor_; 
     float avoidance_range_;
@@ -232,12 +235,6 @@ void Boid_Controller_Node::Subscription_Boid_Info_Callback(const Msg_Boid_Info::
         return;
     }
 
-    if (!boid.initialized)
-    {
-        boid.last_time = clock();
-        boid.initialized = true;
-        return;
-    }
 
     // ---------------------------------------------------------
     // boids logic
@@ -246,20 +243,33 @@ void Boid_Controller_Node::Subscription_Boid_Info_Callback(const Msg_Boid_Info::
     //Vector2 vel_consensus  = Calculate_Vel_Centroid_Consensus(info->odometries, offsets_);
     //std::vector<Vector2> offsets_= {Vector2{0, 0}, Vector2{1.0, 1.0}, Vector2{2.0, 2.0}, Vector2{3.0, 3.0}};
     Vector2 vel_consensus;
+
+
+    // RCUTILS_LOG_INFO("mode is %s", mode_.c_str());
+    // RCUTILS_LOG_INFO("adjacency_init is %d", adjacency_init);
+    // RCUTILS_LOG_INFO("robot goals init is %d", robot_goals_init);
+    
     if (mode_ == "rendevous")
     {
 	vel_consensus = Calculate_Vel_Centroid_Consensus(info->odometries);
     }
-    if (mode_ == "formation" || mode_ == "market")
+    else if (mode_ == "formation")
     {
-	vel_consensus = Calculate_Vel_Centroid_Consensus(info->odometries, offsets_);
+	if (!formation_init) return;	    						
+	vel_consensus = Calculate_Vel_Centroid_Consensus(info->odometries, offsets_);	    
     }
+    else if (mode_ == "market"){
+	if (!adjacency_init || !robot_goals_init) return;
+        vel_consensus = Calculate_Vel_Centroid_Consensus(info->odometries, offsets_);	    
+    }	
+
+    
     else
     {
 	RCUTILS_LOG_ERROR("Mode must be either market, formation or rendevous, not %s", mode_.c_str());
 	return;
     }
-    
+    // RCUTILS_LOG_INFO("Vel consenus goals init is (%f, %f)", vel_consensus.x, vel_consensus.y);
     
     Vector2 separation_consensus = Calculate_Vel_Centroid_Consensus(info->odometries);
 
@@ -272,8 +282,12 @@ void Boid_Controller_Node::Subscription_Boid_Info_Callback(const Msg_Boid_Info::
        
         // construct message
         Msg_Twist twist_msg;
-     
-        twist_msg.linear.z = 0.1f;
+
+	if (first_take_off)
+	    {
+	    twist_msg.linear.z = 0.1f;
+	    first_take_off = false;
+	    }
         twist_msg.angular.x = 0.0f;
         twist_msg.angular.y = 0.0f;
 
@@ -313,9 +327,17 @@ void Boid_Controller_Node::Subscription_Tuning_Params_Callback(const Msg_Tuning_
 // return: nothing
 void Boid_Controller_Node::Subscription_Goal_Callback(const Msg_PoseArray::SharedPtr poses)
 {
+    robot_goals_init = true;
     
-    goal_point_ = poses->poses[robot_id_ - 1].position;   
-    
+    goal_point_ = poses->poses[robot_id_ - 1].position;
+
+    offsets_.resize(poses->poses.size());
+
+    for (size_t i = 0; i < poses->poses.size(); i++) {
+	offsets_[i].x = poses->poses[i].position.x;
+	offsets_[i].y = poses->poses[i].position.y;
+    }
+
 }
 
 // void Boid_Controller_Node::Subscription_Formation_Callback(const Msg_Formation::SharedPtr points)
@@ -365,6 +387,8 @@ void Boid_Controller_Node::Subscription_Adjacency_Callback(
             adjacency_mat_[r][c] = (msg->data[idx] != 0);
         }
     }
+
+    adjacency_init = true;
 }
 
 
@@ -481,7 +505,7 @@ Vector2 Boid_Controller_Node::Calculate_Vel_Centroid_Consensus(const std::vector
 
 
     for (int i = 0; i < odoms.size(); i++) {
-        if (i == robot_id_-1) continue;	        
+        if (i == robot_id_-1 || !adjacency_mat_[robot_id_-1][i]) continue;	        
 	
         Vector2 delta_pos = { // robot_i.pos - robot_cur.pos
 	  (float)odoms[i].pose.pose.position.x - (float)odoms[robot_id_-1].pose.pose.position.x,
@@ -509,7 +533,8 @@ Vector2 Boid_Controller_Node::Calculate_Avoidance(const std::vector<Msg_Odom> od
 
 
     for (int i = 0; i < odoms.size(); i++) {
-        if (i == robot_id_-1) continue;	        
+        if (i == robot_id_-1 || !adjacency_mat_[robot_id_-1][i]) continue;
+        
 	
         Vector2 delta_pos = { // robot_i.pos - robot_cur.pos
 	  (float)odoms[i].pose.pose.position.x - (float)odoms[robot_id_-1].pose.pose.position.x,

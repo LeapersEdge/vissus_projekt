@@ -15,7 +15,7 @@
 #include <vector>
 #include "geometry_msgs/msg/point.hpp"
 #include "geometry_msgs/msg/pose_array.hpp"
-#include "std_msgs/msg/int32_multi_array.hpp"
+#include "std_msgs/msg/float64_multi_array.hpp"
 
 // msg typedef
 typedef geometry_msgs::msg::Twist Msg_Twist;
@@ -24,7 +24,7 @@ typedef vissus_projekt::msg::OdometryArray Msg_Boid_Info;
 typedef nav_msgs::msg::OccupancyGrid Msg_Map;
 typedef geometry_msgs::msg::Point Msg_Point;
 typedef geometry_msgs::msg::PoseArray Msg_PoseArray;
-typedef std_msgs::msg::Int32MultiArray Msg_Adjacency;
+typedef std_msgs::msg::Float64MultiArray Msg_Adjacency;
 typedef vissus_projekt::msg::TuningParams Msg_Tuning_Params; 
 typedef geometry_msgs::msg::PoseStamped Msg_PoseStamped;
 typedef crazyflie_interfaces::msg::LogDataGeneric Msg_LogDataGeneric;

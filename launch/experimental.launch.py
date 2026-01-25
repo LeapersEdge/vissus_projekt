@@ -16,6 +16,7 @@ def generate_launch_description():
     num_of_robots = int(params['num_of_robots'])
     boid_vision_range = float(params['boid_vision_range'])
     boid_fov = float(params['boid_fov'])
+    mode = params['mode']
 
     boid_controllers = []
     for i in range(1, num_of_robots+1):
@@ -25,7 +26,7 @@ def generate_launch_description():
                 executable='boid_control',
                 name=f'boid_controller_{i}',
                 output='screen',
-                parameters=[{'robot_id': int(i)}]
+                parameters=[{'robot_id': int(i)}, {'mode': mode}]
             )
         )
 
