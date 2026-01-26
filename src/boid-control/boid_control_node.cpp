@@ -157,11 +157,11 @@ private:
     //       - in testing, use the separation rule but switch all other boid rules off
     //       - maybe implement using Goal on the Offset so that you can send the boids to a desired consensus-location without the boids' Go To Goal rule
     //               - (optional) implement separation within consensus protocol (recommended by the instructions in the first place), instead of using the boid separation rules
-    Bool_mat Get_Adjancency_Matrix(std::string filepath, int num_boids);
+    Bool_mat Get_Adjancency_Matrix(std::string filepath, int num_boids);    
     Vector2 Calculate_Vel_Centroid_Consensus(const std::vector<Msg_Odom> odoms);
     Vector2 Calculate_Vel_Centroid_Consensus(const std::vector<Msg_Odom> odoms, const std::vector<Vector2> offsets);
-    Vector2 Calculate_Avoidance(const std::vector<Msg_Odom> odoms);    
-	
+    Vector2 Calculate_Avoidance(const std::vector<Msg_Odom> odoms);     
+    bool Connected(Bool_mat adjacency_mat, int robot_id);
     int sign(float x);
 
 private:
@@ -248,7 +248,7 @@ void Boid_Controller_Node::Subscription_Boid_Info_Callback(const Msg_Boid_Info::
     // RCUTILS_LOG_INFO("mode is %s", mode_.c_str());
     // RCUTILS_LOG_INFO("adjacency_init is %d", adjacency_init);
     // RCUTILS_LOG_INFO("robot goals init is %d", robot_goals_init);
-    
+    printBoolMatrix(adjacency_mat_);
     if (mode_ == "rendevous")
     {
 	vel_consensus = Calculate_Vel_Centroid_Consensus(info->odometries);
@@ -271,6 +271,9 @@ void Boid_Controller_Node::Subscription_Boid_Info_Callback(const Msg_Boid_Info::
     }
     // RCUTILS_LOG_INFO("Vel consenus goals init is (%f, %f)", vel_consensus.x, vel_consensus.y);
     
+    vel_consensus.x = std::clamp(vel_consensus.x, -max_speed_, max_speed_);
+    vel_consensus.y = std::clamp(vel_consensus.y, -max_speed_, max_speed_);
+
     Vector2 separation_consensus = Calculate_Vel_Centroid_Consensus(info->odometries);
 
     vel_consensus += separation_consensus;
@@ -282,19 +285,30 @@ void Boid_Controller_Node::Subscription_Boid_Info_Callback(const Msg_Boid_Info::
        
         // construct message
         Msg_Twist twist_msg;
+	
+	bool connected = Connected(adjacency_mat_, robot_id_);
 
-	if (first_take_off)
+
+    connected = true;
+	if (first_take_off && connected)	    
 	    {
-	    twist_msg.linear.z = 0.1f;
-	    first_take_off = false;
+		twist_msg.linear.z = 0.1f;
+		first_take_off = false;
+	    }
+
+	else if (!connected)
+	    {
+		twist_msg.linear.z = -1.0f;
+		first_take_off = true;
 	    }
         twist_msg.angular.x = 0.0f;
         twist_msg.angular.y = 0.0f;
 
         // Project 2
         //Vector2 vels = Calculate_Vel_Centroid_Consensus(odoms)
-	RCUTILS_LOG_INFO("Vel consensus x:%f", vel_consensus.x); 
-	RCUTILS_LOG_INFO("Vel consensus y:%f", vel_consensus.y);
+	//RCUTILS_LOG_INFO("Vel consensus x:%f", vel_consensus.x);
+	RCUTILS_LOG_INFO("Vel consensus connected: :%d", connected); 
+	//RCUTILS_LOG_INFO("Vel consensus y:%f", vel_consensus.y);
         twist_msg.linear.x = vel_consensus.x;
         twist_msg.linear.y = vel_consensus.y;
 
@@ -563,6 +577,22 @@ Vector2 Boid_Controller_Node::Calculate_Avoidance(const std::vector<Msg_Odom> od
 
 int Boid_Controller_Node::sign(float x) {
     return (x < 0.0f) ? -1 : 1;
+}
+
+bool Boid_Controller_Node::Connected(Bool_mat adjacency_mat, int robot_id)
+{
+    bool has_neighbor = false;
+
+    if (adjacency_init && robot_id - 1 < adjacency_mat.size())
+	{
+	    for (bool connected : adjacency_mat[robot_id - 1])
+		{
+		    if (connected) {
+			has_neighbor = true;
+			break;
+		    }
+		}
+	}
 }
 
 

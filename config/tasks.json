@@ -2,28 +2,28 @@
   "tasks": [
     {
       "id": 1,
-      "pos": [2.0, 3.0],
+      "pos": [1.0, 1.5],
       "duration": 5.0,
       "robots_needed": 1,
       "predecessors": []
     },
     {
       "id": 2,
-      "pos": [8.0, 1.0],
+      "pos": [-1.0, 1.0],
       "duration": 5.0,
       "robots_needed": 1,
       "predecessors": []
     },
     {
       "id": 3,
-      "pos": [5.0, 5.0],
+      "pos": [1.0, -1.0],
       "duration": 15.0,
       "robots_needed": 4,
       "predecessors": [1, 2]
     },
     {
       "id": 4,
-      "pos": [10.0, 10.0],
+      "pos": [-1.0, 1.0],
       "duration": 10.0,
       "robots_needed": 2,
       "predecessors": [3]
