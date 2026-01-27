@@ -232,10 +232,17 @@ class TaskAllocation(Node):
         n = self.num_robots
         A = np.zeros((n, n))
 
-        for i in self.active_robots:
-            for j in self.active_robots:
+        active = self.active_robots
+        idle = set(range(1, n + 1)) - active
+
+        for i in active:
+            for j in active:
                 if i != j:
-                    A[i-1, j-1] = 1.0
+                    A[i - 1, j - 1] = 1.0
+
+        # for i in idle:
+        #     for j in active:
+        #         A[j-1, i-1] = 1.0   # idle sees active
 
         msg = Float64MultiArray()
         msg.layout.dim = [
