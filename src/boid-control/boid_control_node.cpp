@@ -21,6 +21,7 @@
 #include "utils.h"
 #include "vector2.hpp"
 #include "std_msgs/msg/int32_multi_array.hpp"
+#include <yaml-cpp/yaml.h>
 
 
 // ctrl+f sections:
@@ -85,13 +86,12 @@ public:
         //adjacency_mat_ = Boid_Controller_Node::Get_Adjancency_Matrix(filepath, 4);
         //printBoolMatrix(adjacency_mat_);
         adjacency_mat_ = {
-            {false, true,  true,  true},  // Node 1 connected to 2, 3, 4
+            {false, false, false,  false},  // Node 1 connected to 2, 3, 4
             {true,  false, true,  true},  // Node 2 connected to 1, 3, 4
             {true,  true,  false, true},  // Node 3 connected to 1, 2, 4
             {true,  true,  true,  false}  // Node 4 connected to 1, 2, 3
         };
-
-	
+	//adjacency_mat_ = LoadAdjacencyFromYaml("/root/ros2_ws/src/vissus_projekt/launch/topology.yaml");
 	
         // initialize all publishers, subscriptions and boids
         std::string robot_twist_topic = "/cf_" + std::to_string(int(robot_id_)) + "/cmd_vel";
@@ -594,21 +594,25 @@ int Boid_Controller_Node::sign(float x) {
 
 bool Boid_Controller_Node::Connected(Bool_mat adjacency_mat, int robot_id)
 {
-    bool has_neighbor = false;
+    int idx = robot_id - 1;
 
-    if (robot_id - 1 < adjacency_mat.size())
-	{
-	    for (bool connected : adjacency_mat[robot_id - 1])
-		{
-		    if (connected) {
-			has_neighbor = true;
-			break;
-		    }
-		}
-	}
-    return has_neighbor;
+    if (idx < 0 || idx >= (int)adjacency_mat.size())
+        return false;
+
+    // Check outgoing edges (row)
+    for (bool connected : adjacency_mat[idx]) {
+        if (connected)
+            return true;
+    }
+
+    // Check incoming edges (column)
+    for (size_t i = 0; i < adjacency_mat.size(); i++) {
+        if (adjacency_mat[i][idx])
+            return true;
+    }
+
+    return false;
 }
-
 
 Bool_mat Boid_Controller_Node::Get_Adjancency_Matrix(std::string filepath, int num_boids)
 {
@@ -708,3 +712,4 @@ Bool_mat Boid_Controller_Node::Get_Adjancency_Matrix(std::string filepath, int n
 
     return mat;
 }
+
