@@ -134,11 +134,11 @@ class TaskAllocation(Node):
         dtype=float
     )
 
-        # self.get_logger().info(
-        #     f"[POSE] Robot {robot_id} @ "
-        #     f"x={msg.pose.position.x:.2f}, "
-        #     f"y={msg.pose.position.y:.2f}"
-        #)
+        self.get_logger().info(
+            f"[POSE] Robot {robot_id} @ "
+            f"x={msg.pose.position.x:.2f}, "
+            f"y={msg.pose.position.y:.2f}"
+        )
         self.check_task_completion()
 
     # ==================================================
