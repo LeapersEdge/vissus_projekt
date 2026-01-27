@@ -149,9 +149,18 @@ class TaskAllocation(Node):
         for tid, robots in self.task_to_robots.items():
             if tid in self.task_completed:
                 continue
+            
+            if self.task_state.get(tid) != 'active':
+                continue
+
 
             # Only consider fully assigned tasks
             if len(robots) != self.task_required[tid]:
+                self.get_logger().debug(
+                    f"[SKIP] Task {tid}: "
+                    f"coalition size mismatch "
+                    f"({len(robots)} != {self.task_required[tid]})"
+                )
                 continue
 
             goal = self.task_pos[tid]
@@ -160,10 +169,19 @@ class TaskAllocation(Node):
             for r in robots:
                 if r not in self.robot_positions:
                     arrived = False
+                    self.get_logger().warn(
+                        f"[WAIT] Task {tid}: "
+                        f"robot {r} has no pose yet"
+                    )
                     break
 
                 dist = np.linalg.norm(self.robot_positions[r] - goal)
                 if dist > self.goal_tolerance:
+                    self.get_logger().info(
+                       f"[WAIT] Task {tid}: "
+                       f"robot {r} distance={dist:.3f} "
+                       f"(tolerance={self.goal_tolerance})"
+                    )
                     arrived = False
                     break
 
