@@ -1,8 +1,6 @@
-boid_controller_node:
-  ros__parameters:
-    num_boids: 4
-    adjacency:
-      - [false, true,  true,  true]
-      - [true,  false, true,  true]
-      - [true,  true,  false, true]
-      - [true,  true,  true,  false]
+adjacency:
+  - [0, 1, 1, 1]
+  - [1, 0, 1, 1]
+  - [1, 1, 0, 1]
+  - [1, 1, 1, 0]
+
