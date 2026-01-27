@@ -262,12 +262,12 @@ void Boid_Controller_Node::Subscription_Boid_Info_Callback(const Msg_Boid_Info::
     {
 	if (!formation_init) return;	    						
 	vel_consensus = Calculate_Vel_Centroid_Consensus(info->odometries, offsets_);
-	RCUTILS_LOG_ERROR("Offsets are (%f, %f), (%f, %f), (%f, %f), (%f, %f)", offsets_[0].x, offsets_[0].y, offsets_[1].x, offsets_[1].y, offsets_[2].x, offsets_[2].y, offsets_[3].x, offsets_[3].y);
+	RCUTILS_LOG_ERROR("Offsets are (%f, %f), (%f, %f), (%f, %f), (%f, %f), (%f, %f)", offsets_[0].x, offsets_[0].y, offsets_[1].x, offsets_[1].y, offsets_[2].x, offsets_[2].y, offsets_[3].x, offsets_[3].y);
     }
     else if (mode_ == "market"){
 	if (!adjacency_init || !robot_goals_init || std::isnan(offsets_[robot_id_ - 1].x) || std::isnan(offsets_[robot_id_ - 1].y)) return;
-    vel_consensus = Calculate_Vel_To_Goal(info->odometries[robot_id_ - 1], offsets_);
-	RCUTILS_LOG_ERROR("Offsets are (%f, %f), (%f, %f), (%f, %f), (%f, %f)", offsets_[0].x, offsets_[0].y, offsets_[1].x, offsets_[1].y, offsets_[2].x, offsets_[2].y, offsets_[3].x, offsets_[3].y);
+	
+	RCUTILS_LOG_ERROR("Offsets are (%f, %f), (%f, %f), (%f, %f), (%f, %f), (%f, %f)", offsets_[0].x, offsets_[0].y, offsets_[1].x, offsets_[1].y, offsets_[2].x, offsets_[2].y, offsets_[3].x, offsets_[3].y);
     }	
 
     
@@ -301,13 +301,17 @@ void Boid_Controller_Node::Subscription_Boid_Info_Callback(const Msg_Boid_Info::
 	}
 	
 	
-	if (first_take_off)	    
+	if (first_take_off && connected)	    
 	    {
 		twist_msg.linear.z = 0.1f;
 		first_take_off = false;
 	    }
-    else twist_msg.linear.z = 0.0f;
 
+	else if (!connected)
+	    {
+		twist_msg.linear.z = -1.0f;
+		first_take_off = true;
+	    }
         twist_msg.angular.x = 0.0f;
         twist_msg.angular.y = 0.0f;
 

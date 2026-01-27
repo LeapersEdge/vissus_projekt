@@ -15,7 +15,7 @@ class TaskAllocation(Node):
         super().__init__('task_allocation')
 
         self.num_robots = 4
-        self.goal_tolerance = 0.2
+        self.goal_tolerance = 0.5
 
         base_path = Path(__file__).resolve().parent
         self.tasks_file = base_path.parent / 'config' / 'tasks.json'
