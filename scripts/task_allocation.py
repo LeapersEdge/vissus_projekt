@@ -54,7 +54,7 @@ class TaskAllocation(Node):
         self.load_robot_schedules()
         # Check pending tasks twice per second
         self.create_timer(0.5, self.try_activate_tasks)
-        self.try_activate_tasks()
+        #self.try_activate_tasks()
 
     # ==================================================
     # Initialization
@@ -134,11 +134,11 @@ class TaskAllocation(Node):
         dtype=float
     )
 
-        self.get_logger().info(
-            f"[POSE] Robot {robot_id} @ "
-            f"x={msg.pose.position.x:.2f}, "
-            f"y={msg.pose.position.y:.2f}"
-        )
+        # self.get_logger().info(
+        #     f"[POSE] Robot {robot_id} @ "
+        #     f"x={msg.pose.position.x:.2f}, "
+        #     f"y={msg.pose.position.y:.2f}"
+        # )
         self.check_task_completion()
 
     # ==================================================
@@ -177,11 +177,11 @@ class TaskAllocation(Node):
 
                 dist = np.linalg.norm(self.robot_positions[r] - goal)
                 if dist > self.goal_tolerance:
-                    self.get_logger().info(
-                       f"[WAIT] Task {tid}: "
-                       f"robot {r} distance={dist:.3f} "
-                       f"(tolerance={self.goal_tolerance})"
-                    )
+                    # self.get_logger().info(
+                    #    f"[WAIT] Task {tid}: "
+                    #    f"robot {r} distance={dist:.3f} "
+                    #    f"(tolerance={self.goal_tolerance})"
+                    # )
                     arrived = False
                     break
 
@@ -190,11 +190,13 @@ class TaskAllocation(Node):
 
     def complete_task(self, task_id: int):
         self.task_completed.add(task_id)
+        self.task_state[task_id] = 'completed'
 
         robots = self.task_to_robots[task_id]
         for r in robots:
             self.robot_goals.pop(r, None)
             self.active_robots.discard(r)
+            self.robot_state[r] = 'idle'
 
         self.get_logger().info(
             f"Task {task_id} completed by robots {sorted(robots)}"
