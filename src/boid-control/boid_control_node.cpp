@@ -265,8 +265,9 @@ void Boid_Controller_Node::Subscription_Boid_Info_Callback(const Msg_Boid_Info::
 	RCUTILS_LOG_ERROR("Offsets are (%f, %f), (%f, %f), (%f, %f), (%f, %f)", offsets_[0].x, offsets_[0].y, offsets_[1].x, offsets_[1].y, offsets_[2].x, offsets_[2].y, offsets_[3].x, offsets_[3].y);
     }
     else if (mode_ == "market"){
-	if (!adjacency_init || !robot_goals_init || std::isnan(offsets_[robot_id_ - 1].x) || std::isnan(offsets_[robot_id_ - 1].y)) return;
-    vel_consensus = Calculate_Vel_To_Goal(info->odometries[robot_id_ - 1], offsets_);
+	if (!adjacency_init || !robot_goals_init) return;	
+	if (std::isnan(offsets_[robot_id_ - 1].x) || std::isnan(offsets_[robot_id_ - 1].y)) vel_consensus = Vector2{0, 0};	
+	else vel_consensus = Calculate_Vel_To_Goal(info->odometries[robot_id_ - 1], offsets_);
 	RCUTILS_LOG_ERROR("Offsets are (%f, %f), (%f, %f), (%f, %f), (%f, %f)", offsets_[0].x, offsets_[0].y, offsets_[1].x, offsets_[1].y, offsets_[2].x, offsets_[2].y, offsets_[3].x, offsets_[3].y);
     }	
 

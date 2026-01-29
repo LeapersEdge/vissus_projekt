@@ -15,7 +15,7 @@ class TaskAllocation(Node):
         super().__init__('task_allocation')
 
         self.num_robots = 4
-        self.goal_tolerance = 0.5
+        self.goal_tolerance = 0.6
 
         base_path = Path(__file__).resolve().parent
         self.tasks_file = base_path.parent / 'config' / 'tasks.json'
@@ -240,9 +240,9 @@ class TaskAllocation(Node):
                 if i != j:
                     A[i - 1, j - 1] = 1.0
 
-        # for i in idle:
-        #     for j in active:
-        #         A[j-1, i-1] = 1.0   # idle sees active
+        for i in idle:
+            for j in active:
+                A[i-1, j-1] = 1.0   # idle sees active
 
         msg = Float64MultiArray()
         msg.layout.dim = [
