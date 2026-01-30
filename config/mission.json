@@ -1,0 +1,74 @@
+{
+  "tasks": [
+    {
+      "id": 1,
+      "pos": [-1.0, 1.8],
+      "duration": 5.0,
+      "robots_needed": 1,
+      "predecessors": []
+    },
+    {
+      "id": 2,
+      "pos": [1.0, 1.0],
+      "duration": 5.0,
+      "robots_needed": 1,
+      "predecessors": []
+    },
+    {
+      "id": 3,
+      "pos": [1.5, 2.0],
+      "duration": 5.0,
+      "robots_needed": 1,
+      "predecessors": []
+    },
+    {
+      "id": 4,
+      "pos": [-1.8, 0.5],
+      "duration": 5.0,
+      "robots_needed": 1,
+      "predecessors": []
+    },
+    {
+      "id": 5,
+      "pos": [1.8, -1.0],
+      "duration": 5.0,
+      "robots_needed": 1,
+      "predecessors": []
+    },
+    {
+      "id": 6,
+      "pos": [-0.5, -0.2],
+      "duration": 5.0,
+      "robots_needed": 1,
+      "predecessors": []
+    },
+    {
+      "id": 7,
+      "pos": [1.0, 1.7],
+      "duration": 15.0,
+      "robots_needed": 2,
+      "predecessors": [1,2]
+    },
+    {
+      "id": 8,
+      "pos": [1.8, 0.5],
+      "duration": 15.0,
+      "robots_needed": 2,
+      "predecessors": [3,5]
+    },
+    {
+      "id": 9,
+      "pos": [0.5, 0],
+      "duration": 15.0,
+      "robots_needed": 3,
+      "predecessors": [7,8]
+    },
+    {
+      "id": 10,
+      "pos": [1.7, 2.0],
+      "duration": 5.0,
+      "robots_needed": 1,
+      "predecessors": [6,8]
+    },
+  ]
+}
