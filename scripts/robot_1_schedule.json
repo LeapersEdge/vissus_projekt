@@ -4,41 +4,81 @@
     "graph": {},
     "nodes": [
         {
-            "start_time": 12.23606797749979,
-            "id": 3,
+            "start_time": 0.5385164807134505,
+            "id": 6,
             "task_details": {
-                "id": 3,
+                "id": 6,
                 "pos": [
-                    5.0,
-                    5.0
+                    -0.5,
+                    -0.2
                 ],
-                "duration": 15.0,
-                "robots_needed": 3,
+                "duration": 5.0,
+                "robots_needed": 1,
                 "predecessors": [],
-                "earliest_start": 8.0
+                "earliest_start": 0.0
             }
         },
         {
-            "start_time": 34.30713578936526,
+            "start_time": 7.014998786736791,
             "id": 4,
             "task_details": {
                 "id": 4,
                 "pos": [
-                    10.0,
-                    10.0
+                    -1.8,
+                    0.5
                 ],
-                "duration": 10.0,
+                "duration": 5.0,
                 "robots_needed": 1,
                 "predecessors": [],
-                "earliest_start": 34.30713578936526
+                "earliest_start": 0.0
+            }
+        },
+        {
+            "start_time": 16.982100316813302,
+            "id": 7,
+            "task_details": {
+                "id": 7,
+                "pos": [
+                    1.0,
+                    1.7
+                ],
+                "duration": 15.0,
+                "robots_needed": 2,
+                "predecessors": [],
+                "earliest_start": 14.979601877363223
+            }
+        },
+        {
+            "start_time": 33.754104831480234,
+            "id": 9,
+            "task_details": {
+                "id": 9,
+                "pos": [
+                    0.5,
+                    0.0
+                ],
+                "duration": 15.0,
+                "robots_needed": 2,
+                "predecessors": [],
+                "earliest_start": 31.982100316813302
             }
         }
     ],
     "edges": [
         {
-            "distance": 7.0710678118654755,
-            "source": 3,
+            "distance": 1.47648230602334,
+            "source": 6,
             "target": 4
+        },
+        {
+            "distance": 3.046309242345563,
+            "source": 4,
+            "target": 7
+        },
+        {
+            "distance": 1.772004514666935,
+            "source": 7,
+            "target": 9
         }
     ]
 }

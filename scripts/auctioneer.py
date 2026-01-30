@@ -81,7 +81,7 @@ class Auctioneer(Node):
 
     def load_mission_config(self):
         # TODO: ROS Path
-        json_path = "../config/tasks.json"
+        json_path = "../config/mission.json"
 
         try:
             with open(json_path, 'r') as f:
