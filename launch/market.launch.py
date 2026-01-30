@@ -22,7 +22,7 @@ def generate_launch_description():
             name=f'bidder_{i}',
             parameters=[{
                 'robot_id': i,
-                'start_x': float(i * 2),
+                'start_x': 0.0,
                 'start_y': 0.0
             }],
             output='screen'

@@ -7,7 +7,7 @@ from pathlib import Path
 from rclpy.node import Node
 from geometry_msgs.msg import Pose, PoseStamped, PoseArray
 from std_msgs.msg import Float64MultiArray, MultiArrayDimension
-
+import time
 
 class TaskAllocation(Node):
 
@@ -30,6 +30,8 @@ class TaskAllocation(Node):
         self.robot_positions = {}       # robot_id -> np.array([x,y])
         self.robot_goals = {}            # robot_id -> [x,y]
         self.active_robots = set()
+
+        self.task_duration = {}
 
 
         self.goal_pub = self.create_publisher(PoseArray, 'robot_goals', 10)
@@ -69,6 +71,7 @@ class TaskAllocation(Node):
             self.task_pos[tid] = np.array(t['pos'], dtype=float)
             self.task_required[tid] = t['robots_needed']
             self.task_to_robots[tid] = set()
+            self.task_duration[tid] = t['duration']
 
         self.get_logger().info(f"Loaded {len(self.task_pos)} tasks")
         return data['tasks']
@@ -186,6 +189,8 @@ class TaskAllocation(Node):
                     break
 
             if arrived:
+                start = time.time()
+                time.sleep(self.task_duration[tid])
                 self.complete_task(tid)
 
     def complete_task(self, task_id: int):
