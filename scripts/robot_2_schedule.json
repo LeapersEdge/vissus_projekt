@@ -4,13 +4,13 @@
     "graph": {},
     "nodes": [
         {
-            "start_time": 3.0,
-            "id": 1,
+            "start_time": 1.019803902718557,
+            "id": 5,
             "task_details": {
-                "id": 1,
+                "id": 5,
                 "pos": [
-                    2.0,
-                    3.0
+                    1.8,
+                    -1.0
                 ],
                 "duration": 5.0,
                 "robots_needed": 1,
@@ -19,46 +19,66 @@
             }
         },
         {
-            "start_time": 12.23606797749979,
-            "id": 3,
+            "start_time": 9.979601877363223,
+            "id": 1,
             "task_details": {
-                "id": 3,
+                "id": 1,
                 "pos": [
-                    5.0,
-                    5.0
+                    -1.0,
+                    1.8
                 ],
-                "duration": 15.0,
-                "robots_needed": 2,
+                "duration": 5.0,
+                "robots_needed": 1,
                 "predecessors": [],
-                "earliest_start": 8.0
+                "earliest_start": 0.0
             }
         },
         {
-            "start_time": 44.30713578936526,
-            "id": 5,
+            "start_time": 16.982100316813302,
+            "id": 7,
             "task_details": {
-                "id": 5,
+                "id": 7,
                 "pos": [
-                    0.0,
-                    0.0
+                    1.0,
+                    1.7
                 ],
-                "duration": 3.0,
+                "duration": 15.0,
                 "robots_needed": 1,
                 "predecessors": [],
-                "earliest_start": 44.30713578936526
+                "earliest_start": 15.061308029082353
+            }
+        },
+        {
+            "start_time": 33.754104831480234,
+            "id": 9,
+            "task_details": {
+                "id": 9,
+                "pos": [
+                    0.5,
+                    0.0
+                ],
+                "duration": 15.0,
+                "robots_needed": 1,
+                "predecessors": [],
+                "earliest_start": 33.754104831480234
             }
         }
     ],
     "edges": [
         {
-            "distance": 3.605551275463989,
-            "source": 1,
-            "target": 3
+            "distance": 3.959797974644666,
+            "source": 5,
+            "target": 1
         },
         {
-            "distance": 7.0710678118654755,
-            "source": 3,
-            "target": 5
+            "distance": 2.0024984394500787,
+            "source": 1,
+            "target": 7
+        },
+        {
+            "distance": 1.772004514666935,
+            "source": 7,
+            "target": 9
         }
     ]
 }

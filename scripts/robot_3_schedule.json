@@ -4,41 +4,61 @@
     "graph": {},
     "nodes": [
         {
-            "start_time": 12.23606797749979,
-            "id": 3,
+            "start_time": 3.1622776601683795,
+            "id": 2,
             "task_details": {
-                "id": 3,
+                "id": 2,
                 "pos": [
-                    5.0,
-                    5.0
+                    1.0,
+                    1.0
                 ],
-                "duration": 15.0,
-                "robots_needed": 4,
+                "duration": 5.0,
+                "robots_needed": 1,
                 "predecessors": [],
-                "earliest_start": 8.0
+                "earliest_start": 0.0
             }
         },
         {
-            "start_time": 34.30713578936526,
-            "id": 4,
+            "start_time": 11.454134754975888,
+            "id": 8,
             "task_details": {
-                "id": 4,
+                "id": 8,
                 "pos": [
-                    10.0,
-                    10.0
+                    1.8,
+                    0.5
                 ],
-                "duration": 10.0,
+                "duration": 15.0,
                 "robots_needed": 2,
                 "predecessors": [],
-                "earliest_start": 27.23606797749979
+                "earliest_start": 9.924428900898052
+            }
+        },
+        {
+            "start_time": 27.95746439281318,
+            "id": 10,
+            "task_details": {
+                "id": 10,
+                "pos": [
+                    1.7,
+                    2.0
+                ],
+                "duration": 5.0,
+                "robots_needed": 1,
+                "predecessors": [],
+                "earliest_start": 26.45413475497589
             }
         }
     ],
     "edges": [
         {
-            "distance": 7.0710678118654755,
-            "source": 3,
-            "target": 4
+            "distance": 0.9433981132056605,
+            "source": 2,
+            "target": 8
+        },
+        {
+            "distance": 1.503329637837291,
+            "source": 8,
+            "target": 10
         }
     ]
 }
