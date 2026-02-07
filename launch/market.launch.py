@@ -22,8 +22,8 @@ def generate_launch_description():
             name=f'bidder_{i}',
             parameters=[{
                 'robot_id': i,
-                'start_x': 0.0,
-                'start_y': 0.0
+                'start_x': -0.5 if i%2 == 0 else 0.5,
+                'start_y': -4.5 if i>1 else -4.0
             }],
             output='screen'
         )

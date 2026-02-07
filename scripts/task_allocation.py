@@ -18,7 +18,7 @@ class TaskAllocation(Node):
         self.goal_tolerance = 0.6
 
         base_path = Path(__file__).resolve().parent
-        self.tasks_file = base_path.parent / 'config' / 'tasks.json'
+        self.tasks_file = base_path.parent / 'config' / 'mission.json'
         self.schedule_folder = base_path
 
         self.task_pos = {}              # task_id -> np.array([x,y])
