@@ -10,7 +10,7 @@ Dependencies (links to installation guides):
 
 - [ROS2 stage](https://github.com/tuw-robotics/stage_ros2/blob/humble/res/install.md) [(alternativa ako prethodni ne radi)](https://github.com/LeapersEdge/vissus_projekt/blob/main/docs/stage%20installation.md)
 
-- [Sve iz MRS uputa](https://github.com/larics/mrs_simulation/blob/main/README.md#2-manual-installation-if-you-already-have-ros-installed)
+- [All from MRS instructions](https://github.com/larics/mrs_simulation/blob/main/README.md#2-manual-installation-if-you-already-have-ros-installed)
 
 Build:
 
@@ -21,9 +21,10 @@ colcon build --merge-install --symlink-install --packages-select vissus_projekt
 ### Concept
 
 #### Nodes
-Imamo *node*ove:
-- `boid-control`: aktivira se za svaki bot, *subscribe*a na svoj topic u kojem se nalaze odmetry msgs od svakog boida u svome susjedstvu, i nalazi pozu najbliže prepreke) 
-- `data-splitter`: pokreće se samo jednom i *publish*ati će sve topic-ove koje za svakog boida
+- `boid-control`: active for each individual robot, subscribes to its own topic in which there are neccessary odmetry msgs for each robot in the system 
+- `data-splitter`: only one i launched and publishes all topics relevant for each robot
+- `auctioneer`: actions tasks between bidders
+- `bidder`: bid on the task (each bidder represents one robot)
 
 Boid controller prima dva parametara: 
 - ID od robota na kojeg se *subscribe*a (default: 0)
@@ -81,7 +82,7 @@ Prvo u launch/launch_params.yaml morate podesiti:
   3. Njegov vidni dosed
   4. Način rada (rendevous/market/formation)
 
-Parametre sustava(koji su zapravo pojačanja reynolodsovih pravila) namještate tako da publishate poruku tipa TuningParams msg. Mi preporučujemo rqt za to, ali možete i lagano iskoristiti ros2 topic pub.
+Parametre sustava namještate tako da publishate poruku tipa TuningParams msg. Mi preporučujemo rqt za to, ali možete i lagano iskoristiti ros2 topic pub.
 ```shell
 rqt
 ```
