@@ -1,4 +1,7 @@
 # vissus_projekt
+## Project: 2nd phase
+### Controlling a Swarm of Crazyflies using Consensus Protocol and Auction-Based Task Allocation
+### (scroll to bottom)
 
   Grupa: Gabrijel Biočić, Dino Dubinović, Quinn Lee Fletcher, Ita Poklepović, Antonio Škara.
 
@@ -56,6 +59,8 @@ Pošto svaki pojedini boid ne zna sam po sebi gdje je svaki drugi boid, koristim
 ![Graph node za primjer s 6 boida](https://github.com/LeapersEdge/vissus_projekt/blob/main/images/node_graph.png)
 
 ### How to use
+
+Postavite graf usmjerene komunikacije drona u `launch/topology`. 
 Ovisno o tome želi li se koristiti market ili samo jednostavna verzija bez njega, koristit će se sljedeće naredbe:
 
 Market:
@@ -95,3 +100,15 @@ It is advised to modify the parameters via rqt; change the parameters in `/tunin
 1. `avoidance_factor` should be sufficiently high; great enough to make sure no collisions are happening but low enough to prevent violent and sudden jerking
 2. `avoidance_range` should be sufficiently small; great enough to affect boids but not too small to prevent violent and sudden jerking
 3. `goal_factor` should be lower than concensus factor to allow boids to form it at a reasonable pace
+
+### Experimental setup (real drones)
+0.1. Build everything with `colcon build --symlink-install` and source.
+0.2. Use `cfclient` to check if you can connect with drone
+1. Modify by need `mrs_crazyfile_exp/config/crazyflies_mrs.yaml`
+2. Run nodes that interact with antenna and real drones
+```bash
+cd ~/ros2_ws/src/mrs_crazyfiles_exp/startup
+./start.sh
+```
+3. Modify launch_params.yaml by need especcialy `num_of_robots` part.
+4. Launch with one of the `_start.sh` scripts within `~/ros2_ws/src/vissus_projekt/launch` directory
