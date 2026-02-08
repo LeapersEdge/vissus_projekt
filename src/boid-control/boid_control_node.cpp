@@ -700,7 +700,7 @@ Bool_mat Boid_Controller_Node::Get_Adjancency_Matrix(std::string filepath, int n
             for (const int r : right)
             {
                 mat[left][r] = '1';
-                mat[r][left] = '1';
+                //mat[r][left] = '1';
             }
         }
     }
