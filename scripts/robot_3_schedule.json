@@ -4,41 +4,61 @@
     "graph": {},
     "nodes": [
         {
-            "start_time": 12.23606797749979,
-            "id": 3,
+            "start_time": 3.5355339059327378,
+            "id": 5,
             "task_details": {
-                "id": 3,
+                "id": 5,
                 "pos": [
-                    5.0,
-                    5.0
+                    -1.0,
+                    -1.0
                 ],
-                "duration": 15.0,
-                "robots_needed": 4,
+                "duration": 5.0,
+                "robots_needed": 1,
                 "predecessors": [],
-                "earliest_start": 8.0
+                "earliest_start": 0.0
             }
         },
         {
-            "start_time": 34.30713578936526,
-            "id": 4,
+            "start_time": 16.5,
+            "id": 7,
             "task_details": {
-                "id": 4,
+                "id": 7,
                 "pos": [
-                    10.0,
-                    10.0
+                    0.0,
+                    2.0
                 ],
-                "duration": 10.0,
-                "robots_needed": 2,
+                "duration": 15.0,
+                "robots_needed": 1,
                 "predecessors": [],
-                "earliest_start": 27.23606797749979
+                "earliest_start": 16.5
+            }
+        },
+        {
+            "start_time": 38.32842712474619,
+            "id": 9,
+            "task_details": {
+                "id": 9,
+                "pos": [
+                    0.0,
+                    0.0
+                ],
+                "duration": 15.0,
+                "robots_needed": 3,
+                "predecessors": [],
+                "earliest_start": 35.5
             }
         }
     ],
     "edges": [
         {
-            "distance": 7.0710678118654755,
-            "source": 3,
-            "target": 4
+            "distance": 3.1622776601683795,
+            "source": 5,
+            "target": 7
+        },
+        {
+            "distance": 2.0,
+            "source": 7,
+            "target": 9
         }
     ]
 }

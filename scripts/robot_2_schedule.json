@@ -4,13 +4,13 @@
     "graph": {},
     "nodes": [
         {
-            "start_time": 3.0,
-            "id": 1,
+            "start_time": 2.5,
+            "id": 4,
             "task_details": {
-                "id": 1,
+                "id": 4,
                 "pos": [
                     2.0,
-                    3.0
+                    -2.0
                 ],
                 "duration": 5.0,
                 "robots_needed": 1,
@@ -19,46 +19,66 @@
             }
         },
         {
-            "start_time": 12.23606797749979,
-            "id": 3,
+            "start_time": 11.5,
+            "id": 2,
             "task_details": {
-                "id": 3,
+                "id": 2,
                 "pos": [
-                    5.0,
-                    5.0
+                    2.0,
+                    2.0
+                ],
+                "duration": 5.0,
+                "robots_needed": 1,
+                "predecessors": [],
+                "earliest_start": 0.0
+            }
+        },
+        {
+            "start_time": 20.5,
+            "id": 8,
+            "task_details": {
+                "id": 8,
+                "pos": [
+                    2.0,
+                    2.0
                 ],
                 "duration": 15.0,
                 "robots_needed": 2,
                 "predecessors": [],
-                "earliest_start": 8.0
+                "earliest_start": 16.5
             }
         },
         {
-            "start_time": 44.30713578936526,
-            "id": 5,
+            "start_time": 38.32842712474619,
+            "id": 9,
             "task_details": {
-                "id": 5,
+                "id": 9,
                 "pos": [
                     0.0,
                     0.0
                 ],
-                "duration": 3.0,
-                "robots_needed": 1,
+                "duration": 15.0,
+                "robots_needed": 2,
                 "predecessors": [],
-                "earliest_start": 44.30713578936526
+                "earliest_start": 35.5
             }
         }
     ],
     "edges": [
         {
-            "distance": 3.605551275463989,
-            "source": 1,
-            "target": 3
+            "distance": 4.0,
+            "source": 4,
+            "target": 2
         },
         {
-            "distance": 7.0710678118654755,
-            "source": 3,
-            "target": 5
+            "distance": 0.0,
+            "source": 2,
+            "target": 8
+        },
+        {
+            "distance": 2.8284271247461903,
+            "source": 8,
+            "target": 9
         }
     ]
 }

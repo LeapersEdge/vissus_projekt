@@ -78,7 +78,7 @@ class Bidder(Node):
                 del node['task']
 
         # Write to JSON file
-        filename = f"robot_{self.robot_id}_schedule.json"
+        filename = f"robot_{self.robot_id + 1}_schedule.json"
         with open(filename, 'w') as f:
             json.dump(data, f, indent=4)
 
