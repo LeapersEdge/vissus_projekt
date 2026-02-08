@@ -4,18 +4,12 @@
     "mainwindow": {
       "keys": {
         "geometry": {
-<<<<<<< HEAD
-          "repr(QByteArray.hex)": "QtCore.QByteArray(b'01d9d0cb000300000000000000000000000002f30000023a0000000000000025000002f30000023a000000010000000006900000000000000025000002f30000023a')",
+          "repr(QByteArray.hex)": "QtCore.QByteArray(b'01d9d0cb000300000000000600000005000002fa000001fe000000060000002a000002fa000001fe00000001000000000690000000060000002a000002fa000001fe')",
           "type": "repr(QByteArray.hex)",
-          "pretty-print": "           :   %   :        %   :"
-=======
-          "repr(QByteArray.hex)": "QtCore.QByteArray(b'01d9d0cb000300000000000f0000000c00000356000004250000000f000000310000035600000425000000010000000006900000000f000000310000035600000425')",
-          "type": "repr(QByteArray.hex)",
-          "pretty-print": "         V %   1 V %        1 V %"
->>>>>>> 1232e6771bafb822401d3cfc404575d221e88cf1
+          "pretty-print": "               *            *    "
         },
         "state": {
-          "repr(QByteArray.hex)": "QtCore.QByteArray(b'000000ff00000000fd0000000100000003000002f4000001ecfc0100000003fb00000058007200710074005f007000750062006c00690073006800650072005f005f005000750062006c00690073006800650072005f005f0031005f005f005000750062006c006900730068006500720057006900640067006500740100000000000002f40000022b00fffffffb0000004c007200710074005f0074006f007000690063005f005f0054006f0070006900630050006c007500670069006e005f005f0031005f005f0054006f007000690063005700690064006700650074010000027e0000011f0000000000000000fb00000044007200710074005f00670072006100700068005f005f0052006f007300470072006100700068005f005f0031005f005f0052006f0073004700720061007000680055006901000002e1000004590000000000000000000002f40000000000000004000000040000000800000008fc00000001000000030000000100000036004d0069006e0069006d0069007a006500640044006f0063006b00570069006400670065007400730054006f006f006c0062006100720000000000ffffffff0000000000000000')",
+          "repr(QByteArray.hex)": "QtCore.QByteArray(b'000000ff00000000fd0000000100000003000002f5000001abfc0100000003fb00000058007200710074005f007000750062006c00690073006800650072005f005f005000750062006c00690073006800650072005f005f0031005f005f005000750062006c006900730068006500720057006900640067006500740100000000000002f50000022b00fffffffb0000004c007200710074005f0074006f007000690063005f005f0054006f0070006900630050006c007500670069006e005f005f0031005f005f0054006f007000690063005700690064006700650074010000027e0000011f0000000000000000fb00000044007200710074005f00670072006100700068005f005f0052006f007300470072006100700068005f005f0031005f005f0052006f0073004700720061007000680055006901000002e1000004590000000000000000000002f50000000000000004000000040000000800000008fc00000001000000030000000100000036004d0069006e0069006d0069007a006500640044006f0063006b00570069006400670065007400730054006f006f006c0062006100720000000000ffffffff0000000000000000')",
           "type": "repr(QByteArray.hex)",
           "pretty-print": "                 Xrqt_publisher__Publisher__1__PublisherWidget          Lrqt_topic__TopicPlugin__1__TopicWidget          Drqt_graph__RosGraph__1__RosGraphUi                            6MinimizedDockWidgetsToolbar        "
         }
@@ -150,11 +144,7 @@
             "plugin": {
               "keys": {
                 "publishers": {
-<<<<<<< HEAD
-                  "repr": "\"[{'topic_name': '/formation', 'type_name': 'vissus_projekt/msg/Formation', 'rate': 1.0, 'enabled': False, 'publisher_id': 0, 'counter': 0, 'expressions': {'/formation/cf1/x': '-0.5', '/formation/cf1/y': '-0.5', '/formation/cf3/x': '0.5', '/formation/cf3/y': '-0.5', '/formation/cf4/x': '1.0', '/formation/cf4/y': '1.0', '/formation/cf2/y': '0.2'}}, {'topic_name': '/tuning_params', 'type_name': 'vissus_projekt/msg/TuningParams', 'rate': 1.0, 'enabled': False, 'publisher_id': 1, 'counter': 0, 'expressions': {'/tuning_params/avoidance_factor': '1', '/tuning_params/avoidance_range': '0.5', '/tuning_params/census_factor': '0.1', '/tuning_params/goal_factor': '0.05', '/tuning_params/max_speed': '1'}}]\"",
-=======
-                  "repr": "\"[{'topic_name': '/formation', 'type_name': 'vissus_projekt/msg/Formation', 'rate': 1.0, 'enabled': False, 'publisher_id': 0, 'counter': 0, 'expressions': {'/formation/cf1/x': '-0.5', '/formation/cf1/y': '-0.5', '/formation/cf3/x': '0.5', '/formation/cf3/y': '0.5', '/formation/cf4/x': '1.0', '/formation/cf4/y': '1.0'}}, {'topic_name': '/tuning_params', 'type_name': 'vissus_projekt/msg/TuningParams', 'rate': 1.0, 'enabled': False, 'publisher_id': 1, 'counter': 0, 'expressions': {'/tuning_params/avoidance_factor': '-1', '/tuning_params/avoidance_range': '0.5', '/tuning_params/census_factor': '0.01', '/tuning_params/goal_factor': '0.05', '/tuning_params/max_speed': '1'}}]\"",
->>>>>>> 1232e6771bafb822401d3cfc404575d221e88cf1
+                  "repr": "\"[{'topic_name': '/formation', 'type_name': 'vissus_projekt/msg/Formation', 'rate': 1.0, 'enabled': False, 'publisher_id': 0, 'counter': 143, 'expressions': {'/formation/cf1/x': '-0.5', '/formation/cf1/y': '-4', '/formation/cf3/x': '-0.5', '/formation/cf3/y': '-4.5', '/formation/cf4/x': '0.5', '/formation/cf4/y': '-4.5', '/formation/cf2/y': '-4', '/formation/cf2/x': '0.5', '/formation/cf2/z': '0', '/formation/cf3/z': '0'}}, {'topic_name': '/tuning_params', 'type_name': 'vissus_projekt/msg/TuningParams', 'rate': 1.0, 'enabled': False, 'publisher_id': 1, 'counter': 142, 'expressions': {'/tuning_params/avoidance_factor': '1', '/tuning_params/avoidance_range': '0.2', '/tuning_params/census_factor': '0.5', '/tuning_params/goal_factor': '0.05', '/tuning_params/max_speed': '1'}}]\"",
                   "type": "repr"
                 }
               },
