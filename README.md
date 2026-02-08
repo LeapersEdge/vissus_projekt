@@ -56,7 +56,7 @@ Since each individual boid does not know by itself where every other boid is, we
 
 `data-splitter`, therefore, takes all boids' odometries and produces an odmetry array from them, which it sends to each individual boid. It is essentially an information center that sends each robot the information it needs to make decisions.
 
-![Graph node za primjer s 6 boida](https://github.com/LeapersEdge/vissus_projekt/blob/main/images/node_graph3.jpeg)
+![Graph node with 4 robots](https://github.com/LeapersEdge/vissus_projekt/blob/zadatak-2/images/node_graph3.jpeg)
 
 ### How to use
 
