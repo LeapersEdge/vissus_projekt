@@ -83,14 +83,14 @@ public:
 	
 	std::string filepath = "/root/ros2_ws/src/vissus_projekt/launch/topology";
 	int num_boids = 4;
-        //adjacency_mat_ = Boid_Controller_Node::Get_Adjancency_Matrix(filepath, 4);
+    adjacency_mat_ = Boid_Controller_Node::Get_Adjancency_Matrix(filepath, 4);
         //printBoolMatrix(adjacency_mat_);
-        adjacency_mat_ = {
-            {false, false, false,  false},  // Node 1 connected to 2, 3, 4
-            {true,  false, true,  true},  // Node 2 connected to 1, 3, 4
-            {true,  true,  false, true},  // Node 3 connected to 1, 2, 4
-            {true,  true,  true,  false}  // Node 4 connected to 1, 2, 3
-        };
+    //    adjacency_mat_ = {
+    //    {false, false, false,  false},  // Node 1 connected to 2, 3, 4
+    //    {true,  false, true,  true},  // Node 2 connected to 1, 3, 4
+    //    {true,  true,  false, true},  // Node 3 connected to 1, 2, 4
+    //    {true,  true,  true,  false}  // Node 4 connected to 1, 2, 3
+    //};
 	//adjacency_mat_ = LoadAdjacencyFromYaml("/root/ros2_ws/src/vissus_projekt/launch/topology.yaml");
 	
         // initialize all publishers, subscriptions and boids
@@ -279,8 +279,8 @@ void Boid_Controller_Node::Subscription_Boid_Info_Callback(const Msg_Boid_Info::
     RCUTILS_LOG_INFO("Mode is %s", mode_.c_str());
     // RCUTILS_LOG_INFO("Vel consenus goals init is (%f, %f)", vel_consensus.x, vel_consensus.y);
     
-    //vel_consensus.x = std::clamp(vel_consensus.x, -max_speed_, max_speed_);
-    //vel_consensus.y = std::clamp(vel_consensus.y, -max_speed_, max_speed_);
+    vel_consensus.x = std::clamp(vel_consensus.x, -max_speed_, max_speed_);
+    vel_consensus.y = std::clamp(vel_consensus.y, -max_speed_, max_speed_);
 
     Vector2 separation_consensus = Calculate_Avoidance(info->odometries);
 
@@ -296,7 +296,7 @@ void Boid_Controller_Node::Subscription_Boid_Info_Callback(const Msg_Boid_Info::
 	
 	bool connected = Connected(adjacency_mat_, robot_id_);
 
-	for (int i = 0; i < 4; i++){
+	for (int i = 0; i < 4; i++){    
 	    RCUTILS_LOG_INFO("robot position cf {i} is (%f, %f)", i, info->odometries[i].pose.pose.position.x, info->odometries[i].pose.pose.position.y);
 	}
 	
@@ -545,7 +545,7 @@ Vector2 Boid_Controller_Node::Calculate_Avoidance(const std::vector<Msg_Odom> od
 	    separation.x = (1. - delta_dist / avoidance_range_) * delta_pos.x / delta_pos.length_squared(); // linear repulsion 
             separation.y = (1. - delta_dist / avoidance_range_) * delta_pos.y / delta_pos.length_squared(); //
 
-            separation *= avoidance_factor_; 
+            separation *= -1.0 * avoidance_factor_; 
             separation /= delta_dist / avoidance_range_; // affect it by where it is proportional to the range at which separation starts
         
             directed_total += separation;

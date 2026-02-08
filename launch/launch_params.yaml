@@ -3,7 +3,7 @@ num_of_robots: 4            # Number of robots to spawn
 distribution: 'circle'        # One of the options from 'distribution_list'
 boid_fov: 0.20
 boid_vision_range: 10
-mode: "market"           # One of: 'rendevous', 'market', 'formation'
+mode: "formation"           # One of: 'rendevous', 'market', 'formation'
 
 distribution_list:
   circle:                   # If selected, this option will spawn 'num_of_robots'
