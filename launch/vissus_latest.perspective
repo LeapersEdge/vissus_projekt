@@ -1,0 +1,190 @@
+{
+  "keys": {},
+  "groups": {
+    "mainwindow": {
+      "keys": {
+        "geometry": {
+          "repr(QByteArray.hex)": "QtCore.QByteArray(b'01d9d0cb000300000000000f0000000c00000356000004250000000f000000310000035600000425000000010000000006900000000f000000310000035600000425')",
+          "type": "repr(QByteArray.hex)",
+          "pretty-print": "         V %   1 V %        1 V %"
+        },
+        "state": {
+          "repr(QByteArray.hex)": "QtCore.QByteArray(b'000000ff00000000fd000000010000000300000348000003cbfc0100000003fb00000058007200710074005f007000750062006c00690073006800650072005f005f005000750062006c00690073006800650072005f005f0031005f005f005000750062006c006900730068006500720057006900640067006500740100000000000003480000022b00fffffffb0000004c007200710074005f0074006f007000690063005f005f0054006f0070006900630050006c007500670069006e005f005f0031005f005f0054006f007000690063005700690064006700650074010000027e0000011f0000000000000000fb00000044007200710074005f00670072006100700068005f005f0052006f007300470072006100700068005f005f0031005f005f0052006f0073004700720061007000680055006901000002e1000004590000000000000000000003480000000000000004000000040000000800000008fc00000001000000030000000100000036004d0069006e0069006d0069007a006500640044006f0063006b00570069006400670065007400730054006f006f006c0062006100720000000000ffffffff0000000000000000')",
+          "type": "repr(QByteArray.hex)",
+          "pretty-print": "                 Xrqt_publisher__Publisher__1__PublisherWidget          Lrqt_topic__TopicPlugin__1__TopicWidget          Drqt_graph__RosGraph__1__RosGraphUi                            6MinimizedDockWidgetsToolbar        "
+        }
+      },
+      "groups": {
+        "toolbar_areas": {
+          "keys": {
+            "MinimizedDockWidgetsToolbar": {
+              "repr": "8",
+              "type": "repr"
+            }
+          },
+          "groups": {}
+        }
+      }
+    },
+    "pluginmanager": {
+      "keys": {
+        "running-plugins": {
+          "repr": "{'rqt_publisher/Publisher': [1]}",
+          "type": "repr"
+        }
+      },
+      "groups": {
+        "plugin__rqt_graph__RosGraph__1": {
+          "keys": {},
+          "groups": {
+            "dock_widget__RosGraphUi": {
+              "keys": {
+                "dock_widget_title": {
+                  "repr": "'Node Graph'",
+                  "type": "repr"
+                },
+                "dockable": {
+                  "repr": "'true'",
+                  "type": "repr"
+                },
+                "parent": {
+                  "repr": "None",
+                  "type": "repr"
+                }
+              },
+              "groups": {}
+            },
+            "plugin": {
+              "keys": {
+                "actionlib_check_box_state": {
+                  "repr": "'true'",
+                  "type": "repr"
+                },
+                "auto_fit_graph_check_box_state": {
+                  "repr": "'true'",
+                  "type": "repr"
+                },
+                "dead_sinks_check_box_state": {
+                  "repr": "'true'",
+                  "type": "repr"
+                },
+                "filter_line_edit_text": {
+                  "repr": "'/'",
+                  "type": "repr"
+                },
+                "graph_type_combo_box_index": {
+                  "repr": "'0'",
+                  "type": "repr"
+                },
+                "group_image_check_box_state": {
+                  "repr": "'true'",
+                  "type": "repr"
+                },
+                "group_tf_check_box_state": {
+                  "repr": "'true'",
+                  "type": "repr"
+                },
+                "hide_dynamic_reconfigure_check_box_state": {
+                  "repr": "'true'",
+                  "type": "repr"
+                },
+                "hide_tf_nodes_check_box_state": {
+                  "repr": "'false'",
+                  "type": "repr"
+                },
+                "highlight_connections_check_box_state": {
+                  "repr": "'true'",
+                  "type": "repr"
+                },
+                "leaf_topics_check_box_state": {
+                  "repr": "'true'",
+                  "type": "repr"
+                },
+                "namespace_cluster_spin_box_value": {
+                  "repr": "'2'",
+                  "type": "repr"
+                },
+                "quiet_check_box_state": {
+                  "repr": "'true'",
+                  "type": "repr"
+                },
+                "topic_filter_line_edit_text": {
+                  "repr": "'/'",
+                  "type": "repr"
+                },
+                "unreachable_check_box_state": {
+                  "repr": "'true'",
+                  "type": "repr"
+                }
+              },
+              "groups": {}
+            }
+          }
+        },
+        "plugin__rqt_publisher__Publisher__1": {
+          "keys": {},
+          "groups": {
+            "dock_widget__PublisherWidget": {
+              "keys": {
+                "dock_widget_title": {
+                  "repr": "'Message Publisher'",
+                  "type": "repr"
+                },
+                "dockable": {
+                  "repr": "True",
+                  "type": "repr"
+                },
+                "parent": {
+                  "repr": "None",
+                  "type": "repr"
+                }
+              },
+              "groups": {}
+            },
+            "plugin": {
+              "keys": {
+                "publishers": {
+                  "repr": "\"[{'topic_name': '/formation', 'type_name': 'vissus_projekt/msg/Formation', 'rate': 1.0, 'enabled': False, 'publisher_id': 0, 'counter': 0, 'expressions': {'/formation/cf1/x': '-0.5', '/formation/cf1/y': '-0.5', '/formation/cf3/x': '0.5', '/formation/cf3/y': '0.5', '/formation/cf4/x': '1.0', '/formation/cf4/y': '1.0'}}, {'topic_name': '/tuning_params', 'type_name': 'vissus_projekt/msg/TuningParams', 'rate': 1.0, 'enabled': False, 'publisher_id': 1, 'counter': 0, 'expressions': {'/tuning_params/avoidance_factor': '-1', '/tuning_params/avoidance_range': '0.5', '/tuning_params/census_factor': '0.01', '/tuning_params/goal_factor': '0.05', '/tuning_params/max_speed': '1'}}]\"",
+                  "type": "repr"
+                }
+              },
+              "groups": {}
+            }
+          }
+        },
+        "plugin__rqt_topic__TopicPlugin__1": {
+          "keys": {},
+          "groups": {
+            "dock_widget__TopicWidget": {
+              "keys": {
+                "dock_widget_title": {
+                  "repr": "'Topic Monitor'",
+                  "type": "repr"
+                },
+                "dockable": {
+                  "repr": "'true'",
+                  "type": "repr"
+                },
+                "parent": {
+                  "repr": "None",
+                  "type": "repr"
+                }
+              },
+              "groups": {}
+            },
+            "plugin": {
+              "keys": {
+                "tree_widget_header_state": {
+                  "repr(QByteArray.hex)": "QtCore.QByteArray(b'000000ff0000000000000001000000000000000501000000000000000000000006200000000100000005000000640000030e000000060101000100000000000000000600000064ffffffff000000810000000300000006000000b700000001000000030000016600000001000000030000006200000001000000030000002b0000000100000003000000640000000100000003000000000000000100000003000003e80000000064')",
+                  "type": "repr(QByteArray.hex)",
+                  "pretty-print": "                      d                                                            d"
+                }
+              },
+              "groups": {}
+            }
+          }
+        }
+      }
+    }
+  }
+}

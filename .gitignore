@@ -55,3 +55,6 @@ CATKIN_IGNORE
 
 # vscode stuff
 .vscode
+
+#pycharm stuff
+.idea

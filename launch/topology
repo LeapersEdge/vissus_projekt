@@ -1,0 +1,13 @@
+1: 2 3 4 
+2: 3 4 
+3: 2 4 
+4: 2 3
+
+! Exclamation mark at the start of a row marks a comment line which will not be considered during topology parsing
+! 1-indexing is used, meaning that first robot should always be 1 and not 0
+! Each line should be structured like in the first 4 lines of this file
+! The meaning of where each number sits is the following: `<left_hand_side>: <right_hand_side>`
+! ! <left_hand_side> represents the individual robot ID that is connected to all the robots on the <right_hand_side>. It should be noted that there should only be a single robot ID on <left_hand_side>
+! ! <right_hand_side> is a list of robot IDs to which the robot on <left_hand_side> is connected to. The separator for the list is space
+! The parser creates the directed node matrix, meaning that <left_hand_side> is directed to <right_hand_side> nodes, but not the other way around unless explicitly specified in other lines
+! Having multiple instances where same robot ID is referenced in <left_hand_side> on different lines is undefined behaviour, each robot ID should only have at most one line where it is in <left_hand_side>

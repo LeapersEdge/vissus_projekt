@@ -23,7 +23,11 @@
   <depend>std_msgs</depend>
   <depend>nav_msgs</depend>
   <depend>geometry_msgs</depend>
+  <depend>message_filters</depend>
+  <build_depend>crazyflie_interfaces</build_depend>
+  <exec_depend>crazyflie_interfaces</exec_depend>
 
+  
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
 

@@ -15,6 +15,8 @@ find_package(std_msgs REQUIRED)
 find_package(nav_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
+find_package(message_filters REQUIRED)
+find_package(crazyflie_interfaces)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
@@ -36,6 +38,10 @@ endif()
 rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/OdometryArray.msg"
   "msg/TuningParams.msg"
+  "msg/Formation.msg"
+  "msg/Task.msg"
+  "msg/TaskList.msg"
+  "msg/Bid.msg"
   DEPENDENCIES std_msgs nav_msgs geometry_msgs
 )
 
@@ -57,20 +63,20 @@ file(GLOB_RECURSE MY_SRC_DATA_SPLITTER CONFIGURE_DEPENDS
 
 # compile and link boid_control
 add_executable(boid_control "${MY_SRC}" "${MY_SRC_BOID_CONTROL}")
-ament_target_dependencies(boid_control rclcpp std_msgs nav_msgs geometry_msgs)
+ament_target_dependencies(boid_control rclcpp std_msgs nav_msgs geometry_msgs message_filters crazyflie_interfaces)
 rosidl_target_interfaces(boid_control
   ${PROJECT_NAME} "rosidl_typesupport_cpp")
 
 
 # compile and link goal_pub
 add_executable(goal_pub "${MY_SRC}" "${MY_SRC_GOAL_PUB}")
-ament_target_dependencies(goal_pub rclcpp std_msgs nav_msgs geometry_msgs)
+ament_target_dependencies(goal_pub rclcpp std_msgs nav_msgs geometry_msgs message_filters crazyflie_interfaces) 
 rosidl_target_interfaces(goal_pub
   ${PROJECT_NAME} "rosidl_typesupport_cpp")
 
 # compile and link data-splitter
 add_executable(data_splitter "${MY_SRC}" "${MY_SRC_DATA_SPLITTER}")
-ament_target_dependencies(data_splitter rclcpp std_msgs nav_msgs geometry_msgs)
+ament_target_dependencies(data_splitter rclcpp std_msgs nav_msgs geometry_msgs message_filters crazyflie_interfaces)
 rosidl_target_interfaces(data_splitter
   ${PROJECT_NAME} "rosidl_typesupport_cpp")
 
@@ -132,7 +138,7 @@ install(TARGETS
 
 # install py scripts
 install(PROGRAMS
-  "${MY_SCRIPTS}" 
+  ${MY_SCRIPTS} 
   DESTINATION lib/${PROJECT_NAME}
 )
 

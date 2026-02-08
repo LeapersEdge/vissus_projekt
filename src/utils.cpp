@@ -10,6 +10,11 @@ float squared_euclidan_norm(Vector2 vec)
     return vec.x * vec.x + vec.y * vec.y;
 }
 
+float euclidean_norm(Vector2 vec)
+{
+    return std::sqrt(vec.x * vec.x + vec.y * vec.y);
+}
+
 float p_controller_update(float reference, float state, float kp)
 {
     return (reference - state)*kp;
