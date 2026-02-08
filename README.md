@@ -30,6 +30,7 @@ Boid controller takes 2 parameters:
 - ID of the robot it is representing (default: 0)
 - Mode of operation / Working mode (default: "market")
 
+
 #### Messages
 - `OdometryArray`
 - `TuningParams`
