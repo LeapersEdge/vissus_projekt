@@ -36,10 +36,10 @@ Boid controller prima dva parametara:
 - `TaskList`
 
 #### Boid control
-Svaki boid koristi ROS2 topics od kojih čita/piše po sljedečim:
+Svaki boid koristi ROS2 topics od kojih čita/piše po sljedećim:
 - *Subscribers*:
   - `/adjacency_matrix` (određuje koje se robote treba ignorirat a koje ne)
-  - `/robot_<self_ID>/boid_info` (sve trenutno dostupne i potrebne informacije o okolini)
+  - `/robot_<self_ID>/boid_info` (sve trenutačno dostupne i potrebne informacije o okolini)
   - `/tuning_params` (nezavisni parametri za rad i ponašanje robota)
   - `/robot_goals` (ciljevi na koji bi robot trebao doci)
   - `/formation` (podaci o formaciji jata)
