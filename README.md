@@ -24,7 +24,7 @@ colcon build --merge-install --symlink-install --packages-select vissus_projekt
 - `boid-control`: active for each individual robot, subscribes to its own topic in which there are necessary odometry msgs for each robot in the system 
 - `data-splitter`: only one is launched and publishes all topics relevant for each robot
 - `auctioneer`: actions tasks between bidders
-- `bidder`: bid on the task (each bidder represents one robot)
+- `bidder`: bids on the task (each bidder represents one robot)
 
 Boid controller takes 2 parameters: 
 - ID of the robot it is representing (default: 0)
