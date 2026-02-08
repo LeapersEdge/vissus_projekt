@@ -22,13 +22,13 @@ colcon build --merge-install --symlink-install --packages-select vissus_projekt
 
 #### Nodes
 - `boid-control`: active for each individual robot, subscribes to its own topic in which there are neccessary odmetry msgs for each robot in the system 
-- `data-splitter`: only one i launched and publishes all topics relevant for each robot
+- `data-splitter`: only one is launched and publishes all topics relevant for each robot
 - `auctioneer`: actions tasks between bidders
 - `bidder`: bid on the task (each bidder represents one robot)
 
-Boid controller prima dva parametara: 
-- ID od robota na kojeg se *subscribe*a (default: 0)
-- način rada (default: "market")
+Boid controller takes 2 parameters: 
+- ID of the robot its subscribing and representing (default: 0)
+- working mode (default: "market")
 
 #### Messages
 - `OdometryArray`
@@ -39,53 +39,51 @@ Boid controller prima dva parametara:
 - `TaskList`
 
 #### Boid control
-Svaki boid koristi ROS2 topics od kojih čita/piše po sljedećim:
-- *Subscribers*:
-  - `/adjacency_matrix` (određuje koje se robote treba ignorirat a koje ne)
-  - `/robot_<self_ID>/boid_info` (sve trenutačno dostupne i potrebne informacije o okolini)
-  - `/tuning_params` (nezavisni parametri za rad i ponašanje robota)
-  - `/robot_goals` (ciljevi na koji bi robot trebao doci)
-  - `/formation` (podaci o formaciji jata)
-- *Publishers*:
+Every robot uses ROS2 topics of which it subscribes and publishes to the following:
+- Subscribers:
+  - `/adjacency_matrix` (determines which robots' positions should be considered when calculating movement)
+  - `/robot_<self_ID>/boid_info` (all currently available and neccessary information about robots enviroment)
+  - `/tuning_params` (state independent parameters that determine robots behaviour)
+  - `/robot_goals` (goal to which the robot is trying to get)
+  - `/formation` (information about desired formation)
+- Publishers:
   - `/cf_<self_ID>/cmd_vel` (velocity command)
 
 #### Data splitter
-Umjesto da imamo jedan node koji upravlja svima (centralizirano upravljanje), mi **radimo decentralizirano upravljanje** (svaki boid upravlja sobom).
+Instead of having one node that manages everyone (centralized management), we **do decentralized management** (each boid manages itself).
 
-Pošto svaki pojedini boid ne zna sam po sebi gdje je svaki drugi boid, koristimo `data-splitter` node, gdje će se konstruirati message **svoje odometrije**, **odometrije svakog od boida kojeg vidi**, te **closest obstacle**.
+Since each individual boid does not know by itself where every other boid is, we use a `data-splitter` node, where the message **its odometry** and **odometry of each of the boids it sees** will be constructed.
 
-`data-splitter`, dakle, uzme sve odometrije boidova i iz njih proizvede odmetry array kojeg šalje svakom pojedinačnom boidu. On je esencijalno centar informacije koji šalje svakom robotu informaciju potrebnu da napravi odluke.
+`data-splitter`, therefore, takes all boids' odometry and produces an odmetry array from them, which it sends to each individual boid. It is essentially an information center that sends each robot the information it needs to make decisions.
 
 ![Graph node za primjer s 6 boida](https://github.com/LeapersEdge/vissus_projekt/blob/main/images/node_graph.png)
 
 ### How to use
 
-Postavite graf usmjerene komunikacije drona u `launch/topology`. 
-Ovisno o tome želi li se koristiti market ili samo jednostavna verzija bez njega, koristit će se sljedeće naredbe:
+Set up the drone's directed communication graph in `launch/topology`.
+To read up on how to do that, open the `launch/topology` and read the comments at the end of the file.
 
+Depending on whether you want to use the market or just a simple version, the following commands will be used:
 Market:
 ```shell
 cd ~/ros2_ws/src/vissus_projekt/launch
 ./market_start.sh
 ```
 
-Jednostavna verzija:
+Simple version:
 ```shell
 cd ~/ros2_ws/src/vissus_projekt/launch
 ./simple_start.sh
 ```
 
-Parametre sustave morate podesiti na dva mjesta.
-Prvo u launch/launch_params.yaml morate podesiti: 
-  1. Broj boida: 
-  2. FOV boida
-  3. Njegov vidni dosed
-  4. Način rada (rendevous/market/formation)
+You need to set the system parameters in two places.
+First in launch/launch_params.yaml you need to set:
+1. Number of boids
+2. FOV of the boids
+3. Its visual range
+4. Mode of operation / Working mode ('rendevous', 'market' or 'formation')
 
-Parametre sustava namještate tako da publishate poruku tipa TuningParams msg. Mi preporučujemo rqt za to, ali možete i lagano iskoristiti ros2 topic pub.
-```shell
-rqt
-```
+You set the system parameters by publishing a message of type TuningParams msg. We recommend `rqt` for this, but you can also easily do it with `ros2 topic pub`.
 
 #### Parameters
 It is advised to modify the parameters via rqt; change the parameters in `/tuning_params`. The parameters and what they control are listed below, along with some values found to be acceptable while testing.
