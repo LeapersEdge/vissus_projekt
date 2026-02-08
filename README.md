@@ -1,7 +1,6 @@
 # vissus_projekt
 ## Project: 2nd phase
 ### Controlling a Swarm of Crazyflies using Consensus Protocol and Auction-Based Task Allocation
-### (scroll to bottom)
 
   Grupa: Gabrijel Biočić, Dino Dubinović, Quinn Lee Fletcher, Ita Poklepović, Antonio Škara.
 
